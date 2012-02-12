@@ -11,27 +11,27 @@ public class Cards {
 	private static final int FIRST_CARD = 0;
 
 	// the types of suit's card
-	private final static String HEART = "Heart";
-	private final static String DIAMOND = "Diamond";
-	private final static String CLUB = "Club";
-	private final static String SPADE = "Spade";
+	public final static String HEART = "Heart";
+	public final static String DIAMOND = "Diamond";
+	public final static String CLUB = "Club";
+	public final static String SPADE = "Spade";
 
 	// the ranks of cards
 	// the honors
-	private final static String KING = "King";
-	private final static String QUEEN = "Queen";
-	private final static String JACK = "Jack";
+	public final static String KING = "King";
+	public final static String QUEEN = "Queen";
+	public final static String JACK = "Jack";
 	// the points
-	private final static String ACE = "As";
-	private final static String TWO = "Two";
-	private final static String THREE = "Three";
-	private final static String FOUR = "Four";
-	private final static String FIVE = "Five";
-	private final static String SIX = "Six";
-	private final static String SEVEN = "Seven";
-	private final static String EIGHT = "Eight";
-	private final static String NINE = "Nine";
-	private final static String TEN = "Ten";
+	public final static String ACE = "As";
+	public final static String TWO = "Two";
+	public final static String THREE = "Three";
+	public final static String FOUR = "Four";
+	public final static String FIVE = "Five";
+	public final static String SIX = "Six";
+	public final static String SEVEN = "Seven";
+	public final static String EIGHT = "Eight";
+	public final static String NINE = "Nine";
+	public final static String TEN = "Ten";
 
 	private static final String CARDS_NUMBER_TO_MUCH = "The number of cards to flip is "
 			+ "bigger than the number of the rest cards";
