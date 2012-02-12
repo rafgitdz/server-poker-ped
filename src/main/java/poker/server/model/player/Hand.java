@@ -20,6 +20,7 @@ public class Hand {
 	private static final int ONE_PAIR = 1;
 	private static final int HIGH_CARD = 0;
 	private static final String NOT_FIVE_CARDS = "can't evaluate less than or more than five cards";
+	private static final int QUAD_SUIT_COUNT = 4;
 
 	private List<Card> currentHand;
 
@@ -67,6 +68,8 @@ public class Hand {
 
 		List<Card> tempCards = currentHand;
 
+		// if there is a Ten Card, it saves the suit et verfiy if there is a
+		// suit (JACK, QUEEN, KING, ACE) of suit's ten
 		for (Card card : tempCards) {
 
 			if (card.getValue() == Cards.TEN) {
@@ -114,37 +117,40 @@ public class Hand {
 	public boolean isStraightFlush() {
 
 		Card minCard = null;
-		int min = Cards.KING + 1;
+		int min;
 		List<Card> tempCards = currentHand;
 
-		for (Card card : currentHand) {
-			if (card.getValue() < min) {
-				minCard = card;
-				min = card.getValue();
-			}
-		}
+		// detect the less card to fix the others if they are in the suit
+		minCard = minCard();
+		min = minCard.getValue();
 		tempCards.remove(minCard);
 
-		int minSaved = 0;
-		while (tempCards.size() > 0) {
-
-			minSaved = min;
-			for (Card card : tempCards) {
-				if (card.getValue() == min + 1
-						&& card.getSuit().equals(minCard.getSuit())) {
-
-					tempCards.remove(card);
-					min = card.getValue();
-					break;
-				}
+		int count = 1;
+		for (int i = 0; i < tempCards.size(); ++i) {
+			// if the rest of cards have a value between min and min + 4,
+			// increment the count of the suited cards
+			if (tempCards.get(i).getValue() <= min + 4
+					&& tempCards.get(i).getSuit().equals(minCard.getSuit())) {
+				++count;
 			}
-			if (minSaved == min)
-				return false;
 		}
+		if (count != 5) // there isn't a suit of cards with the same suit
+			return false;
+
 		return true;
 	}
 
 	public boolean isQuads() {
+
+		List<Card> tempCards = currentHand;
+
+		// detect if for the first card, it exists a suit from the remaining
+		// cards
+		if (countSuitCards(tempCards) != QUAD_SUIT_COUNT) {
+			// if not, delete the handled cards and remade the same handling
+			if (countSuitCards(tempCards) != QUAD_SUIT_COUNT)
+				return false;
+		}
 		return true;
 	}
 
@@ -180,5 +186,32 @@ public class Hand {
 		if (card.getValue() == value && card.getSuit().equals(suit))
 			return true;
 		return false;
+	}
+
+	private Card minCard() {
+
+		int min = Cards.KING + 1;
+		Card minCard = null;
+
+		for (Card card : currentHand) {
+			if (card.getValue() < min) {
+				min = card.getValue();
+				minCard = card;
+			}
+		}
+		return minCard;
+	}
+
+	private int countSuitCards(List<Card> tempCards) {
+
+		int count = 1;
+		Card firstCard = tempCards.get(0);
+		tempCards.remove(firstCard);
+
+		for (Card card : tempCards) {
+			if (card.getValue() == firstCard.getValue())
+				++count;
+		}
+		return count;
 	}
 }

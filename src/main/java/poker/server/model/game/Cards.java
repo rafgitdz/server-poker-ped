@@ -18,9 +18,9 @@ public class Cards {
 
 	// the ranks of cards
 	// the honors
-	public final static int KING = 11;
+	public final static int KING = 13;
 	public final static int QUEEN = 12;
-	public final static int JACK = 13;
+	public final static int JACK = 11;
 	// the points
 	public final static int ACE = 1;
 	public final static int TWO = 2;

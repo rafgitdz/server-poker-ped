@@ -1,7 +1,7 @@
 package poker.server.model.player;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +28,8 @@ public class TestPlayer {
 				Cards.JACK, Cards.CLUB, Cards.TEN, Cards.CLUB, Cards.ACE,
 				Cards.CLUB);
 
-		int actual = handPlayer.evaluateHand();
-		int expected = 9;
-		assertEquals(expected, actual);
+		boolean actual = handPlayer.isRoyalFlush();
+		assertTrue(actual);
 	}
 
 	@Test
@@ -40,9 +39,8 @@ public class TestPlayer {
 				Cards.JACK, Cards.CLUB, Cards.TEN, Cards.SPADE, Cards.ACE,
 				Cards.DIAMOND);
 
-		int actual = handPlayer.evaluateHand(); // not royalFlush
-		int expected = 9; // royalFlush
-		assertNotSame(expected, actual);
+		boolean actual = handPlayer.isRoyalFlush(); // not royalFlush
+		assertFalse(actual);
 	}
 
 	@Test
@@ -52,9 +50,8 @@ public class TestPlayer {
 				Cards.QUEEN, Cards.CLUB, Cards.NINE, Cards.CLUB, Cards.EIGHT,
 				Cards.CLUB);
 
-		int actual = handPlayer.evaluateHand();
-		int expected = 8;
-		assertEquals(expected, actual);
+		boolean actual = handPlayer.isStraightFlush();
+		assertTrue(actual);
 	}
 
 	@Test
@@ -64,9 +61,30 @@ public class TestPlayer {
 				Cards.SIX, Cards.CLUB, Cards.TEN, Cards.CLUB, Cards.THREE,
 				Cards.CLUB);
 
-		int actual = handPlayer.evaluateHand();
-		int expected = 8;
-		assertNotSame(expected, actual);
+		boolean actual = handPlayer.isStraightFlush();
+		assertFalse(actual);
+	}
+
+	@Test
+	public void testTrueQuads() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.TEN,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isQuads();
+		assertTrue(actual);
+	}
+	
+	@Test
+	public void testNotQuads() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.ACE,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isQuads();
+		assertFalse(actual);
 	}
 
 	private void buildPlayerHand(int v1, String s1, int v2, String s2, int v3,
