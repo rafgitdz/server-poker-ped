@@ -1,4 +1,4 @@
-package net.poker.server.model;
+package poker.server.model;
 
 import java.util.List;
 

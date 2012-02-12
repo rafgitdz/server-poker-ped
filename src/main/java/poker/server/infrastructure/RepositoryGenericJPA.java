@@ -1,4 +1,4 @@
-package net.poker.server.infrastructure;
+package poker.server.infrastructure;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import net.poker.server.model.RepositoryGeneric;
+import poker.server.model.RepositoryGeneric;
 
 public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 
@@ -33,14 +33,6 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 	}
 
 	@Override
-	public List<T> loadAll() {		
-		@SuppressWarnings("unchecked")
-		List<T> entities = em.createQuery(
-				"from " + persistentClass.getName()).getResultList();
-		return entities;
-	}
-
-	@Override
 	public T save(T entity) {
 
 		em.persist(entity);
@@ -56,10 +48,17 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 
 		if (em.find(persistentClass, id) != null)
 			em.merge(entity);
-		else {
-			System.out.println(entity + " " + id);
+		else
 			em.persist(entity);
-		}
+
 		return entity;
+	}
+
+	@Override
+	public List<T> loadAll() {
+		@SuppressWarnings("unchecked")
+		List<T> entities = em.createQuery("from " + persistentClass.getName())
+				.getResultList();
+		return entities;
 	}
 }
