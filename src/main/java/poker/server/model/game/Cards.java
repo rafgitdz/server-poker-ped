@@ -18,20 +18,20 @@ public class Cards {
 
 	// the ranks of cards
 	// the honors
-	public final static String KING = "King";
-	public final static String QUEEN = "Queen";
-	public final static String JACK = "Jack";
+	public final static int KING = 11;
+	public final static int QUEEN = 12;
+	public final static int JACK = 13;
 	// the points
-	public final static String ACE = "As";
-	public final static String TWO = "Two";
-	public final static String THREE = "Three";
-	public final static String FOUR = "Four";
-	public final static String FIVE = "Five";
-	public final static String SIX = "Six";
-	public final static String SEVEN = "Seven";
-	public final static String EIGHT = "Eight";
-	public final static String NINE = "Nine";
-	public final static String TEN = "Ten";
+	public final static int ACE = 1;
+	public final static int TWO = 2;
+	public final static int THREE = 3;
+	public final static int FOUR = 4;
+	public final static int FIVE = 5;
+	public final static int SIX = 6;
+	public final static int SEVEN = 7;
+	public final static int EIGHT = 8;
+	public final static int NINE = 9;
+	public final static int TEN = 10;
 
 	private static final String CARDS_NUMBER_TO_MUCH = "The number of cards to flip is "
 			+ "bigger than the number of the rest cards";

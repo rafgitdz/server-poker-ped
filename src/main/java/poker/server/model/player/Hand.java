@@ -3,6 +3,7 @@ package poker.server.model.player;
 import java.util.ArrayList;
 import java.util.List;
 
+import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Card;
 import poker.server.model.game.Cards;
 
@@ -18,6 +19,7 @@ public class Hand {
 	private static final int TWO_PAIR = 2;
 	private static final int ONE_PAIR = 1;
 	private static final int HIGH_CARD = 0;
+	private static final String NOT_FIVE_CARDS = "can't evaluate less than or more than five cards";
 
 	private List<Card> currentHand;
 
@@ -35,6 +37,9 @@ public class Hand {
 	}
 
 	public int evaluateHand() {
+
+		if (currentHand.size() != 5)
+			throw new PlayerException(NOT_FIVE_CARDS);
 
 		if (isRoyalFlush())
 			return ROYAL_FLUSH;
@@ -64,30 +69,25 @@ public class Hand {
 
 		for (Card card : tempCards) {
 
-			if (card.getValue().equals(Cards.TEN)) {
+			if (card.getValue() == Cards.TEN) {
 				String suit = card.getSuit();
 				tempCards.remove(card);
 
-				for (Card card2 : tempCards) {
-					if (card2.getValue().equals(Cards.JACK)
-							&& card2.getSuit().equals(suit)) {
+				for (Card cardJack : tempCards) {
+					if (isCardInSuit(cardJack, Cards.JACK, suit)) {
 
-						tempCards.remove(card2);
-						for (Card card3 : tempCards) {
-							if (card3.getValue().equals(Cards.QUEEN)
-									&& card3.getSuit().equals(suit)) {
+						tempCards.remove(cardJack);
+						for (Card cardQueen : tempCards) {
+							if (isCardInSuit(cardQueen, Cards.QUEEN, suit)) {
 
-								tempCards.remove(card3);
-								for (Card card4 : tempCards) {
-									if (card4.getValue().equals(Cards.KING)
-											&& card4.getSuit().equals(suit)) {
+								tempCards.remove(cardQueen);
+								for (Card cardKing : tempCards) {
+									if (isCardInSuit(cardKing, Cards.KING, suit)) {
 
-										tempCards.remove(card4);
-										for (Card card5 : tempCards) {
-											if (card5.getValue().equals(
-													Cards.ACE)
-													&& card5.getSuit().equals(
-															suit)) {
+										tempCards.remove(cardKing);
+										for (Card cardAce : tempCards) {
+											if (isCardInSuit(cardAce,
+													Cards.ACE, suit)) {
 												return true;
 											}
 										}
@@ -112,6 +112,35 @@ public class Hand {
 	}
 
 	public boolean isStraightFlush() {
+
+		Card minCard = null;
+		int min = Cards.KING + 1;
+		List<Card> tempCards = currentHand;
+
+		for (Card card : currentHand) {
+			if (card.getValue() < min) {
+				minCard = card;
+				min = card.getValue();
+			}
+		}
+		tempCards.remove(minCard);
+
+		int minSaved = 0;
+		while (tempCards.size() > 0) {
+
+			minSaved = min;
+			for (Card card : tempCards) {
+				if (card.getValue() == min + 1
+						&& card.getSuit().equals(minCard.getSuit())) {
+
+					tempCards.remove(card);
+					min = card.getValue();
+					break;
+				}
+			}
+			if (minSaved == min)
+				return false;
+		}
 		return true;
 	}
 
@@ -145,5 +174,11 @@ public class Hand {
 
 	private Card highCard() {
 		return null;
+	}
+
+	private boolean isCardInSuit(Card card, int value, String suit) {
+		if (card.getValue() == value && card.getSuit().equals(suit))
+			return true;
+		return false;
 	}
 }

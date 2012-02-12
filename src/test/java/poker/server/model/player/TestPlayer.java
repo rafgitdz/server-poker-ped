@@ -24,13 +24,9 @@ public class TestPlayer {
 	@Test
 	public void testTrueRoyalFlushHand() {
 
-		List<Card> flop = new ArrayList<Card>();
-		flop.add(new Card(Cards.KING, Cards.CLUB));
-		flop.add(new Card(Cards.QUEEN, Cards.CLUB));
-		flop.add(new Card(Cards.JACK, Cards.CLUB));
-		handPlayer.addCards(flop);
-		handPlayer.addCard(new Card(Cards.TEN, Cards.CLUB)); // tournant
-		handPlayer.addCard(new Card(Cards.ACE, Cards.CLUB)); // river
+		buildPlayerHand(Cards.KING, Cards.CLUB, Cards.QUEEN, Cards.CLUB,
+				Cards.JACK, Cards.CLUB, Cards.TEN, Cards.CLUB, Cards.ACE,
+				Cards.CLUB);
 
 		int actual = handPlayer.evaluateHand();
 		int expected = 9;
@@ -40,16 +36,48 @@ public class TestPlayer {
 	@Test
 	public void testNotRoyalFlushHand() {
 
-		List<Card> flop = new ArrayList<Card>();
-		flop.add(new Card(Cards.TWO, Cards.CLUB));
-		flop.add(new Card(Cards.FOUR, Cards.SPADE));
-		flop.add(new Card(Cards.FIVE, Cards.CLUB));
-		handPlayer.addCards(flop);
-		handPlayer.addCard(new Card(Cards.NINE, Cards.HEART)); // tournant
-		handPlayer.addCard(new Card(Cards.SEVEN, Cards.CLUB)); // river
+		buildPlayerHand(Cards.KING, Cards.HEART, Cards.QUEEN, Cards.CLUB,
+				Cards.JACK, Cards.CLUB, Cards.TEN, Cards.SPADE, Cards.ACE,
+				Cards.DIAMOND);
 
 		int actual = handPlayer.evaluateHand(); // not royalFlush
 		int expected = 9; // royalFlush
 		assertNotSame(expected, actual);
+	}
+
+	@Test
+	public void testTrueStraightFlush() {
+
+		buildPlayerHand(Cards.TEN, Cards.CLUB, Cards.JACK, Cards.CLUB,
+				Cards.QUEEN, Cards.CLUB, Cards.NINE, Cards.CLUB, Cards.EIGHT,
+				Cards.CLUB);
+
+		int actual = handPlayer.evaluateHand();
+		int expected = 8;
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testNotStraightFlush() {
+
+		buildPlayerHand(Cards.TWO, Cards.CLUB, Cards.FOUR, Cards.CLUB,
+				Cards.SIX, Cards.CLUB, Cards.TEN, Cards.CLUB, Cards.THREE,
+				Cards.CLUB);
+
+		int actual = handPlayer.evaluateHand();
+		int expected = 8;
+		assertNotSame(expected, actual);
+	}
+
+	private void buildPlayerHand(int v1, String s1, int v2, String s2, int v3,
+			String s3, int v4, String s4, int v5, String s5) {
+
+		List<Card> flop = new ArrayList<Card>();
+		flop.add(new Card(v1, s1));
+		flop.add(new Card(v2, s2));
+		flop.add(new Card(v3, s3));
+		handPlayer.addCards(flop);
+		handPlayer.addCard(new Card(v4, s4)); // tournant
+		handPlayer.addCard(new Card(v5, s5)); // river
 	}
 }

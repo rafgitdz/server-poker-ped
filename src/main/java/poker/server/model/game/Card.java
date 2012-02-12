@@ -2,15 +2,15 @@ package poker.server.model.game;
 
 public class Card {
 
-	private String value;
+	private int value;
 	private String suit;
 
-	public Card(String valueCard, String suitCard) {
+	public Card(int valueCard, String suitCard) {
 		value = valueCard;
 		suit = suitCard;
 	}
 
-	public String getValue() {
+	public int getValue() {
 		return value;
 	}
 
