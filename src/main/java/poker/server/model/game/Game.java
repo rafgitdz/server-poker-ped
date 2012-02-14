@@ -31,8 +31,8 @@ public class Game {
 	
 	
 	// CONSTRUCTOR
-	public Game(Parameters param) {
-		this.gameType = new SitAndGo();
+	public Game(Parameters gameType) {
+		this.gameType = gameType;
 		this.gameType.Init();
 	}
 	
