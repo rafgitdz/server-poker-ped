@@ -20,9 +20,6 @@ public abstract class Parameters {
 	protected int speakTime = 0;
 	
 	
-	public abstract void Init();
-	
-	
 	public void setPotSplit(ArrayList<Integer> percents) {
 		
 		ArrayList<Integer> finalSplit = new ArrayList<Integer>();

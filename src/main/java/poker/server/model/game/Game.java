@@ -31,9 +31,10 @@ public class Game {
 	
 	
 	// CONSTRUCTOR
+	public Game() { }
+	
 	public Game(Parameters gameType) {
 		this.gameType = gameType;
-		this.gameType.Init();
 	}
 	
 	// GETTERS / SETTERS

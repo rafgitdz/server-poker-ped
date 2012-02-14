@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 public class SitAndGo extends Parameters {
 	
-	public SitAndGo () { }
-	
-	public void Init() {
+	public SitAndGo () {
 		
 		this.playerNumber = 6;
 		this.speakTime = 30;
