@@ -20,7 +20,7 @@ public abstract class Parameters {
 	protected int speakTime = 0;
 	
 	
-	public void setPotSplit(ArrayList<Integer> percents) {
+	protected void setPotSplit(ArrayList<Integer> percents) {
 		
 		ArrayList<Integer> finalSplit = new ArrayList<Integer>();
 		int sum = 0;
@@ -42,6 +42,21 @@ public abstract class Parameters {
 		this.potSplit = finalSplit;
 	}
 	
+	protected void setPotAsCash() {
+		this.potType = CASH;
+	}
+	
+	protected void setPotAsToken() {
+		this.potType = TOKEN;
+	}
+	
+	protected void setBlinds(int smallBlind, int multFactor) {
+		this.smallBlind = smallBlind;
+		this.bigBlind = smallBlind * multFactor;
+	}
+	
+	
+	
 	public ArrayList<Integer> getPotSplit() {
 		return this.potSplit;
 	}
@@ -58,25 +73,12 @@ public abstract class Parameters {
 		return this.potType == TOKEN;
 	}
 	
-	public void setPotAsCash() {
-		this.potType = CASH;
-	}
-	
-	public void setPotAsToken() {
-		this.potType = TOKEN;
-	}
-	
 	public int getBuyIn() {
 		return this.buyIn;
 	}
 	
 	public int getBuyInIncreasing() {
 		return this.buyInIncreasing;
-	}
-	
-	public void setBlinds(int smallBlind, int multFactor) {
-		this.smallBlind = smallBlind;
-		this.bigBlind = smallBlind * multFactor;
 	}
 	
 	public int getBigBlind() {

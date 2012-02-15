@@ -2,6 +2,7 @@ package poker.server.model.game;
 
 import java.util.ArrayList;
 
+import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.model.player.Player;
 import poker.server.parameters.Parameters;
 import poker.server.parameters.SitAndGo;
@@ -21,8 +22,8 @@ public class Game {
 	private int bigBlind = 0;
 	private int smallBlind = 0;
 	
-	private int totalPot = 0;
-	private int roundPot = 0;
+	private int pot = 0;
+	private int bet = 0;
 	
 	private int currentRound = 1;
 	public static final int FLOP = 1;
@@ -70,12 +71,12 @@ public class Game {
 		return this.smallBlind;
 	}
 	
-	public int getTotalPot() {
-		return this.totalPot;
+	public int getPot() {
+		return this.pot;
 	}
 	
-	public int getRoundPot() {
-		return this.roundPot;
+	public int getBet() {
+		return this.bet;
 	}
 	
 	public int getCurrentRound() {
@@ -90,65 +91,115 @@ public class Game {
 	
 	// PLAYER MANAGEMENT
 	public void addPlayer(String name) {
-		System.out.println("addPlayer(String name) : TODO");
+		
+		RepositoryGenericJPA<Player, String> playerRepositoryJPA = new RepositoryGenericJPA<Player, String>();
+		Player player = playerRepositoryJPA.load(name);
+		
+		if (player.isPresent()) {
+			this.players.add(player);
+		}
 	}
 	
 	public void removePlayer(String name) {
-		System.out.println("removePlayer(String name) : TODO");
+	
+		RepositoryGenericJPA<Player, String> playerRepositoryJPA = new RepositoryGenericJPA<Player, String>();
+		Player player = playerRepositoryJPA.load(name);
+		
+		this.players.remove(player);
 	}
 	
-	public void removePlayer() {
-		System.out.println("removePlayer() : TODO");
+	public void nextPlayer() {
+		
+		if (this.currentPlayer == (this.players.size()-1)) {
+			this.currentPlayer = 0;
+		} else {
+			this.currentPlayer++;
+		}	
+	}
+	
+	public void setDealer() {
+		
+		if (this.dealer == (this.players.size()-1)) {
+			this.dealer = 0;
+		} else {
+			this.dealer++;
+		}
 	}
 	
 	public void setBigBlind() {
-		System.out.println("setBigBlind() : TODO");
+		
+		if (this.bigBlind == (this.players.size()-1)) {
+			this.bigBlind = 0;
+		} else {
+			this.bigBlind++;
+		}
 	}
 	
 	public void setSmallBlind() {
-		System.out.println("setSmallBlind() : TODO");
+		
+		if (this.bigBlind == (this.players.size()-1)) {
+			this.bigBlind = 0;
+		} else {
+			this.bigBlind++;
+		}
 	}
 	
 	
 	// ROUND MANAGEMENT
-	public void nextPlayer() {
-		System.out.println("nextPlayer() : TODO");
-	}
-	
-	public void burnCard() {
-		System.out.println("burnCard() : TODO");
-	}
-	
 	public void flop() {
-		System.out.println("flop() : TODO");
+		
+		this.deck.burnCard();
+		
+		for (int i = 0; i < 3; i++) {
+			Card card = this.deck.getNextCard();
+			this.flippedCards.add(card);
+		}
+		
 	}
 	
 	public void tournant() {
-		System.out.println("tournant() : TODO");
+		
+		this.deck.burnCard();
+		Card card = this.deck.getNextCard();
+		this.flippedCards.add(card);
 	}
 	
 	public void river() {
-		System.out.println("river() : TODO");
+		
+		this.deck.burnCard();
+		Card card = this.deck.getNextCard();
+		this.flippedCards.add(card);
 	}
 	
 	
 	// BLIND / POT MANAGEMENT	
 	public void updateBlind() {
-		System.out.println("updateBlind() : TODO");
+		int blindMultFactor = this.gameType.getBuyInIncreasing();
+		this.smallBlind = this.smallBlind * blindMultFactor;
+		this.bigBlind = this.bigBlind * blindMultFactor;
 	}
 	
-	public void updatePot(Player player, int raise) {
-		System.out.println("updatePot(Player player, int raise) : TODO");
+	public void updateBet(Player player, int raise) {
+		this.bet += raise;
+		int playerIndex = this.players.indexOf(player);
+		this.players.get(playerIndex).currentBet -= raise;
 	}
 	
-	public void updateRoundPot() {
-		System.out.println("updateRoundPot() : TODO");
+	public void updatePot() {
+		this.pot += this.bet;
+		this.bet = 0;
 	}
 	
 	
 	// OTHER
 	public void dealCards() {
-		System.out.println("dealCards() : TODO");
+		Card card;
+		for (int i = 0; i < 2; i++) {
+			for (Player player : this.players) {
+				card = this.deck.getNextCard();
+				player.currentHand.addCard(card);
+			}
+		}
 	}
 
 	public void start() {

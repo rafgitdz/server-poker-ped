@@ -57,6 +57,21 @@ public class Cards {
 		}
 	}
 
+	public Card getNextCard() {
+		
+		int lastCardIndex = this.cards.size()-1;
+		Card card = this.cards.get(lastCardIndex);
+		this.cards.remove(card);
+		
+		return card;
+	}
+	
+	public void burnCard() {
+		
+		Card card = this.getNextCard();
+		this.cards.add(0, card);
+	}
+	
 	public List<Card> getRandomCards(int cardsNumber) {
 
 		if (cardsNumber > cards.size())
