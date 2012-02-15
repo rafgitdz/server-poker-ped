@@ -13,6 +13,7 @@ public abstract class Parameters {
 	protected int buyIn = 0;
 	protected int buyInIncreasing = 0;
 	
+	protected int multFactor = 2; // between smallBlind -> bigBlind AND Call -> Raise  
 	protected int bigBlind = 0;
 	protected int smallBlind = 0;
 	
@@ -50,9 +51,9 @@ public abstract class Parameters {
 		this.potType = TOKEN;
 	}
 	
-	protected void setBlinds(int smallBlind, int multFactor) {
+	protected void setBlinds(int smallBlind) {
 		this.smallBlind = smallBlind;
-		this.bigBlind = smallBlind * multFactor;
+		this.bigBlind = smallBlind * this.multFactor;
 	}
 	
 	
@@ -79,6 +80,10 @@ public abstract class Parameters {
 	
 	public int getBuyInIncreasing() {
 		return this.buyInIncreasing;
+	}
+	
+	public int getMultFactor() {
+		return this.multFactor;
 	}
 	
 	public int getBigBlind() {

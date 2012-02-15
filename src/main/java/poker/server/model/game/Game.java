@@ -23,6 +23,7 @@ public class Game {
 	private int smallBlind = 0;
 	
 	private int pot = 0;
+	private int bets = 0;
 	private int bet = 0;
 	
 	private int currentRound = 1;
@@ -73,6 +74,10 @@ public class Game {
 	
 	public int getPot() {
 		return this.pot;
+	}
+	
+	public int getBets() {
+		return this.bets;
 	}
 	
 	public int getBet() {
@@ -146,48 +151,67 @@ public class Game {
 	
 	
 	// ROUND MANAGEMENT
+	public void flipCard() {
+		Card card = this.deck.getNextCard();
+		this.flippedCards.add(card);
+	}
+	
 	public void flop() {
 		
 		this.deck.burnCard();
 		
 		for (int i = 0; i < 3; i++) {
-			Card card = this.deck.getNextCard();
-			this.flippedCards.add(card);
+			this.flipCard();
 		}
+		
+		this.updatePot();
+		this.resetBet();
 		
 	}
 	
 	public void tournant() {
 		
 		this.deck.burnCard();
-		Card card = this.deck.getNextCard();
-		this.flippedCards.add(card);
+		this.flipCard();
+		this.updatePot();
+		this.resetBet();
 	}
 	
 	public void river() {
 		
 		this.deck.burnCard();
-		Card card = this.deck.getNextCard();
-		this.flippedCards.add(card);
+		this.flipCard();
+		this.updatePot();
+		this.resetBet();
 	}
 	
 	
-	// BLIND / POT MANAGEMENT	
+	// BLIND / BET / POT MANAGEMENT	
 	public void updateBlind() {
 		int blindMultFactor = this.gameType.getBuyInIncreasing();
 		this.smallBlind = this.smallBlind * blindMultFactor;
 		this.bigBlind = this.bigBlind * blindMultFactor;
 	}
 	
-	public void updateBet(Player player, int raise) {
-		this.bet += raise;
-		int playerIndex = this.players.indexOf(player);
-		this.players.get(playerIndex).currentBet -= raise;
+	public void resetBet() {
+		this.bet += 0;
+		
+		for (Player player : this.players) {
+			player.currentBet = 0;
+		}
+	}
+	
+	public void updateBet(int quantity) {
+		this.bet += quantity;
+	}
+	
+	public void updateBets(int quantity) {
+		this.bets += quantity;
 	}
 	
 	public void updatePot() {
-		this.pot += this.bet;
-		this.bet = 0;
+		this.pot += this.bets;
+		this.bets = 0;
 	}
 	
 	

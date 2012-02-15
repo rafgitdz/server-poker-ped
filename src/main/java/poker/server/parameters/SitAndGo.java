@@ -11,8 +11,9 @@ public class SitAndGo extends Parameters {
 		
 		this.buyIn = 10;
 		this.buyInIncreasing = 2;
+		this.multFactor = 2;
 		
-		this.setBlinds(10, 2);
+		this.setBlinds(10);
 		this.setPotAsToken();
 		
 		ArrayList<Integer> potSplit = new ArrayList<Integer>();
