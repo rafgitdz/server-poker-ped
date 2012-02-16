@@ -28,7 +28,7 @@ public class Player implements Serializable {
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
 
-	public transient Hand currentHand;
+	public transient Hand currentHand = new Hand();
 
 	public int currentBet = 0;
 	public int currentTokens = 0;
