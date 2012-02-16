@@ -9,3 +9,4 @@ target
 *.iml
 .factorypath
 pokerserver-ds.xml
+pom.xml
