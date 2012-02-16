@@ -8,3 +8,5 @@ target
 .idea
 *.iml
 .factorypath
+pokerserver-ds.xml
+pom.xml

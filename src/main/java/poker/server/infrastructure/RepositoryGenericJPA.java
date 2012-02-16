@@ -34,7 +34,6 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 
 	@Override
 	public T save(T entity) {
-
 		em.persist(entity);
 		return entity;
 	}
