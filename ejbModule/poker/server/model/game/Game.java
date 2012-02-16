@@ -9,6 +9,7 @@ import javax.persistence.Id;
 
 import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.model.parameters.Parameters;
+import poker.server.model.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
@@ -42,6 +43,7 @@ public class Game implements Serializable {
 
 	// CONSTRUCTOR
 	public Game() {
+		this.gameType = new SitAndGo();
 	}
 
 	public Game(Parameters gameType) {

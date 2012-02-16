@@ -16,13 +16,13 @@ public class Player implements Serializable {
 	private String name;
 	private String pwd;
 
-	private boolean folded;
+	private boolean folded = false;
 
-	private int connectionStatus;
+	private int connectionStatus = 1;
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
 
-	private int role;
+	private int role = 4;
 	public final static int DEALER = 1;
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
