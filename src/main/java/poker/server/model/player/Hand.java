@@ -178,6 +178,7 @@ public class Hand {
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	private Card highCard() {
 		return null;
 	}

@@ -1,4 +1,4 @@
-package poker.server.parameters;
+package poker.server.model.parameters;
 
 import java.util.ArrayList;
 
