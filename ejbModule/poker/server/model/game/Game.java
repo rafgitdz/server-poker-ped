@@ -147,10 +147,10 @@ public class Game implements Serializable {
 
 	public void setSmallBlind() {
 
-		if (this.bigBlind == (this.players.size() - 1)) {
-			this.bigBlind = 0;
+		if (this.smallBlind == (this.players.size() - 1)) {
+			this.smallBlind = 0;
 		} else {
-			this.bigBlind++;
+			this.smallBlind++;
 		}
 	}
 

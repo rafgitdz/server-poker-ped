@@ -38,6 +38,10 @@ public class Cards {
 
 	private List<Card> cards = null;
 
+	public List<Card> getCards() {
+		return this.cards;
+	}
+	
 	protected Cards() {
 
 		cards = new ArrayList<Card>(NUMBER_CARDS);

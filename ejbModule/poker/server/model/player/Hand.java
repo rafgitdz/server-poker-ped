@@ -24,6 +24,10 @@ public class Hand {
 
 	private List<Card> currentHand;
 
+	public List<Card> getCurrentHand() {
+		return this.currentHand;
+	}
+	
 	protected Hand() {
 		currentHand = new ArrayList<Card>();
 	}
