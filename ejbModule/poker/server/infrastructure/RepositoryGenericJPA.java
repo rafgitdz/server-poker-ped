@@ -10,7 +10,7 @@ import poker.server.model.RepositoryGeneric;
 
 public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 
-	@PersistenceContext(unitName = "BowlingLeaguePU")
+	@PersistenceContext(unitName = "PokerServerPU")
 	protected EntityManager em;
 	private Class<T> persistentClass;
 
@@ -22,25 +22,10 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 	}
 
 	@Override
-	public T load(TId id) {
-		return em.find(persistentClass, id);
-	}
-
-	@Override
-	public void delete(TId id) {
-		T entity = em.find(persistentClass, id);
-		em.remove(entity);
-	}
-
-	@Override
 	public T save(T entity) {
+
 		em.persist(entity);
 		return entity;
-	}
-
-	@Override
-	public T update(T entity) {
-		return em.merge(entity);
 	}
 
 	public T save(T entity, TId id) {
@@ -51,6 +36,22 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 			em.persist(entity);
 
 		return entity;
+	}
+
+	@Override
+	public T update(T entity) {
+		return em.merge(entity);
+	}
+
+	@Override
+	public T load(TId id) {
+		return em.find(persistentClass, id);
+	}
+
+	@Override
+	public void delete(TId id) {
+		T entity = em.find(persistentClass, id);
+		em.remove(entity);
 	}
 
 	@Override

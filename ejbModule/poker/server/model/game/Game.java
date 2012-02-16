@@ -2,13 +2,13 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.model.parameters.Parameters;
-import poker.server.model.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
@@ -18,10 +18,11 @@ public class Game implements Serializable {
 
 	@Id
 	private int id = 0;
-	private Parameters gameType = new SitAndGo();
+	private transient Parameters gameType;
 
-	private Cards deck = new Cards();
-	private ArrayList<Card> flippedCards = new ArrayList<Card>();
+	private transient Cards deck = new Cards();
+
+	private transient List<Card> flippedCards = new ArrayList<Card>();
 
 	private ArrayList<Player> players = new ArrayList<Player>();
 	private int currentPlayer = 0;
@@ -54,10 +55,6 @@ public class Game implements Serializable {
 
 	public Parameters getGameType() {
 		return this.gameType;
-	}
-
-	public Cards getDeck() {
-		return this.deck;
 	}
 
 	public ArrayList<Player> getPlayers() {
@@ -96,7 +93,7 @@ public class Game implements Serializable {
 		return this.currentRound;
 	}
 
-	public ArrayList<Card> getFlipedCards() {
+	public List<Card> getFlipedCards() {
 		return this.flippedCards;
 	}
 
@@ -231,5 +228,9 @@ public class Game implements Serializable {
 
 	public void start() {
 		System.out.println("start() : TODO");
+	}
+
+	public Cards getDeck() {
+		return deck;
 	}
 }
