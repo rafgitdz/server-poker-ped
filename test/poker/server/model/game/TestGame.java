@@ -60,8 +60,8 @@ public class TestGame {
 		Player player1 = playerFactory.createUser("Rafik", "4533");
 		Player player2 = playerFactory.createUser("Lucas", "1234");
 
-		game.getPlayers().add(player1);
-		game.getPlayers().add(player2);
+		game.add(player1);
+		game.add(player2);
 
 		game.dealCards();
 

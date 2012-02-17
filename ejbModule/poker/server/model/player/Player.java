@@ -37,6 +37,7 @@ public class Player implements Serializable {
 	Player(String name, String pwd){
 		this.pwd = pwd;
 		this.name = name;
+		this.currentHand = new Hand();
 	}
 
 	// SIGN IN
