@@ -1,6 +1,5 @@
 package poker.server.model.player;
 
-import javax.ejb.Local;
 
 public interface PlayerFactoryLocal {
 

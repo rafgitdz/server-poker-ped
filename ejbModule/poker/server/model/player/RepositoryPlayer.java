@@ -1,10 +1,7 @@
 package poker.server.model.player;
 
-import javax.ejb.Remote;
+import poker.server.model.RepositoryGeneric;
 
-import poker.server.infrastructure.RepositoryGenericJPA;
-
-@Remote
-public class RepositoryPlayer extends RepositoryGenericJPA<Player, String> {
+public interface RepositoryPlayer extends RepositoryGeneric<Player, String> {
 
 }

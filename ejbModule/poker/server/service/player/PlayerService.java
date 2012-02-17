@@ -1,14 +1,12 @@
-package poker.server.service;
+package poker.server.service.player;
 
 import javax.ejb.EJB;
-import javax.ejb.Stateless;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.model.player.RepositoryPlayer;
 
-@Stateless
 public class PlayerService implements PlayerServiceRemote {
 
 	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
@@ -26,13 +24,13 @@ public class PlayerService implements PlayerServiceRemote {
 		if (repositoryPlayer.load(name) == null) {
 			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
 		}
-		
+
 		Player player = repositoryPlayer.load(name);
-		
+
 		if (player.getPwd() != pwd) {
 			throw new PlayerException(ERROR_WRONG_PWD);
 		}
-		
+
 		return player;
 	}
 

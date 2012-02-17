@@ -1,4 +1,4 @@
-package poker.server.service;
+package poker.server.service.game;
 
 import javax.ejb.EJB;
 
@@ -8,6 +8,7 @@ import poker.server.model.game.Game;
 import poker.server.model.game.RepositoryGame;
 import poker.server.model.player.Player;
 import poker.server.model.player.RepositoryPlayer;
+import poker.server.service.player.PlayerService;
 
 public class GameService implements GameServiceRemote {
 
