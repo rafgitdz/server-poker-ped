@@ -11,7 +11,7 @@ import poker.server.model.player.RepositoryPlayer;
 @Stateless
 public class PlayerService implements PlayerServiceRemote {
 
-	static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
+	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
 	private static final String ERROR_PLAYER_ALREADY_EXISTS = "The player already exists: ";
 	private static final String ERROR_WRONG_PWD = "The password is not correct";
 
@@ -43,6 +43,5 @@ public class PlayerService implements PlayerServiceRemote {
 		}
 
 		return repositoryPlayer.save(playerFactory.createUser(name, pwd));
-
 	}
 }
