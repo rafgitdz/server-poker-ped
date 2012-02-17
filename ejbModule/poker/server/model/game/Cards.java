@@ -38,6 +38,10 @@ public class Cards {
 
 	private List<Card> cards = null;
 
+	public List<Card> getCards() {
+		return this.cards;
+	}
+	
 	protected Cards() {
 
 		cards = new ArrayList<Card>(NUMBER_CARDS);
@@ -59,8 +63,7 @@ public class Cards {
 
 	public Card getNextCard() {
 		
-		int lastCardIndex = this.cards.size()-1;
-		Card card = this.cards.get(lastCardIndex);
+		Card card = this.cards.get(0);
 		this.cards.remove(card);
 		
 		return card;
@@ -69,7 +72,7 @@ public class Cards {
 	public void burnCard() {
 		
 		Card card = this.getNextCard();
-		this.cards.add(0, card);
+		this.cards.add(card);
 	}
 	
 	public List<Card> getRandomCards(int cardsNumber) {

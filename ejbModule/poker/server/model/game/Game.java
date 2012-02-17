@@ -9,6 +9,7 @@ import javax.persistence.Id;
 
 import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.model.parameters.Parameters;
+import poker.server.model.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
@@ -42,6 +43,7 @@ public class Game implements Serializable {
 
 	// CONSTRUCTOR
 	public Game() {
+		this.gameType = new SitAndGo();
 	}
 
 	public Game(Parameters gameType) {
@@ -145,10 +147,10 @@ public class Game implements Serializable {
 
 	public void setSmallBlind() {
 
-		if (this.bigBlind == (this.players.size() - 1)) {
-			this.bigBlind = 0;
+		if (this.smallBlind == (this.players.size() - 1)) {
+			this.smallBlind = 0;
 		} else {
-			this.bigBlind++;
+			this.smallBlind++;
 		}
 	}
 
@@ -195,7 +197,7 @@ public class Game implements Serializable {
 	}
 
 	public void resetBet() {
-		this.bet += 0;
+		this.bet = 0;
 
 		for (Player player : this.players) {
 			player.currentBet = 0;
