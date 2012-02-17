@@ -34,6 +34,11 @@ public class Player implements Serializable {
 	public int currentTokens = 0;
 	public int money = 0;
 
+	Player(String name, String pwd){
+		this.pwd = pwd;
+		this.name = name;
+	}
+	
 	// SIGN IN
 	public String getName() {
 		return this.name;

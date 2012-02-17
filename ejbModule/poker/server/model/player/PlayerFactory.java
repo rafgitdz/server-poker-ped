@@ -1,5 +1,7 @@
 package poker.server.model.player;
 
+import javax.ejb.Stateless;
+
 public class PlayerFactory implements PlayerFactoryLocal {
 
 	@Override

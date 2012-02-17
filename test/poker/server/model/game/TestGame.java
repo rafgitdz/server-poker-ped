@@ -58,8 +58,8 @@ public class TestGame {
 	public void testDealCards() {
 		
 		Game game = new Game();
-		Player player1 = new Player();
-		Player player2 = new Player();
+		Player player1 = new Player("J1", "null");
+		Player player2 = new Player("J2", "123");
 		
 		game.getPlayers().add(player1);
 		game.getPlayers().add(player2);

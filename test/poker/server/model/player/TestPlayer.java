@@ -1,8 +1,6 @@
 package poker.server.model.player;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,21 +10,35 @@ import org.junit.Test;
 
 import poker.server.model.game.Card;
 import poker.server.model.game.Cards;
+import poker.server.model.player.Hand;
 import poker.server.model.player.Player;
+import poker.server.model.player.PlayerFactory;
+import poker.server.service.PlayerService;
+import poker.server.service.PlayerServiceRemote;
 
 public class TestPlayer {
 
 	private Hand handPlayer;
+	private Player player;
 
+	private PlayerFactory playerFactory = new PlayerFactory();
+	private PlayerServiceRemote playerServiceRemote;
+	
 	@Before
 	public void beforeTest() {
 		handPlayer = new Hand();
-		player = new Player("Luc","1234");
-		}
+		player = playerFactory.createUser("Luc", "1234"); //new Player("Luc","1234");
+	}
 
+    @Test
+    public void createUser(){
+    	playerServiceRemote.createUser("Luc", "1234");
+    }
+    
 	@Test
-	public void testName(){
-		assertEquals("Luc",player.getName());
+	public void testName(){		
+		String name = player.getName();
+		assertEquals("Luc",name);
 	}
 		
 	@Test
