@@ -152,13 +152,13 @@ public class TestPlayer {
 		boolean actual = handPlayer.isTrips();
 		assertFalse(actual);
 	}
-	
+
 	@Test
 	public void testTrueTwoPair() {
 
 		buildPlayerHand(Cards.KING, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.EIGHT, Cards.DIAMOND, Cards.EIGHT,
-				Cards.HEART);
+				Cards.TEN, Cards.SPADE, Cards.EIGHT, Cards.DIAMOND,
+				Cards.EIGHT, Cards.HEART);
 
 		boolean actual = handPlayer.isTwoPair();
 		assertTrue(actual);
@@ -174,7 +174,7 @@ public class TestPlayer {
 		boolean actual = handPlayer.isTwoPair();
 		assertFalse(actual);
 	}
-	
+
 	@Test
 	public void testTruePair() {
 
