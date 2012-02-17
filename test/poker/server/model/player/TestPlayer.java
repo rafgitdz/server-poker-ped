@@ -1,5 +1,6 @@
 package poker.server.model.player;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import poker.server.model.game.Card;
 import poker.server.model.game.Cards;
+import poker.server.model.player.Player;
 
 public class TestPlayer {
 
@@ -19,6 +21,17 @@ public class TestPlayer {
 	@Before
 	public void beforeTest() {
 		handPlayer = new Hand();
+		player = new Player("Luc","1234");
+		}
+
+	@Test
+	public void testName(){
+		assertEquals("Luc",player.getName());
+	}
+		
+	@Test
+	public void testPwd(){
+		assertEquals("1234",player.getPwd());
 	}
 
 	@Test
