@@ -58,7 +58,7 @@ public class TestPlayer {
 	public void testNotStraightFlush() {
 
 		buildPlayerHand(Cards.TWO, Cards.CLUB, Cards.FOUR, Cards.CLUB,
-				Cards.SIX, Cards.CLUB, Cards.TEN, Cards.CLUB, Cards.THREE,
+				Cards.SIX, Cards.CLUB, Cards.FIVE, Cards.SPADE, Cards.THREE,
 				Cards.CLUB);
 
 		boolean actual = handPlayer.isStraightFlush();
@@ -75,7 +75,7 @@ public class TestPlayer {
 		boolean actual = handPlayer.isQuads();
 		assertTrue(actual);
 	}
-	
+
 	@Test
 	public void testNotQuads() {
 
@@ -84,6 +84,116 @@ public class TestPlayer {
 				Cards.CLUB);
 
 		boolean actual = handPlayer.isQuads();
+		assertFalse(actual);
+	}
+
+	@Test
+	public void testTrueFullHouse() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.EIGHT, Cards.DIAMOND, Cards.TEN,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isFullHouse();
+		assertTrue(actual);
+	}
+
+	@Test
+	public void testNotFullHouse() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.ACE,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isFullHouse();
+		assertFalse(actual);
+	}
+
+	@Test
+	public void testTrueStraight() {
+
+		buildPlayerHand(Cards.TEN, Cards.HEART, Cards.JACK, Cards.CLUB,
+				Cards.QUEEN, Cards.SPADE, Cards.ACE, Cards.DIAMOND, Cards.KING,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isStraight();
+		assertTrue(actual);
+	}
+
+	@Test
+	public void testNotStraight() {
+
+		buildPlayerHand(Cards.KING, Cards.HEART, Cards.JACK, Cards.CLUB,
+				Cards.QUEEN, Cards.SPADE, Cards.NINE, Cards.DIAMOND,
+				Cards.EIGHT, Cards.CLUB);
+
+		boolean actual = handPlayer.isStraight();
+		assertFalse(actual);
+	}
+
+	@Test
+	public void testTrueTrips() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.NINE,
+				Cards.HEART);
+
+		boolean actual = handPlayer.isTrips();
+		assertTrue(actual);
+	}
+
+	@Test
+	public void testNotTrips() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.TWO, Cards.DIAMOND, Cards.QUEEN,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isTrips();
+		assertFalse(actual);
+	}
+	
+	@Test
+	public void testTrueTwoPair() {
+
+		buildPlayerHand(Cards.KING, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.EIGHT, Cards.DIAMOND, Cards.EIGHT,
+				Cards.HEART);
+
+		boolean actual = handPlayer.isTwoPair();
+		assertTrue(actual);
+	}
+
+	@Test
+	public void testNotTwoPair() {
+
+		buildPlayerHand(Cards.NINE, Cards.CLUB, Cards.FOUR, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.KING, Cards.DIAMOND, Cards.QUEEN,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isTwoPair();
+		assertFalse(actual);
+	}
+	
+	@Test
+	public void testTruePair() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.KING, Cards.DIAMOND, Cards.NINE,
+				Cards.HEART);
+
+		boolean actual = handPlayer.isOnePair();
+		assertTrue(actual);
+	}
+
+	@Test
+	public void testNotPair() {
+
+		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.ACE, Cards.HEART,
+				Cards.TEN, Cards.SPADE, Cards.TWO, Cards.DIAMOND, Cards.QUEEN,
+				Cards.CLUB);
+
+		boolean actual = handPlayer.isOnePair();
 		assertFalse(actual);
 	}
 

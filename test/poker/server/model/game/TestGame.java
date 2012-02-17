@@ -23,7 +23,7 @@ public class TestGame {
 	@Test(expected = GameException.class)
 	public void testBigNumberRandomCards() {
 
-		assertNotNull(cards.getRandomCards(53));
+		cards.getRandomCards(53);
 	}
 
 	@Test
