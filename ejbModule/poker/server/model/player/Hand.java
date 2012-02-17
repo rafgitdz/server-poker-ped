@@ -23,10 +23,6 @@ public class Hand {
 
 	private List<Card> currentHand;
 
-	public List<Card> getCurrentHand() {
-		return this.currentHand;
-	}
-	
 	protected Hand() {
 		currentHand = new ArrayList<Card>();
 	}
@@ -239,6 +235,10 @@ public class Hand {
 		return null;
 	}
 
+	public List<Card> getCurrentHand() {
+		return this.currentHand;
+	}
+	
 	private int countSuitCards(List<Card> tempCards) {
 
 		int count = 1;
