@@ -10,10 +10,13 @@ import org.junit.Test;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.player.Player;
+import poker.server.model.player.PlayerFactory;
+import poker.server.model.player.PlayerFactoryLocal;
 
 public class TestGame {
 
 	private Cards cards;
+	private PlayerFactoryLocal playerFactory = new PlayerFactory();
 
 	@Before
 	public void beforeTest() {
@@ -50,19 +53,18 @@ public class TestGame {
 		cards.getRandomCards(1);
 	}
 
-	
 	@Test
 	public void testDealCards() {
-		
+
 		Game game = new Game();
-		Player player1 = new Player();
-		Player player2 = new Player();
-		
+		Player player1 = playerFactory.createUser("Rafik", "4533");
+		Player player2 = playerFactory.createUser("Lucas", "1234");
+
 		game.getPlayers().add(player1);
 		game.getPlayers().add(player2);
-		
+
 		game.dealCards();
-		
+
 		assertEquals(game.getDeck().getCards().size(), 48);
 		assertEquals(player1.currentHand.getCurrentHand().size(), 2);
 		assertEquals(player2.currentHand.getCurrentHand().size(), 2);

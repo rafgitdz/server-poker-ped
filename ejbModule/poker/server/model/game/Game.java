@@ -42,11 +42,11 @@ public class Game implements Serializable {
 	public static final int RIVER = 3;
 
 	// CONSTRUCTOR
-	public Game() {
+	Game() {
 		this.gameType = new SitAndGo();
 	}
 
-	public Game(Parameters gameType) {
+	Game(Parameters gameType) {
 		this.gameType = gameType;
 	}
 

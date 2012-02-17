@@ -41,9 +41,8 @@ public class Cards {
 	public List<Card> getCards() {
 		return this.cards;
 	}
-	
-	protected Cards() {
 
+	Cards() {
 		cards = new ArrayList<Card>(NUMBER_CARDS);
 		prepareCards();
 	}
@@ -62,19 +61,19 @@ public class Cards {
 	}
 
 	public Card getNextCard() {
-		
+
 		Card card = this.cards.get(0);
 		this.cards.remove(card);
-		
+
 		return card;
 	}
-	
+
 	public void burnCard() {
-		
+
 		Card card = this.getNextCard();
 		this.cards.add(card);
 	}
-	
+
 	public List<Card> getRandomCards(int cardsNumber) {
 
 		if (cardsNumber > cards.size())

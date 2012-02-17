@@ -28,11 +28,16 @@ public class Player implements Serializable {
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
 
-	public transient Hand currentHand = new Hand();
+	public transient Hand currentHand;
 
 	public int currentBet = 0;
 	public int currentTokens = 0;
 	public int money = 0;
+
+	Player(String name, String pwd) {
+		this.name = name;
+		this.pwd = pwd;
+	}
 
 	// SIGN IN
 	public String getName() {
@@ -155,5 +160,9 @@ public class Player implements Serializable {
 
 	public void getBestHand() {
 		System.out.println("getBestHand() : TODO");
+	}
+
+	public void setCurrentHand(Hand hand) {
+		this.currentHand = hand;
 	}
 }

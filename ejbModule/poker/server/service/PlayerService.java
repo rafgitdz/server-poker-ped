@@ -9,7 +9,7 @@ import poker.server.model.player.RepositoryPlayer;
 
 public class PlayerService implements PlayerServiceRemote {
 
-	private static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
+	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
 	private static final String ERROR_PLAYER_ALREADY_EXISTS = "The player already exists: ";
 
 	@EJB
@@ -31,7 +31,6 @@ public class PlayerService implements PlayerServiceRemote {
 			throw new PlayerException(ERROR_PLAYER_ALREADY_EXISTS + name);
 		}
 
-		return repositoryPlayer.save(playerFactory.newPlayer(name, pwd));
-
+		return repositoryPlayer.save(playerFactory.createUser(name, pwd));
 	}
 }

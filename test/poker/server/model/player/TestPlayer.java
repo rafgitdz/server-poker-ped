@@ -17,21 +17,22 @@ import poker.server.model.player.Player;
 public class TestPlayer {
 
 	private Hand handPlayer;
+	private Player player;
 
 	@Before
 	public void beforeTest() {
 		handPlayer = new Hand();
-		player = new Player("Luc","1234");
-		}
+		player = new Player("Luc", "1234");
+	}
 
 	@Test
-	public void testName(){
-		assertEquals("Luc",player.getName());
+	public void testName() {
+		assertEquals("Luc", player.getName());
 	}
-		
+
 	@Test
-	public void testPwd(){
-		assertEquals("1234",player.getPwd());
+	public void testPwd() {
+		assertEquals("1234", player.getPwd());
 	}
 
 	@Test
