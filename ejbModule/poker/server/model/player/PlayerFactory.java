@@ -3,6 +3,8 @@ package poker.server.model.player;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import poker.server.infrastructure.RepositoryPlayer;
+
 @Stateless
 public class PlayerFactory implements PlayerFactoryLocal {
 

@@ -3,10 +3,10 @@ package poker.server.service.player;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
-import poker.server.model.player.RepositoryPlayer;
 
 @Stateless
 public class PlayerService implements PlayerServiceRemote {
@@ -43,6 +43,17 @@ public class PlayerService implements PlayerServiceRemote {
 			throw new PlayerException(ERROR_WRONG_PWD);
 		}
 
+		return player;
+	}
+
+	@Override
+	public Player loadPlayer(String name) {
+
+		Player player = repositoryPlayer.load(name);
+
+		if (player == null) {
+			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
+		}
 		return player;
 	}
 }

@@ -2,12 +2,12 @@ package poker.server.service.game;
 
 import javax.ejb.EJB;
 
+import poker.server.infrastructure.RepositoryGame;
+import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.GameException;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
-import poker.server.model.game.RepositoryGame;
 import poker.server.model.player.Player;
-import poker.server.model.player.RepositoryPlayer;
 import poker.server.service.player.PlayerService;
 
 public class GameService implements GameServiceRemote {

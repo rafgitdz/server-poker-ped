@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.model.parameters.Parameters;
 import poker.server.model.parameters.SitAndGo;
 import poker.server.model.player.Player;
@@ -18,14 +18,15 @@ public class Game implements Serializable {
 	private static final long serialVersionUID = 2687924657560495636L;
 
 	@Id
-	private int id = 0;
+	@GeneratedValue
+	private int id;
 	private transient Parameters gameType;
 
-	private transient Cards deck = new Cards();
+	private transient Cards deck;
 
-	private transient List<Card> flippedCards = new ArrayList<Card>();
+	private transient List<Card> flippedCards;
 
-	private ArrayList<Player> players = new ArrayList<Player>();
+	private ArrayList<Player> players;
 	private int currentPlayer = 0;
 
 	private int dealer = 0;
@@ -43,11 +44,17 @@ public class Game implements Serializable {
 
 	// CONSTRUCTOR
 	Game() {
-		this.gameType = new SitAndGo();
+		gameType = new SitAndGo();
+		deck = new Cards();
+		flippedCards = new ArrayList<Card>();
+		players = new ArrayList<Player>();
 	}
 
 	Game(Parameters gameType) {
 		this.gameType = gameType;
+		deck = new Cards();
+		flippedCards = new ArrayList<Card>();
+		players = new ArrayList<Player>();
 	}
 
 	// GETTERS / SETTERS
@@ -99,24 +106,27 @@ public class Game implements Serializable {
 		return this.flippedCards;
 	}
 
-	// PLAYER MANAGEMENT
-	public void addPlayer(String name) {
+	// PLAYER MANAGEMENT (TO REMOVE)
+	// public void addPlayer(String name) {
+	//
+	// RepositoryGenericJPA<Player, String> playerRepositoryJPA = new
+	// RepositoryGenericJPA<Player, String>();
+	// Player player = playerRepositoryJPA.load(name);
+	//
+	// if (player.isPresent()) {
+	// this.players.add(player);
+	// }
+	// }
 
-		RepositoryGenericJPA<Player, String> playerRepositoryJPA = new RepositoryGenericJPA<Player, String>();
-		Player player = playerRepositoryJPA.load(name);
-
-		if (player.isPresent()) {
-			this.players.add(player);
-		}
-	}
-
-	public void removePlayer(String name) {
-
-		RepositoryGenericJPA<Player, String> playerRepositoryJPA = new RepositoryGenericJPA<Player, String>();
-		Player player = playerRepositoryJPA.load(name);
-
-		this.players.remove(player);
-	}
+	// ALSO..!
+	// public void removePlayer(String name) {
+	//
+	// RepositoryGenericJPA<Player, String> playerRepositoryJPA = new
+	// RepositoryGenericJPA<Player, String>();
+	// Player player = playerRepositoryJPA.load(name);
+	//
+	// this.players.remove(player);
+	// }
 
 	public void nextPlayer() {
 
