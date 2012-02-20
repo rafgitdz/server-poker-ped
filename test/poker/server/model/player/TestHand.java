@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import poker.server.model.game.Card;
-import poker.server.model.game.Cards;
 
 public class TestHand {
 
@@ -24,9 +23,8 @@ public class TestHand {
 	@Test
 	public void testTrueRoyalFlushHand() {
 
-		buildPlayerHand(Cards.KING, Cards.CLUB, Cards.QUEEN, Cards.CLUB,
-				Cards.JACK, Cards.CLUB, Cards.TEN, Cards.CLUB, Cards.ACE,
-				Cards.CLUB);
+		buildPlayerHand(Card.KING_CLUB, Card.QUEEN_CLUB, Card.TEN_CLUB,
+				Card.ACE_CLUB, Card.JACK_CLUB);
 
 		boolean actual = handPlayer.isRoyalFlush();
 		assertTrue(actual);
@@ -35,9 +33,8 @@ public class TestHand {
 	@Test
 	public void testNotRoyalFlushHand() {
 
-		buildPlayerHand(Cards.KING, Cards.HEART, Cards.QUEEN, Cards.CLUB,
-				Cards.JACK, Cards.CLUB, Cards.TEN, Cards.SPADE, Cards.ACE,
-				Cards.DIAMOND);
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.TEN_CLUB,
+				Card.ACE_CLUB, Card.JACK_HEART);
 
 		boolean actual = handPlayer.isRoyalFlush(); // not royalFlush
 		assertFalse(actual);
@@ -46,9 +43,8 @@ public class TestHand {
 	@Test
 	public void testTrueStraightFlush() {
 
-		buildPlayerHand(Cards.TEN, Cards.CLUB, Cards.JACK, Cards.CLUB,
-				Cards.QUEEN, Cards.CLUB, Cards.NINE, Cards.CLUB, Cards.EIGHT,
-				Cards.CLUB);
+		buildPlayerHand(Card.NINE_CLUB, Card.QUEEN_CLUB, Card.TEN_CLUB,
+				Card.EIGHT_CLUB, Card.JACK_CLUB);
 
 		boolean actual = handPlayer.isStraightFlush();
 		assertTrue(actual);
@@ -57,10 +53,9 @@ public class TestHand {
 	@Test
 	public void testNotStraightFlush() {
 
-		buildPlayerHand(Cards.TWO, Cards.CLUB, Cards.FOUR, Cards.CLUB,
-				Cards.SIX, Cards.CLUB, Cards.FIVE, Cards.SPADE, Cards.THREE,
-				Cards.CLUB);
-
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.TWO_CLUB,
+				Card.ACE_CLUB, Card.THREE_CLUB);
+		
 		boolean actual = handPlayer.isStraightFlush();
 		assertFalse(actual);
 	}
@@ -68,9 +63,8 @@ public class TestHand {
 	@Test
 	public void testTrueQuads() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.TEN,
-				Cards.CLUB);
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.KING_DIAMOND,
+				Card.KING_SPADE, Card.KING_CLUB);
 
 		boolean actual = handPlayer.isQuads();
 		assertTrue(actual);
@@ -79,9 +73,8 @@ public class TestHand {
 	@Test
 	public void testNotQuads() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.ACE,
-				Cards.CLUB);
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.KING_DIAMOND,
+				Card.KING_SPADE, Card.FOUR_HEART);
 
 		boolean actual = handPlayer.isQuads();
 		assertFalse(actual);
@@ -90,9 +83,8 @@ public class TestHand {
 	@Test
 	public void testTrueFullHouse() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.EIGHT, Cards.DIAMOND, Cards.TEN,
-				Cards.CLUB);
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.KING_DIAMOND,
+				Card.KING_SPADE, Card.QUEEN_HEART);
 
 		boolean actual = handPlayer.isFullHouse();
 		assertTrue(actual);
@@ -101,9 +93,8 @@ public class TestHand {
 	@Test
 	public void testNotFullHouse() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.ACE,
-				Cards.CLUB);
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.KING_DIAMOND,
+				Card.KING_SPADE, Card.TEN_HEART);
 
 		boolean actual = handPlayer.isFullHouse();
 		assertFalse(actual);
@@ -112,9 +103,8 @@ public class TestHand {
 	@Test
 	public void testTrueStraight() {
 
-		buildPlayerHand(Cards.TEN, Cards.HEART, Cards.JACK, Cards.CLUB,
-				Cards.QUEEN, Cards.SPADE, Cards.ACE, Cards.DIAMOND, Cards.KING,
-				Cards.CLUB);
+		buildPlayerHand(Card.QUEEN_CLUB, Card.TEN_HEART, Card.KING_DIAMOND,
+				Card.ACE_SPADE, Card.JACK_CLUB);
 
 		boolean actual = handPlayer.isStraight();
 		assertTrue(actual);
@@ -123,9 +113,8 @@ public class TestHand {
 	@Test
 	public void testNotStraight() {
 
-		buildPlayerHand(Cards.KING, Cards.HEART, Cards.JACK, Cards.CLUB,
-				Cards.QUEEN, Cards.SPADE, Cards.NINE, Cards.DIAMOND,
-				Cards.EIGHT, Cards.CLUB);
+		buildPlayerHand(Card.TWO_CLUB, Card.TEN_HEART, Card.KING_DIAMOND,
+				Card.ACE_SPADE, Card.SIX_HEART);
 
 		boolean actual = handPlayer.isStraight();
 		assertFalse(actual);
@@ -134,9 +123,8 @@ public class TestHand {
 	@Test
 	public void testTrueTrips() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.TEN, Cards.DIAMOND, Cards.NINE,
-				Cards.HEART);
+		buildPlayerHand(Card.JACK_CLUB, Card.TEN_HEART, Card.QUEEN_HEART,
+				Card.QUEEN_DIAMOND, Card.QUEEN_SPADE);
 
 		boolean actual = handPlayer.isTrips();
 		assertTrue(actual);
@@ -145,9 +133,8 @@ public class TestHand {
 	@Test
 	public void testNotTrips() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.TWO, Cards.DIAMOND, Cards.QUEEN,
-				Cards.CLUB);
+		buildPlayerHand(Card.JACK_CLUB, Card.TEN_HEART, Card.QUEEN_HEART,
+				Card.QUEEN_DIAMOND, Card.ACE_DIAMOND);
 
 		boolean actual = handPlayer.isTrips();
 		assertFalse(actual);
@@ -156,9 +143,8 @@ public class TestHand {
 	@Test
 	public void testTrueTwoPair() {
 
-		buildPlayerHand(Cards.KING, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.EIGHT, Cards.DIAMOND,
-				Cards.EIGHT, Cards.HEART);
+		buildPlayerHand(Card.TWO_CLUB, Card.THREE_HEART, Card.FOUR_CLUB,
+				Card.FOUR_DIAMOND, Card.TWO_HEART);
 
 		boolean actual = handPlayer.isTwoPair();
 		assertTrue(actual);
@@ -167,9 +153,8 @@ public class TestHand {
 	@Test
 	public void testNotTwoPair() {
 
-		buildPlayerHand(Cards.NINE, Cards.CLUB, Cards.FOUR, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.KING, Cards.DIAMOND, Cards.QUEEN,
-				Cards.CLUB);
+		buildPlayerHand(Card.TWO_CLUB, Card.THREE_HEART, Card.FOUR_CLUB,
+				Card.FOUR_DIAMOND, Card.SIX_DIAMOND);
 
 		boolean actual = handPlayer.isTwoPair();
 		assertFalse(actual);
@@ -178,9 +163,8 @@ public class TestHand {
 	@Test
 	public void testTruePair() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.TEN, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.KING, Cards.DIAMOND, Cards.NINE,
-				Cards.HEART);
+		buildPlayerHand(Card.TWO_CLUB, Card.THREE_HEART, Card.FOUR_CLUB,
+				Card.FOUR_DIAMOND, Card.SIX_DIAMOND);
 
 		boolean actual = handPlayer.isOnePair();
 		assertTrue(actual);
@@ -189,23 +173,22 @@ public class TestHand {
 	@Test
 	public void testNotPair() {
 
-		buildPlayerHand(Cards.EIGHT, Cards.CLUB, Cards.ACE, Cards.HEART,
-				Cards.TEN, Cards.SPADE, Cards.TWO, Cards.DIAMOND, Cards.QUEEN,
-				Cards.CLUB);
+		buildPlayerHand(Card.TWO_CLUB, Card.THREE_HEART, Card.FOUR_CLUB,
+				Card.KING_DIAMOND, Card.SIX_DIAMOND);
 
 		boolean actual = handPlayer.isOnePair();
 		assertFalse(actual);
 	}
 
-	private void buildPlayerHand(int v1, String s1, int v2, String s2, int v3,
-			String s3, int v4, String s4, int v5, String s5) {
+	private void buildPlayerHand(Card card1, Card card2, Card card3,
+			Card card4, Card card5) {
 
 		List<Card> flop = new ArrayList<Card>();
-		flop.add(new Card(v1, s1));
-		flop.add(new Card(v2, s2));
-		flop.add(new Card(v3, s3));
+		flop.add(card1);
+		flop.add(card2);
+		flop.add(card3);
 		handPlayer.addCards(flop);
-		handPlayer.addCard(new Card(v4, s4)); // tournant
-		handPlayer.addCard(new Card(v5, s5)); // river
+		handPlayer.addCard(card4); // tournant
+		handPlayer.addCard(card5); // river
 	}
 }

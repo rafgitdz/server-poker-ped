@@ -5,7 +5,7 @@ import java.util.List;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Card;
-import poker.server.model.game.Cards;
+import poker.server.model.game.Value;
 
 public class Hand {
 
@@ -71,15 +71,15 @@ public class Hand {
 
 		// handle the case when the Ace play the high card role
 		String suit = tempCards.get(0).getSuit();
-		if (tempCards.get(0).getValue() == Cards.ACE
+		if (tempCards.get(0).getValue() == Value.ACE
 				&& tempCards.get(0).getSuit().equals(suit)
-				&& tempCards.get(1).getValue() == Cards.TEN
+				&& tempCards.get(1).getValue() == Value.TEN
 				&& tempCards.get(1).getSuit().equals(suit)
-				&& tempCards.get(2).getValue() == Cards.JACK
+				&& tempCards.get(2).getValue() == Value.JACK
 				&& tempCards.get(2).getSuit().equals(suit)
-				&& tempCards.get(3).getValue() == Cards.QUEEN
+				&& tempCards.get(3).getValue() == Value.QUEEN
 				&& tempCards.get(3).getSuit().equals(suit)
-				&& tempCards.get(4).getValue() == Cards.KING
+				&& tempCards.get(4).getValue() == Value.KING
 				&& tempCards.get(4).getSuit().equals(suit))
 			return true;
 
@@ -170,11 +170,11 @@ public class Hand {
 		sort(tempCards); // sort list from the less value card to the greater
 
 		// handle the case when the Ace play the high card role
-		if (tempCards.get(0).getValue() == Cards.ACE) {
-			if (tempCards.get(1).getValue() == Cards.TEN
-					&& tempCards.get(2).getValue() == Cards.JACK
-					&& tempCards.get(3).getValue() == Cards.QUEEN
-					&& tempCards.get(4).getValue() == Cards.KING)
+		if (tempCards.get(0).getValue() == Value.ACE) {
+			if (tempCards.get(1).getValue() == Value.TEN
+					&& tempCards.get(2).getValue() == Value.JACK
+					&& tempCards.get(3).getValue() == Value.QUEEN
+					&& tempCards.get(4).getValue() == Value.KING)
 				return true;
 		}
 

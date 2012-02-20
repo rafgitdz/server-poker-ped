@@ -65,8 +65,16 @@ public class TestGame {
 
 		game.dealCards();
 
-		assertEquals(game.getDeck().getCards().size(), 48);
+		assertEquals(game.getDeck().getSize(), 48);
 		assertEquals(player1.currentHand.getCurrentHand().size(), 2);
 		assertEquals(player2.currentHand.getCurrentHand().size(), 2);
+	}
+
+	@Test
+	public void testCardnum() {
+
+		Card cardClub = Card.ACE_CLUB;
+		Card cardSpade = Card.ACE_SPADE;
+		assertEquals(cardClub.getValue(), cardSpade.getValue());
 	}
 }

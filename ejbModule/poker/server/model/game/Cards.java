@@ -10,37 +10,10 @@ public class Cards {
 	private static final int NUMBER_CARDS = 52;
 	private static final int FIRST_CARD = 0;
 
-	// the types of suit's card
-	public final static String HEART = "Heart";
-	public final static String DIAMOND = "Diamond";
-	public final static String CLUB = "Club";
-	public final static String SPADE = "Spade";
-
-	// the ranks of cards
-	// the honors
-	public final static int KING = 13;
-	public final static int QUEEN = 12;
-	public final static int JACK = 11;
-	// the points
-	public final static int ACE = 1;
-	public final static int TWO = 2;
-	public final static int THREE = 3;
-	public final static int FOUR = 4;
-	public final static int FIVE = 5;
-	public final static int SIX = 6;
-	public final static int SEVEN = 7;
-	public final static int EIGHT = 8;
-	public final static int NINE = 9;
-	public final static int TEN = 10;
-
 	private static final String CARDS_NUMBER_TO_MUCH = "The number of cards to flip is "
 			+ "bigger than the number of the rest cards";
 
 	private List<Card> cards = null;
-
-	public List<Card> getCards() {
-		return this.cards;
-	}
 
 	Cards() {
 		cards = new ArrayList<Card>(NUMBER_CARDS);
@@ -63,15 +36,14 @@ public class Cards {
 	public Card getNextCard() {
 
 		Card card = this.cards.get(0);
-		this.cards.remove(card);
-
+		cards.remove(card);
 		return card;
 	}
 
 	public void burnCard() {
 
-		Card card = this.getNextCard();
-		this.cards.add(card);
+		Card card = getNextCard();
+		cards.remove(card);
 	}
 
 	public List<Card> getRandomCards(int cardsNumber) {
@@ -88,75 +60,78 @@ public class Cards {
 			randomCards.add(removed);
 			cards.remove(removed);
 		}
-
 		return randomCards;
+	}
+	
+	public int getSize() {
+		return cards.size();
 	}
 
 	private void prepareCards() {
 
-		cards.add(new Card(ACE, HEART));
-		cards.add(new Card(ACE, DIAMOND));
-		cards.add(new Card(ACE, CLUB));
-		cards.add(new Card(ACE, SPADE));
+		cards.add(Card.ACE_HEART);
+		cards.add(Card.ACE_DIAMOND);
+		cards.add(Card.ACE_CLUB);
+		cards.add(Card.ACE_SPADE);
 
-		cards.add(new Card(KING, HEART));
-		cards.add(new Card(KING, DIAMOND));
-		cards.add(new Card(KING, CLUB));
-		cards.add(new Card(KING, SPADE));
+		cards.add(Card.KING_CLUB);
+		cards.add(Card.KING_DIAMOND);
+		cards.add(Card.KING_HEART);
+		cards.add(Card.KING_SPADE);
 
-		cards.add(new Card(QUEEN, HEART));
-		cards.add(new Card(QUEEN, DIAMOND));
-		cards.add(new Card(QUEEN, CLUB));
-		cards.add(new Card(QUEEN, SPADE));
+		cards.add(Card.QUEEN_CLUB);
+		cards.add(Card.QUEEN_DIAMOND);
+		cards.add(Card.QUEEN_HEART);
+		cards.add(Card.QUEEN_SPADE);
 
-		cards.add(new Card(JACK, HEART));
-		cards.add(new Card(JACK, DIAMOND));
-		cards.add(new Card(JACK, CLUB));
-		cards.add(new Card(JACK, SPADE));
+		cards.add(Card.JACK_CLUB);
+		cards.add(Card.JACK_DIAMOND);
+		cards.add(Card.JACK_HEART);
+		cards.add(Card.JACK_SPADE);
 
-		cards.add(new Card(TWO, HEART));
-		cards.add(new Card(TWO, DIAMOND));
-		cards.add(new Card(TWO, CLUB));
-		cards.add(new Card(TWO, SPADE));
+		cards.add(Card.TEN_CLUB);
+		cards.add(Card.TEN_DIAMOND);
+		cards.add(Card.TEN_HEART);
+		cards.add(Card.TEN_SPADE);
 
-		cards.add(new Card(THREE, HEART));
-		cards.add(new Card(THREE, DIAMOND));
-		cards.add(new Card(THREE, CLUB));
-		cards.add(new Card(THREE, SPADE));
+		cards.add(Card.NINE_CLUB);
+		cards.add(Card.NINE_DIAMOND);
+		cards.add(Card.NINE_HEART);
+		cards.add(Card.NINE_SPADE);
 
-		cards.add(new Card(FOUR, HEART));
-		cards.add(new Card(FOUR, DIAMOND));
-		cards.add(new Card(FOUR, CLUB));
-		cards.add(new Card(FOUR, SPADE));
+		cards.add(Card.EIGHT_CLUB);
+		cards.add(Card.EIGHT_DIAMOND);
+		cards.add(Card.EIGHT_HEART);
+		cards.add(Card.EIGHT_SPADE);
 
-		cards.add(new Card(FIVE, HEART));
-		cards.add(new Card(FIVE, DIAMOND));
-		cards.add(new Card(FIVE, CLUB));
-		cards.add(new Card(FIVE, SPADE));
+		cards.add(Card.SEVEN_CLUB);
+		cards.add(Card.SEVEN_DIAMOND);
+		cards.add(Card.SEVEN_HEART);
+		cards.add(Card.SEVEN_SPADE);
 
-		cards.add(new Card(SIX, HEART));
-		cards.add(new Card(SIX, DIAMOND));
-		cards.add(new Card(SIX, CLUB));
-		cards.add(new Card(SIX, SPADE));
+		cards.add(Card.SIX_CLUB);
+		cards.add(Card.SIX_DIAMOND);
+		cards.add(Card.SIX_HEART);
+		cards.add(Card.SIX_SPADE);
 
-		cards.add(new Card(SEVEN, HEART));
-		cards.add(new Card(SEVEN, DIAMOND));
-		cards.add(new Card(SEVEN, CLUB));
-		cards.add(new Card(SEVEN, SPADE));
+		cards.add(Card.FIVE_CLUB);
+		cards.add(Card.FIVE_DIAMOND);
+		cards.add(Card.FIVE_HEART);
+		cards.add(Card.FIVE_SPADE);
 
-		cards.add(new Card(EIGHT, HEART));
-		cards.add(new Card(EIGHT, DIAMOND));
-		cards.add(new Card(EIGHT, CLUB));
-		cards.add(new Card(EIGHT, SPADE));
+		cards.add(Card.FOUR_CLUB);
+		cards.add(Card.FOUR_DIAMOND);
+		cards.add(Card.FOUR_HEART);
+		cards.add(Card.FOUR_SPADE);
 
-		cards.add(new Card(NINE, HEART));
-		cards.add(new Card(NINE, DIAMOND));
-		cards.add(new Card(NINE, CLUB));
-		cards.add(new Card(NINE, SPADE));
+		cards.add(Card.THREE_CLUB);
+		cards.add(Card.THREE_DIAMOND);
+		cards.add(Card.THREE_HEART);
+		cards.add(Card.THREE_SPADE);
 
-		cards.add(new Card(TEN, HEART));
-		cards.add(new Card(TEN, DIAMOND));
-		cards.add(new Card(TEN, CLUB));
-		cards.add(new Card(TEN, SPADE));
+		cards.add(Card.TWO_CLUB);
+		cards.add(Card.TWO_DIAMOND);
+		cards.add(Card.TWO_HEART);
+		cards.add(Card.TWO_SPADE);
 	}
 }
