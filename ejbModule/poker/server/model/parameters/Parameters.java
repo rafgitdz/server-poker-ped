@@ -22,6 +22,9 @@ public abstract class Parameters {
 	protected int playerNumber = 0;
 	protected int speakTime = 0;
 
+	protected int timeChangeBlind = 180; // in seconds
+	protected int timePlaying = 30; // in seconds
+
 	protected void setPotSplit(List<Integer> percents) {
 
 		List<Integer> finalSplit = new ArrayList<Integer>();
