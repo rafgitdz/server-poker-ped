@@ -1,8 +1,9 @@
-package poker.server.infrastructure;
+package poker.server.model.game;
 
 import javax.ejb.Stateless;
 
-import poker.server.model.game.Game;
+import poker.server.infrastructure.RepositoryGame;
+import poker.server.infrastructure.RepositoryGenericJPA;
 
 @Stateless
 public class RepositoryGameJPA extends RepositoryGenericJPA<Game, Integer>

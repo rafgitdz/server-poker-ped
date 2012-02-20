@@ -8,8 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import poker.server.model.parameters.Parameters;
-import poker.server.model.parameters.SitAndGo;
+import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
