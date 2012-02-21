@@ -53,5 +53,4 @@ public class GameService implements GameServiceRemote {
 
 		game.getPlayers().remove(player);
 	}
-
 }

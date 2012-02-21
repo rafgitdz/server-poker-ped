@@ -53,12 +53,12 @@ public class Game implements Serializable {
 	private boolean Started;
 
 	// CONSTRUCTOR
-	Game() {
+	protected Game() {
 		gameType = new SitAndGo();
 		buildGame();
 	}
 
-	Game(Parameters gameT) {
+	protected Game(Parameters gameT) {
 		gameType = gameT;
 		buildGame();
 	}
