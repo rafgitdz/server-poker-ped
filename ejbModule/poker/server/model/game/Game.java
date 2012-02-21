@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import poker.server.model.game.card.Card;
+import poker.server.model.game.card.Cards;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
@@ -44,35 +46,31 @@ public class Game implements Serializable {
 	private int currentRound = 1;
 
 	// to be used...
-	@SuppressWarnings("unused")
-	private static final int FLOP = 1;
-	@SuppressWarnings("unused")
-	private static final int TOURNANT = 2;
-	@SuppressWarnings("unused")
-	private static final int RIVER = 3;
+	public static final int FLOP = 1;
+	public static final int TOURNANT = 2;
+	public static final int RIVER = 3;
 
 	private boolean Started;
 
 	// CONSTRUCTOR
 	Game() {
 		gameType = new SitAndGo();
-		deck = new Cards();
-		flippedCards = new ArrayList<Card>();
-		players = new ArrayList<Player>();
-		// update blinds from parameters
-		smallBlind = gameType.getSmallBlind();
-		bigBlind = gameType.getBigBlind();
-		setStarted(false);
+		buildGame();
 	}
 
 	Game(Parameters gameT) {
 		gameType = gameT;
+		buildGame();
+	}
+
+	private void buildGame() {
 		deck = new Cards();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
-		// update blinds from parameters
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
+		setStarted(false);
+		Event.buildEvents();
 	}
 
 	// GETTERS / SETTERS
@@ -138,6 +136,8 @@ public class Game implements Serializable {
 			this.dealer = 0;
 		else
 			this.dealer++;
+
+		Event.addEvent("THE DEALER IS : " + players.get(dealer).getName());
 	}
 
 	public void setBigBlind() {
@@ -146,6 +146,9 @@ public class Game implements Serializable {
 			this.bigBlindPlayer = 0;
 		else
 			this.bigBlindPlayer++;
+
+		Event.addEvent("THE BIG BLIND IS : "
+				+ players.get(bigBlindPlayer).getName());
 	}
 
 	public void setSmallBlind() {
@@ -154,46 +157,60 @@ public class Game implements Serializable {
 			smallBlindPlayer = 0;
 		else
 			smallBlindPlayer++;
+
+		Event.addEvent("THE SMALL BLIND IS : "
+				+ players.get(smallBlindPlayer).getName());
 	}
 
 	// ROUND MANAGEMENT
-	public void flipCard() {
+	public Card flipCard() {
 		Card card = deck.getNextCard();
 		flippedCards.add(card);
+		return card;
 	}
 
 	public void flop() {
 
+		String eventFlop = "FLOP : ";
+		Card card;
 		deck.burnCard();
 
 		for (int i = 0; i < 3; i++) {
-			flipCard();
+			card = flipCard();
+			eventFlop += card.getValue() + " " + card.getSuit() + " , ";
 		}
 		updatePot();
 		resetBet();
+		Event.addEvent(eventFlop);
 	}
 
 	public void tournant() {
 
 		deck.burnCard();
-		flipCard();
+		Card card = flipCard();
 		updatePot();
 		resetBet();
+		Event.addEvent("TOURNANT : " + card.getValue() + " " + card.getSuit());
 	}
 
 	public void river() {
 
 		deck.burnCard();
-		flipCard();
+		Card card = flipCard();
 		updatePot();
 		resetBet();
+		Event.addEvent("RIVER : " + card.getValue() + " " + card.getSuit());
 	}
 
 	// BLIND / BET / POT MANAGEMENT
 	public void updateBlind() {
+
 		int blindMultFactor = gameType.getBuyInIncreasing();
-		smallBlindPlayer = smallBlind * blindMultFactor;
-		bigBlindPlayer = bigBlind * blindMultFactor;
+		smallBlind = smallBlind * blindMultFactor;
+		bigBlind = bigBlind * blindMultFactor;
+
+		Event.addEvent("SMALL BLIND = " + smallBlind + " , BIG BLIND = "
+				+ bigBlind);
 	}
 
 	public void resetBet() {
@@ -202,23 +219,28 @@ public class Game implements Serializable {
 		for (Player player : this.players) {
 			player.currentBet = 0;
 		}
+		Event.addEvent("RESET BET");
 	}
 
 	public void updateBet(int quantity) {
 		bet += quantity;
+		Event.addEvent("BET = " + bet);
 	}
 
 	public void updateBets(int quantity) {
 		bets += quantity;
+		Event.addEvent("BETS = " + bets);
 	}
 
 	public void updatePot() {
 		pot += bets;
 		bets = 0;
+		Event.addEvent("UPDATE POT, POT = " + pot);
 	}
 
 	// OTHER
 	public void dealCards() {
+
 		Card card;
 		for (int i = 0; i < 2; i++) {
 			for (Player player : players) {
@@ -226,10 +248,12 @@ public class Game implements Serializable {
 				player.currentHand.addCard(card);
 			}
 		}
+		Event.addEvent("DEAL CARDS FOR PLAYERS");
 	}
 
 	public void start() {
 		System.out.println("start() : TODO");
+		Event.addEvent("START GAME");
 	}
 
 	public Cards getDeck() {

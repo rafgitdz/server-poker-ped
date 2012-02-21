@@ -1,68 +1,65 @@
-package poker.server.model.game;
+package poker.server.model.game.card;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import poker.server.model.exception.GameException;
+import poker.server.model.game.Event;
 
 public class Cards {
 
 	private static final int NUMBER_CARDS = 52;
-	private static final int FIRST_CARD = 0;
-
-	private static final String CARDS_NUMBER_TO_MUCH = "The number of cards to flip is "
-			+ "bigger than the number of the rest cards";
+	private static final String NO_CARDS = "there isn't a cards on table !";
 
 	private List<Card> cards = null;
 
-	Cards() {
+	public Cards() {
 		cards = new ArrayList<Card>(NUMBER_CARDS);
 		prepareCards();
 	}
 
-	public void shuffle() {
+	public Card getNextCard() {
 
-		int sizeCards = cards.size() - 1;
+		if (cards.size() == 0)
+			throw new GameException(NO_CARDS);
+
+		shuffle();
+		Card card = this.cards.get(0);
+		cards.remove(card);
+		return card;
+	}
+
+	public Card burnCard() {
+
+		if (cards.size() == 0)
+			throw new GameException(NO_CARDS);
+
+		Card card = getNextCard();
+		cards.remove(card);
+		Event.addEvent("THE BURNED CARD : " + card.getValue() + " , "
+				+ card.getSuit());
+		return card;
+	}
+
+	// based on permutation between 0 and n-1, 1 and n-2,...
+	protected void shuffle() {
+
+		if (cards.size() == 0)
+			throw new GameException(NO_CARDS);
+
 		Card temp = null;
 		int limit = cards.size() / 2;
+		int sizeCards = cards.size() - 1;
 
 		for (int i = 0; i < limit; ++i, --sizeCards) {
 			temp = cards.get(i);
 			cards.set(i, cards.get(sizeCards));
 			cards.set(sizeCards, temp);
 		}
+
+		Event.addEvent("THE DECK IS SHUFFLED");
 	}
 
-	public Card getNextCard() {
-
-		Card card = this.cards.get(0);
-		cards.remove(card);
-		return card;
-	}
-
-	public void burnCard() {
-
-		Card card = getNextCard();
-		cards.remove(card);
-	}
-
-	public List<Card> getRandomCards(int cardsNumber) {
-
-		if (cardsNumber > cards.size())
-			throw new GameException(CARDS_NUMBER_TO_MUCH);
-
-		List<Card> randomCards = new ArrayList<Card>();
-		Card removed = null;
-
-		shuffle();
-		for (int i = 0; i < cardsNumber; ++i) {
-			removed = cards.get(FIRST_CARD);
-			randomCards.add(removed);
-			cards.remove(removed);
-		}
-		return randomCards;
-	}
-	
 	public int getSize() {
 		return cards.size();
 	}

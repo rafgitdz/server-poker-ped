@@ -1,4 +1,4 @@
-package poker.server.model.game;
+package poker.server.model.game.card;
 
 public enum Card {
 

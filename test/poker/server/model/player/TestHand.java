@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import poker.server.model.game.Card;
+import poker.server.model.game.card.Card;
 
 public class TestHand {
 
