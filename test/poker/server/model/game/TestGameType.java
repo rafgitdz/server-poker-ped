@@ -33,12 +33,13 @@ public class TestGameType extends Parameters {
 		this.speakTime = speakTime;
 	}
 	
-	public TestGameType(int buyIn, int buyInIncreasing, int multFactor) {
+	public TestGameType(int buyIn, int buyInIncreasing, int multFactor, int smallBlind) {
 		
 		this.setDefaultParams();
 		this.buyIn = buyIn;
 		this.buyInIncreasing = buyInIncreasing;
 		this.multFactor = multFactor;
+		this.setBlinds(smallBlind);
 	}
 	
 	public TestGameType(List<Integer> potSplit) {
