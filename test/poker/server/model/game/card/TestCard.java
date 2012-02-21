@@ -10,23 +10,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import poker.server.model.exception.GameException;
-import poker.server.model.game.Game;
 import poker.server.model.game.GameFactory;
 import poker.server.model.game.GameFactoryLocal;
-import poker.server.model.player.Player;
-import poker.server.model.player.PlayerFactory;
-import poker.server.model.player.PlayerFactoryLocal;
 
 public class TestCard {
 
 	private Cards cards;
-	private PlayerFactoryLocal playerFactory = new PlayerFactory();
 	private GameFactoryLocal gameFactory = new GameFactory();
 
 	@Before
 	public void beforeTest() {
 		cards = new Cards();
-		gameFactory.newGame();
+		gameFactory.newGame(); // to activate events only
 	}
 
 	// the method "shuffle" is in getRandomCards...
@@ -59,6 +54,21 @@ public class TestCard {
 	}
 
 	@Test
+	public void testBurnedCard() {
+		cards.burnCard();
+		int expected = 51;
+		assertEquals(expected, cards.getSize());
+	}
+
+	@Test(expected = GameException.class)
+	public void testBurnedCardWithException() {
+
+		for (int i = 0; i < 52; ++i)
+			cards.burnCard();
+		cards.burnCard();
+	}
+
+	@Test
 	public void testFlopTournantRiver() {
 
 		List<Card> hand = new ArrayList<Card>();
@@ -70,23 +80,6 @@ public class TestCard {
 
 		int expected = 5;
 		assertEquals(expected, hand.size());
-	}
-
-	@Test
-	public void testDealCards() {
-
-		Game game = gameFactory.newGame();
-		Player player1 = playerFactory.createUser("Rafik", "4533");
-		Player player2 = playerFactory.createUser("Lucas", "1234");
-
-		game.add(player1);
-		game.add(player2);
-
-		game.dealCards();
-
-		assertEquals(game.getDeck().getSize(), 48);
-		assertEquals(player1.currentHand.getCurrentHand().size(), 2);
-		assertEquals(player2.currentHand.getCurrentHand().size(), 2);
 	}
 
 	@Test

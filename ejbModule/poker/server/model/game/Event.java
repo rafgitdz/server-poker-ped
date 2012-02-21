@@ -19,4 +19,8 @@ public class Event {
 			throw new GameException(NO_EVENTS_INSTANCE);
 		allEvents.add(event);
 	}
+
+	public static List<String> getEvents() {
+		return allEvents;
+	}
 }

@@ -2,6 +2,9 @@ package poker.server.model.game;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +25,11 @@ public class TestGame {
 
 	@Test
 	public void testEvent() {
-		Event.addEvent("Rafik folds");
+
+		game.dealCards();
+		List<String> events = new ArrayList<String>();
+		events.add("DEAL CARDS FOR PLAYERS");
+		assertEquals(events, Event.getEvents());
 	}
 
 	public void testDealCards() {
@@ -37,11 +44,12 @@ public class TestGame {
 		game.dealCards();
 
 		assertEquals(game.getDeck().getSize(), 48);
-		assertEquals(player1.currentHand.getCurrentHand().size(), 2);
-		assertEquals(player2.currentHand.getCurrentHand().size(), 2);
+		assertEquals(player1.getCurrentHand().getSize(), 2);
+		assertEquals(player2.getCurrentHand().getSize(), 2);
 	}
 
 	@Test
+	// the burnCard test is included in this test
 	public void testRoundsGame() {
 
 		game.flop();

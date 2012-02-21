@@ -265,4 +265,8 @@ public class Hand {
 			}
 		}
 	}
+
+	public int getSize() {
+		return currentHand.size();
+	}
 }
