@@ -55,7 +55,6 @@ public class TestGame {
 
 	@Test
 	public void testDealCards() {
-
 		Game game = new Game();
 		Player player1 = playerFactory.createUser("Rafik", "4533");
 		Player player2 = playerFactory.createUser("Lucas", "1234");
