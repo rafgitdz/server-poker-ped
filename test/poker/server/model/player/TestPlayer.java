@@ -31,7 +31,7 @@ public class TestPlayer {
 		playerBet = 0;
 		playerTokens = 50;
 	
-		game = gameFactory.createGame();
+		game = gameFactory.newGame();
 		
 		player = playerFactory.createUser("Lucas", "1234");
 		player.currentTokens = playerTokens;
