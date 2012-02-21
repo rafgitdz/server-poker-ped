@@ -152,11 +152,9 @@ public class Player implements Serializable {
 		game.updateBets(this.currentTokens);
 		
 		this.currentTokens = 0;
-<<<<<<< HEAD
 		this.currentBet += game.getBet();
-=======
+
 		Event.addEvent(name + " ALLIN");
->>>>>>> 9cdedf15b763497777789a4e67c6adf147161bd5
 	}
 
 	public void fold() {
