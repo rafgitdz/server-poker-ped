@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import poker.server.infrastructure.RepositoryGenericJPA;
-import poker.server.model.parameters.Parameters;
-import poker.server.model.parameters.SitAndGo;
+import poker.server.model.game.card.Card;
+import poker.server.model.game.card.Cards;
+import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
@@ -18,193 +20,210 @@ public class Game implements Serializable {
 	private static final long serialVersionUID = 2687924657560495636L;
 
 	@Id
-	private int id = 0;
+	@GeneratedValue
+	private int id;
+
 	private transient Parameters gameType;
 
-	private transient Cards deck = new Cards();
+	private transient Cards deck;
 
-	private transient List<Card> flippedCards = new ArrayList<Card>();
+	private transient List<Card> flippedCards;
 
-	private ArrayList<Player> players = new ArrayList<Player>();
+	private ArrayList<Player> players;
 	private int currentPlayer = 0;
 
 	private int dealer = 0;
-	private int bigBlind = 0;
-	private int smallBlind = 0;
+	private int bigBlindPlayer = 0;
+	private int smallBlindPlayer = 0;
+
+	private int smallBlind;
+	private int bigBlind;
 
 	private int pot = 0;
 	private int bets = 0;
 	private int bet = 0;
 
 	private int currentRound = 1;
+
+	// to be used...
 	public static final int FLOP = 1;
 	public static final int TOURNANT = 2;
 	public static final int RIVER = 3;
 
+	private boolean Started;
+
 	// CONSTRUCTOR
-	Game() {
-		this.gameType = new SitAndGo();
+	protected Game() {
+		gameType = new SitAndGo();
+		buildGame();
 	}
 
-	Game(Parameters gameType) {
-		this.gameType = gameType;
+	protected Game(Parameters gameT) {
+		gameType = gameT;
+		buildGame();
+	}
+
+	private void buildGame() {
+		deck = new Cards();
+		flippedCards = new ArrayList<Card>();
+		players = new ArrayList<Player>();
+		smallBlind = gameType.getSmallBlind();
+		bigBlind = gameType.getBigBlind();
+		setStarted(false);
+		Event.buildEvents();
 	}
 
 	// GETTERS / SETTERS
 	public int getId() {
-		return this.id;
+		return id;
 	}
 
 	public Parameters getGameType() {
-		return this.gameType;
+		return gameType;
 	}
 
 	public ArrayList<Player> getPlayers() {
-		return this.players;
+		return players;
 	}
 
 	public int getCurrentPlayer() {
-		return this.currentPlayer;
+		return currentPlayer;
 	}
 
 	public int getDealer() {
-		return this.dealer;
+		return dealer;
 	}
 
-	public int getBigBlind() {
-		return this.bigBlind;
+	public int getBigBlindPlayer() {
+		return bigBlindPlayer;
 	}
 
-	public int getSmallBlind() {
-		return this.smallBlind;
+	public int getSmallBlindPlayer() {
+		return smallBlindPlayer;
 	}
 
 	public int getPot() {
-		return this.pot;
+		return pot;
 	}
 
 	public int getBets() {
-		return this.bets;
+		return bets;
 	}
 
 	public int getBet() {
-		return this.bet;
+		return bet;
 	}
 
 	public int getCurrentRound() {
-		return this.currentRound;
+		return currentRound;
 	}
 
 	public List<Card> getFlipedCards() {
-		return this.flippedCards;
-	}
-
-	// PLAYER MANAGEMENT
-	public void addPlayer(String name) {
-
-		RepositoryGenericJPA<Player, String> playerRepositoryJPA = new RepositoryGenericJPA<Player, String>();
-		Player player = playerRepositoryJPA.load(name);
-
-		if (player.isPresent()) {
-			this.players.add(player);
-		}
-	}
-
-	public void removePlayer(String name) {
-
-		RepositoryGenericJPA<Player, String> playerRepositoryJPA = new RepositoryGenericJPA<Player, String>();
-		Player player = playerRepositoryJPA.load(name);
-
-		this.players.remove(player);
+		return flippedCards;
 	}
 
 	public void nextPlayer() {
 
-		if (this.currentPlayer == (this.players.size() - 1)) {
-			this.currentPlayer = 0;
-		} else {
-			this.currentPlayer++;
-		}
+		if (currentPlayer == (this.players.size() - 1))
+			currentPlayer = 0;
+		else
+			currentPlayer++;
 	}
 
 	public void setDealer() {
 
-		if (this.dealer == (this.players.size() - 1)) {
+		if (this.dealer == (this.players.size() - 1))
 			this.dealer = 0;
-		} else {
+		else
 			this.dealer++;
-		}
+
+		Event.addEvent("THE DEALER IS : " + players.get(dealer).getName());
 	}
 
 	public void setBigBlind() {
 
-		if (this.bigBlind == (this.players.size() - 1)) {
-			this.bigBlind = 0;
-		} else {
-			this.bigBlind++;
-		}
+		if (this.bigBlindPlayer == (this.players.size() - 1))
+			this.bigBlindPlayer = 0;
+		else
+			this.bigBlindPlayer++;
+
+		Event.addEvent("THE BIG BLIND IS : "
+				+ players.get(bigBlindPlayer).getName());
 	}
 
 	public void setSmallBlind() {
 
-		if (this.smallBlind == (this.players.size() - 1)) {
-			this.smallBlind = 0;
-		} else {
-			this.smallBlind++;
-		}
+		if (smallBlindPlayer == (this.players.size() - 1))
+			smallBlindPlayer = 0;
+		else
+			smallBlindPlayer++;
+
+		Event.addEvent("THE SMALL BLIND IS : "
+				+ players.get(smallBlindPlayer).getName());
 	}
 
 	// ROUND MANAGEMENT
-	public void flipCard() {
-		Card card = this.deck.getNextCard();
-		this.flippedCards.add(card);
+	public Card flipCard() {
+		Card card = deck.getNextCard();
+		flippedCards.add(card);
+		return card;
 	}
 
 	public void flop() {
 
-		this.deck.burnCard();
+		String eventFlop = "FLOP : ";
+		Card card;
+		deck.burnCard();
 
 		for (int i = 0; i < 3; i++) {
-			this.flipCard();
+			card = flipCard();
+			eventFlop += card.getValue() + " " + card.getSuit() + " , ";
 		}
-
-		this.updatePot();
-		this.resetBet();
-
+		updatePot();
+		resetBet();
+		Event.addEvent(eventFlop);
 	}
 
 	public void tournant() {
 
-		this.deck.burnCard();
-		this.flipCard();
-		this.updatePot();
-		this.resetBet();
+		deck.burnCard();
+		Card card = flipCard();
+		updatePot();
+		resetBet();
+		Event.addEvent("TOURNANT : " + card.getValue() + " " + card.getSuit());
 	}
 
 	public void river() {
 
-		this.deck.burnCard();
-		this.flipCard();
-		this.updatePot();
-		this.resetBet();
+		deck.burnCard();
+		Card card = flipCard();
+		updatePot();
+		resetBet();
+		Event.addEvent("RIVER : " + card.getValue() + " " + card.getSuit());
 	}
 
 	// BLIND / BET / POT MANAGEMENT
 	public void updateBlind() {
-		int blindMultFactor = this.gameType.getBuyInIncreasing();
-		this.smallBlind = this.smallBlind * blindMultFactor;
-		this.bigBlind = this.bigBlind * blindMultFactor;
+
+		int blindMultFactor = gameType.getBuyInIncreasing();
+		smallBlind = smallBlind * blindMultFactor;
+		bigBlind = bigBlind * blindMultFactor;
+
+		Event.addEvent("SMALL BLIND = " + smallBlind + " , BIG BLIND = "
+				+ bigBlind);
 	}
 
 	public void resetBet() {
-		this.bet = 0;
 
+		this.bet = 0;
 		for (Player player : this.players) {
 			player.currentBet = 0;
 		}
+		Event.addEvent("RESET BET");
 	}
 
 	public void updateBet(int quantity) {
+<<<<<<< HEAD
 		this.bet += quantity;
 	}
 
@@ -215,21 +234,39 @@ public class Game implements Serializable {
 	public void updatePot() {
 		this.pot += this.bets;
 		this.bets = 0;
+=======
+		bet += quantity;
+		Event.addEvent("BET = " + bet);
+	}
+
+	public void updateBets(int quantity) {
+		bets += quantity;
+		Event.addEvent("BETS = " + bets);
+	}
+
+	public void updatePot() {
+		pot += bets;
+		bets = 0;
+		Event.addEvent("UPDATE POT, POT = " + pot);
+>>>>>>> 9cdedf15b763497777789a4e67c6adf147161bd5
 	}
 
 	// OTHER
 	public void dealCards() {
+
 		Card card;
 		for (int i = 0; i < 2; i++) {
-			for (Player player : this.players) {
-				card = this.deck.getNextCard();
+			for (Player player : players) {
+				card = deck.getNextCard();
 				player.currentHand.addCard(card);
 			}
 		}
+		Event.addEvent("DEAL CARDS FOR PLAYERS");
 	}
 
 	public void start() {
 		System.out.println("start() : TODO");
+		Event.addEvent("START GAME");
 	}
 
 	public Cards getDeck() {
@@ -237,6 +274,22 @@ public class Game implements Serializable {
 	}
 
 	public void add(Player player) {
-		this.players.add(player);
+		players.add(player);
+	}
+
+	public int getSmallBlind() {
+		return smallBlind;
+	}
+
+	public int getBigBlind() {
+		return bigBlind;
+	}
+
+	public boolean isStarted() {
+		return Started;
+	}
+
+	public void setStarted(boolean started) {
+		Started = started;
 	}
 }

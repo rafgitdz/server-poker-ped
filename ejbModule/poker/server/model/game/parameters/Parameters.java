@@ -1,6 +1,7 @@
-package poker.server.model.parameters;
+package poker.server.model.game.parameters;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Parameters {
 
@@ -8,7 +9,7 @@ public abstract class Parameters {
 	public final static int TOKEN = 2;
 
 	protected int potType = CASH;
-	protected ArrayList<Integer> potSplit = new ArrayList<Integer>();
+	protected List<Integer> potSplit;
 
 	protected int buyIn = 0;
 	protected int buyInIncreasing = 0;
@@ -21,9 +22,13 @@ public abstract class Parameters {
 	protected int playerNumber = 0;
 	protected int speakTime = 0;
 
-	protected void setPotSplit(ArrayList<Integer> percents) {
+	protected int timeChangeBlind = 180; // in seconds
+	protected int timePlaying = 30; // in seconds
 
-		ArrayList<Integer> finalSplit = new ArrayList<Integer>();
+	protected void setPotSplit(List<Integer> percents) {
+
+		List<Integer> finalSplit = new ArrayList<Integer>();
+
 		int sum = 0;
 		int percent = 0;
 
@@ -56,7 +61,7 @@ public abstract class Parameters {
 		this.bigBlind = smallBlind * this.multFactor;
 	}
 
-	public ArrayList<Integer> getPotSplit() {
+	public List<Integer> getPotSplit() {
 		return this.potSplit;
 	}
 

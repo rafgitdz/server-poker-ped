@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import poker.server.model.exception.PlayerException;
+import poker.server.model.game.Event;
 import poker.server.model.game.Game;
 
 @Entity
@@ -34,7 +35,11 @@ public class Player implements Serializable {
 	public int currentTokens = 0;
 	public int money = 0;
 
-	Player(String name, String pwd){
+	Player() {
+
+	}
+
+	Player(String name, String pwd) {
 		this.pwd = pwd;
 		this.name = name;
 		this.currentHand = new Hand();
@@ -113,11 +118,14 @@ public class Player implements Serializable {
 				quantity = minTokenToRaise;
 			}
 
-			this.currentTokens -= quantity;
-			this.currentBet += quantity;
 			game.updateBet(quantity);
 			game.updateBets(quantity);
+			
+			this.currentTokens -= quantity;
+			this.currentBet += quantity;
 		}
+
+		Event.addEvent(name + " RAISES " + quantity);
 	}
 
 	public void call(Game game) {
@@ -127,27 +135,37 @@ public class Player implements Serializable {
 		if (this.currentTokens < minTokenToCall) {
 			throw new PlayerException("not enough tokens to call");
 		} else {
-			this.currentTokens -= minTokenToCall;
-			this.currentBet += minTokenToCall;
+					
 			game.updateBet(minTokenToCall);
 			game.updateBets(minTokenToCall);
+			
+			this.currentTokens -= minTokenToCall;
+			this.currentBet += minTokenToCall;
 		}
+
+		Event.addEvent(name + " CALLS");
 	}
 
 	public void allIn(Game game) {
 
 		game.updateBet(this.currentTokens);
 		game.updateBets(this.currentTokens);
-		this.currentBet += game.getBet();
+		
 		this.currentTokens = 0;
+<<<<<<< HEAD
+		this.currentBet += game.getBet();
+=======
+		Event.addEvent(name + " ALLIN");
+>>>>>>> 9cdedf15b763497777789a4e67c6adf147161bd5
 	}
 
 	public void fold() {
-		this.folded = true;
+		folded = true;
+		Event.addEvent(name + " FOLDS");
 	}
 
 	public void unFold() {
-		this.folded = false;
+		folded = false;
 	}
 
 	public void check() {
@@ -156,7 +174,7 @@ public class Player implements Serializable {
 
 	// OTHER
 	public boolean isfolded() {
-		return this.folded;
+		return folded;
 	}
 
 	public void getBestHand() {
@@ -165,5 +183,9 @@ public class Player implements Serializable {
 
 	public void setCurrentHand(Hand hand) {
 		this.currentHand = hand;
+	}
+
+	public Hand getCurrentHand() {
+		return currentHand;
 	}
 }

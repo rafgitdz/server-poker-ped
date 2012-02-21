@@ -1,4 +1,4 @@
-package poker.server.model.parameters;
+package poker.server.model.game.parameters;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class SitAndGo extends Parameters {
 		this.setBlinds(10);
 		this.setPotAsToken();
 
-		ArrayList<Integer> potSplit = new ArrayList<Integer>();
+		this.potSplit = new ArrayList<Integer>();
 		potSplit.add(50);
 		potSplit.add(35);
 		potSplit.add(15);

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import poker.server.model.RepositoryGeneric;
 
 public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 

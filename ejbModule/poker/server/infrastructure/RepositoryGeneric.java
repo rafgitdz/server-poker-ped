@@ -1,4 +1,4 @@
-package poker.server.model;
+package poker.server.infrastructure;
 
 import java.util.List;
 

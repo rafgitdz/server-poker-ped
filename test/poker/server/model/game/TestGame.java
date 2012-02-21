@@ -1,71 +1,60 @@
 package poker.server.model.game;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import poker.server.model.exception.GameException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
 
 public class TestGame {
 
-	private Cards cards;
 	private PlayerFactoryLocal playerFactory = new PlayerFactory();
+	private GameFactoryLocal gameFactory = new GameFactory();
+	private Game game;
 
 	@Before
 	public void beforeTest() {
-		cards = new Cards();
-	}
-
-	@Test(expected = GameException.class)
-	public void testBigNumberRandomCards() {
-
-		cards.getRandomCards(53);
+		game = gameFactory.newGame();
 	}
 
 	@Test
-	public void testGetRandomCards() {
+	public void testEvent() {
 
-		List<Card> randomCards = cards.getRandomCards(4);
-		int expected = 4;
-		assertEquals(expected, randomCards.size());
+		game.dealCards();
+		List<String> events = new ArrayList<String>();
+		events.add("DEAL CARDS FOR PLAYERS");
+		assertEquals(events, Event.getEvents());
 	}
 
-	@Test
-	public void testShuffleCards() {
-
-		Card card = cards.getRandomCards(1).get(0);
-		Card actual = card;
-		Card unexpected = cards.getRandomCards(1).get(0);
-		assertNotSame(unexpected, actual);
-	}
-
-	@Test(expected = GameException.class)
-	public void testNotNullShuffleCards() {
-
-		cards.getRandomCards(52);
-		cards.getRandomCards(1);
-	}
-
-	@Test
 	public void testDealCards() {
-		Game game = new Game();
 		Player player1 = playerFactory.createUser("Rafik", "4533");
 		Player player2 = playerFactory.createUser("Lucas", "1234");
 
+		Game game = gameFactory.newGame();
 		game.add(player1);
 		game.add(player2);
 
 		game.dealCards();
 
-		assertEquals(game.getDeck().getCards().size(), 48);
-		assertEquals(player1.currentHand.getCurrentHand().size(), 2);
-		assertEquals(player2.currentHand.getCurrentHand().size(), 2);
+		assertEquals(game.getDeck().getSize(), 48);
+		assertEquals(player1.getCurrentHand().getSize(), 2);
+		assertEquals(player2.getCurrentHand().getSize(), 2);
+	}
+
+	@Test
+	// the burnCard test is included in this test
+	public void testRoundsGame() {
+
+		game.flop();
+		game.tournant();
+		game.river();
+		int expected2 = 44;
+		assertEquals(expected2, game.getDeck().getSize());
 	}
 }

@@ -10,4 +10,6 @@ public interface PlayerServiceRemote {
 	public Player authentificate(String name, String pwd);
 
 	public Player createUser(String name, String pwd);
+	
+	public Player loadPlayer(String name);
 }
