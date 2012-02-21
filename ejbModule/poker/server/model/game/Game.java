@@ -223,32 +223,20 @@ public class Game implements Serializable {
 	}
 
 	public void updateBet(int quantity) {
-<<<<<<< HEAD
+
 		this.bet += quantity;
+		Event.addEvent("BET = " + bet);
 	}
 
 	public void updateBets(int quantity) {
 		this.bets += quantity;
+		Event.addEvent("BETS = " + bets);
 	}
 
 	public void updatePot() {
 		this.pot += this.bets;
 		this.bets = 0;
-=======
-		bet += quantity;
-		Event.addEvent("BET = " + bet);
-	}
-
-	public void updateBets(int quantity) {
-		bets += quantity;
-		Event.addEvent("BETS = " + bets);
-	}
-
-	public void updatePot() {
-		pot += bets;
-		bets = 0;
 		Event.addEvent("UPDATE POT, POT = " + pot);
->>>>>>> 9cdedf15b763497777789a4e67c6adf147161bd5
 	}
 
 	// OTHER
