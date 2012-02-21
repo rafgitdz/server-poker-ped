@@ -2,23 +2,22 @@ package poker.server.model.player;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Method;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import poker.server.model.exception.PlayerException;
-import poker.server.model.game.*;
+import poker.server.model.game.Game;
+import poker.server.model.game.GameFactory;
+import poker.server.model.game.GameFactoryLocal;
 
 public class TestPlayer {
 
-	
 	private PlayerFactoryLocal playerFactory = new PlayerFactory();
 	private GameFactoryLocal gameFactory = new GameFactory();
-	
+
 	private Player player;
 	private Game game;
-	
+
 	private int gameBet = 0;
 	private int gameBets = 0;
 	private int playerBet = 0;

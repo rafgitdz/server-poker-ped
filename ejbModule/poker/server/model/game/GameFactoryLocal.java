@@ -4,6 +4,6 @@ import javax.ejb.Local;
 
 @Local
 public interface GameFactoryLocal {
-	
-	public Game createGame();
+
+	public Game newGame();
 }

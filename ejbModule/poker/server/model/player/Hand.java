@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import poker.server.model.exception.PlayerException;
-import poker.server.model.game.Card;
-import poker.server.model.game.Value;
+import poker.server.model.game.card.Card;
+import poker.server.model.game.card.Value;
 
 public class Hand {
 
@@ -264,5 +264,9 @@ public class Hand {
 				}
 			}
 		}
+	}
+
+	public int getSize() {
+		return currentHand.size();
 	}
 }

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import poker.server.model.exception.PlayerException;
+import poker.server.model.game.Event;
 import poker.server.model.game.Game;
 
 @Entity
@@ -123,6 +124,8 @@ public class Player implements Serializable {
 			this.currentTokens -= quantity;
 			this.currentBet += quantity;
 		}
+
+		Event.addEvent(name + " RAISES " + quantity);
 	}
 
 	public void call(Game game) {
@@ -139,6 +142,8 @@ public class Player implements Serializable {
 			this.currentTokens -= minTokenToCall;
 			this.currentBet += minTokenToCall;
 		}
+
+		Event.addEvent(name + " CALLS");
 	}
 
 	public void allIn(Game game) {
@@ -147,15 +152,20 @@ public class Player implements Serializable {
 		game.updateBets(this.currentTokens);
 		
 		this.currentTokens = 0;
+<<<<<<< HEAD
 		this.currentBet += game.getBet();
+=======
+		Event.addEvent(name + " ALLIN");
+>>>>>>> 9cdedf15b763497777789a4e67c6adf147161bd5
 	}
 
 	public void fold() {
-		this.folded = true;
+		folded = true;
+		Event.addEvent(name + " FOLDS");
 	}
 
 	public void unFold() {
-		this.folded = false;
+		folded = false;
 	}
 
 	public void check() {
@@ -164,7 +174,7 @@ public class Player implements Serializable {
 
 	// OTHER
 	public boolean isfolded() {
-		return this.folded;
+		return folded;
 	}
 
 	public void getBestHand() {
@@ -173,5 +183,9 @@ public class Player implements Serializable {
 
 	public void setCurrentHand(Hand hand) {
 		this.currentHand = hand;
+	}
+
+	public Hand getCurrentHand() {
+		return currentHand;
 	}
 }
