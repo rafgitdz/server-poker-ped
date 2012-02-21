@@ -117,10 +117,11 @@ public class Player implements Serializable {
 				quantity = minTokenToRaise;
 			}
 
-			this.currentTokens -= quantity;
-			this.currentBet += quantity;
 			game.updateBet(quantity);
 			game.updateBets(quantity);
+			
+			this.currentTokens -= quantity;
+			this.currentBet += quantity;
 		}
 	}
 
@@ -131,10 +132,12 @@ public class Player implements Serializable {
 		if (this.currentTokens < minTokenToCall) {
 			throw new PlayerException("not enough tokens to call");
 		} else {
-			this.currentTokens -= minTokenToCall;
-			this.currentBet += minTokenToCall;
+					
 			game.updateBet(minTokenToCall);
 			game.updateBets(minTokenToCall);
+			
+			this.currentTokens -= minTokenToCall;
+			this.currentBet += minTokenToCall;
 		}
 	}
 
@@ -142,8 +145,9 @@ public class Player implements Serializable {
 
 		game.updateBet(this.currentTokens);
 		game.updateBets(this.currentTokens);
-		this.currentBet += game.getBet();
+		
 		this.currentTokens = 0;
+		this.currentBet += game.getBet();
 	}
 
 	public void fold() {

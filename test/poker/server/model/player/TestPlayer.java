@@ -22,18 +22,20 @@ public class TestPlayer {
 	private int gameBet = 0;
 	private int gameBets = 0;
 	private int playerBet = 0;
-	private int playerMoney = 0;
+	private int playerTokens = 0;
 	
 	@Before
 	public void beforeTest() {
 		
-		player = playerFactory.createUser("Lucas", "1234");
-		game = gameFactory.createGame();
-		
 		gameBet = 0;
 		gameBets = 0;
 		playerBet = 0;
-		playerMoney = 0;
+		playerTokens = 50;
+	
+		game = gameFactory.createGame();
+		
+		player = playerFactory.createUser("Lucas", "1234");
+		player.currentTokens = playerTokens;
 	}
 
 	@Test
@@ -46,101 +48,89 @@ public class TestPlayer {
 		assertEquals("1234", player.getPwd());
 	}
 	
-	private void updateTestBets()
+	private void saveGameBets()
 	{
 		gameBet = game.getBet();
 		gameBets = game.getBets();
 		playerBet = player.currentBet;
-		playerMoney = player.money;
+		playerTokens = player.currentTokens;
 	}
 	
-	private void raiseAux(int money, int quantity, int nbCall) {
+	private void raiseCallAsserts(int quantity) {
 		
-		player.money = money;
-		
-		for (int i = 0; i < nbCall; i++) {
-				 
-			updateTestBets();
-			player.raise(game, quantity);
-			
-			assertEquals(gameBet + quantity, game.getBet());
-			assertEquals(gameBets + quantity, game.getBets());
-			assertEquals(playerBet + quantity, player.currentBet);
-			assertEquals(playerMoney - quantity, player.money);
-		}
+		assertEquals(gameBet + quantity, game.getBet());
+		assertEquals(gameBets + quantity, game.getBets());
+		assertEquals(playerBet + quantity, player.currentBet);
+		assertEquals(playerTokens - quantity, player.currentTokens);
 	}
 	
-	private void callAux(int money, int quantity, int nbCall) {
+	private void allInAsserts() {
 		
-		player.money = money;
-		
-		for (int i = 0; i < nbCall; i++) {
-			
-			updateTestBets();
-			player.call(game);
-			
-			assertEquals(gameBet + quantity, game.getBet());
-			assertEquals(gameBets + quantity, game.getBets());
-			assertEquals(playerBet + quantity, player.currentBet);
-			assertEquals(playerMoney - quantity, player.money);
-		}
-	}
-	
-	private void allInAux(int money, int nbCall) {
-		
-		player.money = money;
-		
-		for (int i = 0; i < nbCall; i++) {
-			
-			updateTestBets();
-			player.allIn(game);
-			
-			assertEquals(gameBet + playerMoney, game.getBet());
-			assertEquals(gameBets + playerMoney, game.getBets());
-			assertEquals(playerBet + playerMoney, player.currentBet);
-			assertEquals(0, player.money);
-		}
+		assertEquals(gameBet + playerTokens, game.getBet());
+		assertEquals(gameBets + playerTokens, game.getBets());
+		assertEquals(playerBet + playerTokens, player.currentTokens);
+		assertEquals(0, player.currentTokens);
 	}
 	
 	@Test
 	public void testRaiseEnough() {
-		raiseAux(50, 10, 1);
+		
+		int quantity = 10;
+		
+		for (int i = 0; i < 1; i++) {
+			saveGameBets();
+			player.raise(game, quantity);
+			raiseCallAsserts(quantity);
+		}
+	}
+
+	@Test(expected = PlayerException.class)
+	public void testRaiseNotEnough() {
+
+		int quantity = 80;
+		player.raise(game, quantity);
 	}
 	
-	/*
-	@Test(expected = PlayerException.class)
-	public void testRaiseNotEnough1() {
-		raiseAux(20, 30, 1);
-	}
 	
 	@Test(expected = PlayerException.class)
 	public void testRaiseNotEnough2() {
-		raiseAux(50, 20, 6);
+		
+		for (int i = 0; i < 6; i++) {
+			saveGameBets();
+			player.raise(game, 20);
+		}
 	}
 	
 	@Test
 	public void testCallEnough() {
-		callAux(50, 10, 1);
+		
+		int quantity = 20;
+		player.call(game);
+		raiseCallAsserts(quantity);
 	}
 	
 	@Test(expected = PlayerException.class)
-	public void testCallNotEnough1() {
-		callAux(20, 30, 1);
-	}
-	
-	@Test(expected = PlayerException.class)
-	public void testCallNotEnough2() {
-		callAux(50, 20, 6);
+	public void testCallNotEnough() {
+		
+		for (int i = 0; i < 6; i++) {
+			saveGameBets();
+			player.call(game);
+		}
 	}
 	
 	@Test
 	public void testAllInEnough() {
-		allInAux(50, 1);
+		
+		player.allIn(game);
+		allInAsserts();
 	}
 	
 	@Test(expected = PlayerException.class)
-	public void testAllInNotEnough1() {
-		allInAux(50, 2);
+	public void testAllInNotEnough() {
+		
+		for (int i = 0; i < 2; i++) {
+			saveGameBets();
+			player.allIn(game);
+		}
 	}
-	*/
 }

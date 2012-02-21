@@ -197,23 +197,23 @@ public class Game implements Serializable {
 
 	public void resetBet() {
 
-		bet = 0;
+		this.bet = 0;
 		for (Player player : this.players) {
 			player.currentBet = 0;
 		}
 	}
 
 	public void updateBet(int quantity) {
-		bet += quantity;
+		this.bet += quantity;
 	}
 
 	public void updateBets(int quantity) {
-		bets += quantity;
+		this.bets += quantity;
 	}
 
 	public void updatePot() {
-		pot += bets;
-		bets = 0;
+		this.pot += this.bets;
+		this.bets = 0;
 	}
 
 	// OTHER
