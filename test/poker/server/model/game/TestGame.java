@@ -12,12 +12,14 @@ import poker.server.model.exception.GameException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
+import poker.server.service.game.GameService;
 
 public class TestGame {
 
 	private Cards cards;
 	private PlayerFactoryLocal playerFactory = new PlayerFactory();
-
+	private GameFactoryLocal gameFactory = new GameFactory();
+	
 	@Before
 	public void beforeTest() {
 		cards = new Cards();
@@ -56,10 +58,10 @@ public class TestGame {
 	@Test
 	public void testDealCards() {
 
-		Game game = new Game();
 		Player player1 = playerFactory.createUser("Rafik", "4533");
 		Player player2 = playerFactory.createUser("Lucas", "1234");
 
+		Game game = gameFactory.createGame();
 		game.add(player1);
 		game.add(player2);
 

@@ -8,8 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import poker.server.model.game.parameters.Parameters;
-import poker.server.model.game.parameters.SitAndGo;
+import poker.server.model.game.parameters.*;
 import poker.server.model.player.Player;
 
 @Entity
@@ -54,7 +53,7 @@ public class Game implements Serializable {
 	private boolean Started;
 
 	// CONSTRUCTOR
-	Game() {
+	protected Game() {
 		gameType = new SitAndGo();
 		deck = new Cards();
 		flippedCards = new ArrayList<Card>();
@@ -65,7 +64,7 @@ public class Game implements Serializable {
 		setStarted(false);
 	}
 
-	Game(Parameters gameT) {
+	protected Game(Parameters gameT) {
 		gameType = gameT;
 		deck = new Cards();
 		flippedCards = new ArrayList<Card>();
