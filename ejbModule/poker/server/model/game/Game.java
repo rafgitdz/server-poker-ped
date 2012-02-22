@@ -3,6 +3,8 @@ package poker.server.model.game;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +17,7 @@ import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
-public class Game implements Serializable {
+public class Game implements Serializable, Observer {
 
 	private static final long serialVersionUID = 2687924657560495636L;
 
@@ -201,9 +203,9 @@ public class Game implements Serializable {
 	// BLIND / BET / POT MANAGEMENT
 	public void updateBlind() {
 
-		int blindMultFactor = gameType.getBuyInIncreasing();
+		int blindMultFactor = gameType.getMultFactor();
 		smallBlind = smallBlind * blindMultFactor;
-		bigBlind = bigBlind * blindMultFactor;
+		bigBlind = smallBlind * 2;
 
 		Event.addEvent("SMALL BLIND = " + smallBlind + " , BIG BLIND = "
 				+ bigBlind);
@@ -281,5 +283,10 @@ public class Game implements Serializable {
 	public void updateCurrentBet(int quantity) {
 		currentBet += quantity;
 		Event.addEvent("CURRENT BET = " + currentBet);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		updateBlind();
 	}
 }
