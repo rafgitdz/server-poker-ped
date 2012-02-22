@@ -108,21 +108,18 @@ public class TestPlayer {
 	// CALL TESTS
 	@Test
 	public void testCallCurrentPot() {
-		
 		player.call(game);
 		assertEquals(gameCurrentPot + quantity, game.getCurrentPot());
 	}
 	
 	@Test
 	public void testCallCurrentBet() {
-		
 		player.call(game);
 		assertEquals(gameCurrentBet + quantity, game.getCurrentBet());
 	}
 	
 	@Test
 	public void testCallPlayerBet() {
-		
 		player.call(game);
 		assertEquals(playerBet + quantity, player.getCurrentBet());
 	}
@@ -136,9 +133,6 @@ public class TestPlayer {
 	
 	@Test(expected = PlayerException.class)
 	public void testCallNotEnough() {
-		game.updateCurrentBet(20);
-		player.setCurrentBet(10);
-		
 		player.call(game);
 	}
 	
