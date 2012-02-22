@@ -125,13 +125,13 @@ public class TestPlayer {
 	
 	@Test
 	public void testCallPlayerTokens() {
-	
 		player.call(game);
 		assertEquals(playerTokens - quantity, player.getCurrentTokens());
 	}
 	
 	@Test(expected = PlayerException.class)
 	public void testCallNotEnough() {
+		game.setCurrentBet(60);
 		player.call(game);
 	}
 	
