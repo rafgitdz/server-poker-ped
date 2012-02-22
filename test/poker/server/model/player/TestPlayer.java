@@ -101,12 +101,8 @@ public class TestPlayer {
 	// }
 	// }
 
-	@Test
-	public void testRaiseTotalPot() {
-		player.raise(game, quantity);
-		assertEquals(gameTotalPot + quantity, game.getTotalPot());
-	}
 
+	// RAISE TESTS
 	@Test
 	public void testRaiseCurrentPot() {
 		player.raise(game, quantity);
