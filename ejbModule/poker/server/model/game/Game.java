@@ -158,6 +158,35 @@ public class Game implements Serializable {
 				+ players.get(smallBlindPlayer).getName());
 	}
 
+	public int getCurrentBet() {
+		return currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+	
+	public Cards getDeck() {
+		return deck;
+	}
+	
+	public int getSmallBlind() {
+		return smallBlind;
+	}
+
+	public int getBigBlind() {
+		return bigBlind;
+	}
+
+	public boolean isStarted() {
+		return Started;
+	}
+
+	public void setStarted(boolean started) {
+		Started = started;
+	}
+	
+	
 	// ROUND MANAGEMENT
 	public Card flipCard() {
 		Card card = deck.getNextCard();
@@ -228,6 +257,12 @@ public class Game implements Serializable {
 		Event.addEvent("UPDATE POT, POT = " + totalPot);
 	}
 
+	public void updateCurrentBet(int quantity) {
+		currentBet += quantity;
+		Event.addEvent("CURRENT BET = " + currentBet);
+	}
+	
+	
 	// OTHER
 	public void dealCards() {
 
@@ -246,40 +281,7 @@ public class Game implements Serializable {
 		Event.addEvent("START GAME");
 	}
 
-	public Cards getDeck() {
-		return deck;
-	}
-
 	public void add(Player player) {
 		players.add(player);
-	}
-
-	public int getSmallBlind() {
-		return smallBlind;
-	}
-
-	public int getBigBlind() {
-		return bigBlind;
-	}
-
-	public boolean isStarted() {
-		return Started;
-	}
-
-	public void setStarted(boolean started) {
-		Started = started;
-	}
-
-	public int getCurrentBet() {
-		return currentBet;
-	}
-
-	public void setCurrentBet(int currentBet) {
-		this.currentBet = currentBet;
-	}
-
-	public void updateCurrentBet(int quantity) {
-		currentBet += quantity;
-		Event.addEvent("CURRENT BET = " + currentBet);
-	}
+	}	
 }
