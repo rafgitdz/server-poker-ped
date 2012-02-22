@@ -1,9 +1,11 @@
 package poker.server.model.player;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.hamcrest.*;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
@@ -40,9 +42,18 @@ public class TestPlayer {
 		quantity = 10;
 		
 		game = gameFactory.newGame();
-
+		game.updateCurrentBet(playerBet);
+		game.updateCurrentPot(gameCurrentPot);
+		
 		player = playerFactory.createUser("Lucas", "1234");
 		player.setCurrentTokens(playerTokens);
+		player.setCurrentBet(playerBet);
+	}
+	
+	@After
+	public void afterTest() {
+		game = null;
+		player = null;
 	}
 
 	@Test
@@ -125,6 +136,58 @@ public class TestPlayer {
 		quantity = 80;
 		player.raise(game, quantity);
 	}
+	
+//	@Test(expected = PlayerException.class)
+//	public void testRaiseNotEnough2() {
+//		int quantity = 20;
+//		
+//		game.updateCurrentBet(20);
+//		saveGameBets();
+//		player.raise(game, quantity);
+//	}
+//	
+//	@Test
+//	public void testCallEnough() {
+//		int quantity = 10;
+//
+//		game.updateCurrentBet(20);
+//		player.currentBet = 10;
+//		saveGameBets();
+//		player.call(game);
+//		raiseCallAsserts(quantity);
+//	}
+//	
+//	@Test(expected = PlayerException.class)
+//	public void testCallNotEnough() {
+//		game.updateCurrentBet(60);
+//		player.currentBet = 0;
+//		saveGameBets();
+//		player.call(game);
+//	}
+//	
+//	@Test
+//	public void testAllInEnough() {	
+//		player.allIn(game);
+//		saveGameBets();
+//		allInAsserts();
+//	}
+//	
+//	@Test
+//	public void testCheckEnough() {
+//		game.updateCurrentBet(50);
+//		player.currentBet=50;
+//		saveGameBets();
+//		player.check(game);
+//	}
+//	
+//	@Test(expected = PlayerException.class)
+//	public void testCheckNotEnough() {
+//		game.updateCurrentBet(60);
+//		player.currentBet=0;
+//		saveGameBets();
+//		player.check(game);
+//	}
+
 
 	/*
 	 * @Test(expected = PlayerException.class) public void testRaiseNotEnough2()
