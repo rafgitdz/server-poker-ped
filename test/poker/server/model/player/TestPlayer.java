@@ -83,6 +83,7 @@ public class TestPlayer {
 		}
 	}
 
+	
 	@Test(expected = PlayerException.class)
 	public void testRaiseNotEnough() {
 
@@ -90,7 +91,7 @@ public class TestPlayer {
 		player.raise(game, quantity);
 	}
 	
-	
+	/*
 	@Test(expected = PlayerException.class)
 	public void testRaiseNotEnough2() {
 		
@@ -132,4 +133,5 @@ public class TestPlayer {
 			player.allIn(game);
 		}
 	}
+	*/
 }
