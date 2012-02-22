@@ -150,15 +150,8 @@ public class Player implements Serializable {
 	public void raise(Game game, int quantity) {
 
 		int minTokenToRaise = (game.getCurrentBet() * 2 - this.currentBet);
-<<<<<<< HEAD
-		// * game.getGameType().getMultFactor();
 
-		if (this.currentTokens < minTokenToRaise
-				|| this.currentTokens < quantity || quantity < minTokenToRaise) {
-=======
-		
 		if (quantity > this.currentTokens || quantity < minTokenToRaise) {
->>>>>>> fc327d58eef2e70d9c8d56e8ea58a4dbe894a206
 			throw new PlayerException("not enough tokens to raise");
 		} else {
 			game.updateCurrentBet(quantity);

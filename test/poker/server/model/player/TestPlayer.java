@@ -133,6 +133,38 @@ public class TestPlayer {
 		player.raise(game, quantity);
 	}
 	
+	
+	// CALL TESTS
+	@Test
+	public void testCallCurrentPot() {
+		player.call(game);
+		assertEquals(gameCurrentPot + quantity, game.getCurrentPot());
+	}
+	
+	@Test
+	public void testCallCurrentBet() {
+		player.call(game);
+		assertEquals(gameCurrentBet + quantity, game.getCurrentBet());
+	}
+	
+	@Test
+	public void testCallPlayerBet() {
+		player.call(game);
+		assertEquals(playerBet + quantity, player.getCurrentBet());
+	}
+	
+	@Test
+	public void testCallPlayerTokens() {
+		player.call(game);
+		assertEquals(playerTokens - quantity, player.getCurrentTokens());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testCallNotEnough() {
+		player.call(game);
+	}
+	
+	
 //	@Test(expected = PlayerException.class)
 //	public void testRaiseNotEnough2() {
 //		int quantity = 20;
