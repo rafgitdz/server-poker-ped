@@ -31,6 +31,7 @@ public class TestGame {
 		assertEquals(events, Event.getEvents());
 	}
 
+	@Test
 	public void testDealCards() {
 		Player player1 = playerFactory.createUser("Rafik", "4533");
 		Player player2 = playerFactory.createUser("Lucas", "1234");

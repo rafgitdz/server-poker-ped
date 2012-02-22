@@ -39,9 +39,9 @@ public class Game implements Serializable {
 	private int smallBlind;
 	private int bigBlind;
 
-	private int pot = 0;
-	private int bets = 0;
-	private int bet = 0;
+	private int totalPot = 0;
+	private int currentPot = 0;
+	private int currentBet = 0;
 
 	private int currentRound = 1;
 
@@ -102,16 +102,12 @@ public class Game implements Serializable {
 		return smallBlindPlayer;
 	}
 
-	public int getPot() {
-		return pot;
+	public int getTotalPot() {
+		return totalPot;
 	}
 
-	public int getBets() {
-		return bets;
-	}
-
-	public int getBet() {
-		return bet;
+	public int getCurrentPot() {
+		return currentPot;
 	}
 
 	public int getCurrentRound() {
@@ -179,8 +175,8 @@ public class Game implements Serializable {
 			card = flipCard();
 			eventFlop += card.getValue() + " " + card.getSuit() + " , ";
 		}
-		updatePot();
-		resetBet();
+		updateTotalPot();
+		resetCurrentPot();
 		Event.addEvent(eventFlop);
 	}
 
@@ -188,8 +184,8 @@ public class Game implements Serializable {
 
 		deck.burnCard();
 		Card card = flipCard();
-		updatePot();
-		resetBet();
+		updateTotalPot();
+		resetCurrentPot();
 		Event.addEvent("TOURNANT : " + card.getValue() + " " + card.getSuit());
 	}
 
@@ -197,8 +193,8 @@ public class Game implements Serializable {
 
 		deck.burnCard();
 		Card card = flipCard();
-		updatePot();
-		resetBet();
+		updateTotalPot();
+		resetCurrentPot();
 		Event.addEvent("RIVER : " + card.getValue() + " " + card.getSuit());
 	}
 
@@ -213,29 +209,23 @@ public class Game implements Serializable {
 				+ bigBlind);
 	}
 
-	public void resetBet() {
+	public void resetCurrentPot() {
 
-		this.bet = 0;
+		this.currentPot = 0;
 		for (Player player : this.players) {
 			player.currentBet = 0;
 		}
 		Event.addEvent("RESET BET");
 	}
 
-	public void updateBet(int quantity) {
-		bet += quantity;
-		Event.addEvent("BET = " + bet);
+	public void updateCurrentPot(int quantity) {
+		this.currentPot += quantity;
+		Event.addEvent("BETS = " + currentPot);
 	}
 
-	public void updateBets(int quantity) {
-		bets += quantity;
-		Event.addEvent("BETS = " + bets);
-	}
-
-	public void updatePot() {
-		pot += bets;
-		bets = 0;
-		Event.addEvent("UPDATE POT, POT = " + pot);
+	public void updateTotalPot() {
+		this.totalPot += this.currentPot;
+		Event.addEvent("UPDATE POT, POT = " + totalPot);
 	}
 
 	// OTHER
@@ -278,5 +268,18 @@ public class Game implements Serializable {
 
 	public void setStarted(boolean started) {
 		Started = started;
+	}
+
+	public int getCurrentBet() {
+		return currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+
+	public void updateCurrentBet(int quantity) {
+		currentBet += quantity;
+		Event.addEvent("CURRENT BET = " + currentBet);
 	}
 }
