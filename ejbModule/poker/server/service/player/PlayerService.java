@@ -56,4 +56,11 @@ public class PlayerService implements PlayerServiceRemote {
 		}
 		return player;
 	}
+
+	// @Override
+	// public Response testMessage(String message) {
+	//
+	// String result = "Restful example : " + message;
+	// return Response.status(200).entity(result).build();
+	// }
 }
