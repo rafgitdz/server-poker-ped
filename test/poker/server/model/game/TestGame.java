@@ -25,7 +25,6 @@ public class TestGame {
 
 	@Test
 	public void testEvent() {
-
 		game.dealCards();
 		List<String> events = new ArrayList<String>();
 		events.add("DEAL CARDS FOR PLAYERS");

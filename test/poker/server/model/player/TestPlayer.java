@@ -1,9 +1,11 @@
 package poker.server.model.player;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.hamcrest.*;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
@@ -18,23 +20,31 @@ public class TestPlayer {
 	private Player player;
 	private Game game;
 
-	private int gameBet = 0;
-	private int gameBets = 0;
-	private int playerBet = 0;
-	private int playerTokens = 0;
+	private int gameBet;
+	private int gameBets;
+	private int playerBet;
+	private int playerTokens;
 	
 	@Before
-	public void beforeTest() {
-		
+	public void beforeTest() {		
 		gameBet = 0;
 		gameBets = 0;
 		playerBet = 0;
 		playerTokens = 50;
 	
-		game = gameFactory.createGame();
+		game = gameFactory.newGame();
+		game.updateBet(gameBet);
+		game.updateBets(gameBets);
 		
 		player = playerFactory.createUser("Lucas", "1234");
 		player.currentTokens = playerTokens;
+		player.currentBet = playerBet;
+	}
+	
+	@After
+	public void afterTest() {
+		game = null;
+		player = null;
 	}
 
 	@Test
@@ -56,7 +66,6 @@ public class TestPlayer {
 	}
 	
 	private void raiseCallAsserts(int quantity) {
-		
 		assertEquals(gameBet + quantity, game.getBet());
 		assertEquals(gameBets + quantity, game.getBets());
 		assertEquals(playerBet + quantity, player.currentBet);
@@ -64,7 +73,6 @@ public class TestPlayer {
 	}
 	
 	private void allInAsserts() {
-		
 		assertEquals(gameBet + playerTokens, game.getBet());
 		assertEquals(gameBets + playerTokens, game.getBets());
 		assertEquals(playerBet + playerTokens, player.currentTokens);
@@ -72,64 +80,70 @@ public class TestPlayer {
 	}
 	
 	@Test
-	public void testRaiseEnough() {
-		
+	public void testRaiseEnough() {	
 		int quantity = 10;
-		
-		for (int i = 0; i < 1; i++) {
-			saveGameBets();
-			player.raise(game, quantity);
-			raiseCallAsserts(quantity);
-		}
+
+		saveGameBets();
+		player.raise(game, quantity);
+		raiseCallAsserts(quantity);
 	}
 
 	@Test(expected = PlayerException.class)
 	public void testRaiseNotEnough() {
-
-		int quantity = 80;
+		int quantity = 60;
+		
+		saveGameBets();
 		player.raise(game, quantity);
 	}
 	
-	
 	@Test(expected = PlayerException.class)
 	public void testRaiseNotEnough2() {
+		int quantity = 20;
 		
-		for (int i = 0; i < 6; i++) {
-			saveGameBets();
-			player.raise(game, 20);
-		}
+		game.updateBet(20);
+		saveGameBets();
+		player.raise(game, quantity);
 	}
 	
 	@Test
 	public void testCallEnough() {
-		
-		int quantity = 20;
+		int quantity = 10;
+
+		game.updateBet(20);
+		player.currentBet = 10;
+		saveGameBets();
 		player.call(game);
 		raiseCallAsserts(quantity);
 	}
 	
 	@Test(expected = PlayerException.class)
 	public void testCallNotEnough() {
-		
-		for (int i = 0; i < 6; i++) {
-			saveGameBets();
-			player.call(game);
-		}
+		game.updateBet(60);
+		player.currentBet = 0;
+		saveGameBets();
+		player.call(game);
 	}
 	
 	@Test
-	public void testAllInEnough() {
-		
+	public void testAllInEnough() {	
 		player.allIn(game);
+		saveGameBets();
 		allInAsserts();
 	}
 	
+	@Test
+	public void testCheckEnough() {
+		game.updateBet(50);
+		player.currentBet=50;
+		saveGameBets();
+		player.check(game);
+	}
+	
 	@Test(expected = PlayerException.class)
-	public void testAllInNotEnough() {
-		
-		for (int i = 0; i < 2; i++) {
-			saveGameBets();
-			player.allIn(game);
-		}
+	public void testCheckNotEnough() {
+		game.updateBet(60);
+		player.currentBet=0;
+		saveGameBets();
+		player.check(game);
 	}
 }

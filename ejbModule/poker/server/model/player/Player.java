@@ -110,13 +110,9 @@ public class Player implements Serializable {
 		int minTokenToRaise = (game.getBet() - this.currentBet)
 				* game.getGameType().getMultFactor();
 
-		if (this.currentTokens < minTokenToRaise) {
-			throw new PlayerException("not enough tokens to raise");
+		if (quantity > this.currentTokens || quantity < minTokenToRaise) {
+			throw new PlayerException("Not enough tokens to raise");
 		} else {
-
-			if (quantity < minTokenToRaise) {
-				quantity = minTokenToRaise;
-			}
 
 			game.updateBet(quantity);
 			game.updateBets(quantity);
@@ -152,11 +148,7 @@ public class Player implements Serializable {
 		game.updateBets(this.currentTokens);
 		
 		this.currentTokens = 0;
-<<<<<<< HEAD
-		this.currentBet += game.getBet();
-=======
 		Event.addEvent(name + " ALLIN");
->>>>>>> 9cdedf15b763497777789a4e67c6adf147161bd5
 	}
 
 	public void fold() {
@@ -168,8 +160,13 @@ public class Player implements Serializable {
 		folded = false;
 	}
 
-	public void check() {
-		System.out.println("check() : TODO");
+	public void check(Game game) {
+		if(this.currentBet != game.getBet()) {
+			throw new PlayerException("not enough tokens to check");
+		} else { 
+			
+		}
+		Event.addEvent(name + "CHECK");
 	}
 
 	// OTHER
