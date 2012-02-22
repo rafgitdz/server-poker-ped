@@ -215,7 +215,7 @@ public class Game implements Serializable, Observer {
 
 		this.currentPot = 0;
 		for (Player player : this.players) {
-			player.currentBet = 0;
+			player.setCurrentBet(0);
 		}
 		Event.addEvent("RESET BET");
 	}

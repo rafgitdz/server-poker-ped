@@ -31,9 +31,9 @@ public class Player implements Serializable {
 
 	public transient Hand currentHand;
 
-	public int currentBet = 0;
-	public int currentTokens = 0;
-	public int money = 0;
+	private int currentBet = 0;
+	private int currentTokens = 0;
+	private int money = 0;
 
 	Player() {
 
@@ -104,12 +104,54 @@ public class Player implements Serializable {
 		return role == REGULAR;
 	}
 
+	// HAND
+	public boolean isfolded() {
+		return folded;
+	}
+
+	public void getBestHand() {
+		System.out.println("getBestHand() : TODO");
+	}
+
+	public void setCurrentHand(Hand hand) {
+		this.currentHand = hand;
+	}
+
+	public Hand getCurrentHand() {
+		return currentHand;
+	}
+	
+	// BET / TOKENS / MONEY
+	public int getCurrentBet() {
+		return this.currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+	
+	public int getCurrentTokens() {
+		return this.currentTokens;
+	}
+
+	public void setCurrentTokens(int tokens) {
+		this.currentTokens = tokens;
+	}
+	
+	public int getMoney() {
+		return money;
+	}
+
+	public void setMoney(int money) {
+		this.money = money;
+	}
+
 	// ACTIONS
 	public void raise(Game game, int quantity) {
 
 		int minTokenToRaise = (game.getCurrentBet() * 2 - this.currentBet);
-		
-		if (this.currentTokens < minTokenToRaise) {
+
+		if (quantity > this.currentTokens || quantity < minTokenToRaise) {
 			throw new PlayerException("not enough tokens to raise");
 		} else {
 			game.updateCurrentBet(quantity);
@@ -117,7 +159,7 @@ public class Player implements Serializable {
 			this.currentTokens -= quantity;
 			this.currentBet += quantity;
 		}
-		
+
 		Event.addEvent(name + " RAISES " + quantity);
 	}
 
@@ -128,9 +170,9 @@ public class Player implements Serializable {
 		if (this.currentTokens < minTokenToCall) {
 			throw new PlayerException("not enough tokens to call");
 		} else {
-	
+
 			game.updateCurrentBet(minTokenToCall);
-			game.updateCurrentPot(minTokenToCall);		
+			game.updateCurrentPot(minTokenToCall);
 			this.currentTokens -= minTokenToCall;
 			this.currentBet += minTokenToCall;
 		}
@@ -142,7 +184,7 @@ public class Player implements Serializable {
 
 		game.updateCurrentPot(this.currentTokens);
 		game.updateCurrentBet(this.currentTokens);
-		
+
 		this.currentTokens = 0;
 		this.currentBet += game.getCurrentBet();
 
@@ -158,24 +200,12 @@ public class Player implements Serializable {
 		folded = false;
 	}
 
-	public void check() {
-		System.out.println("check() : TODO");
-	}
-
-	// OTHER
-	public boolean isfolded() {
-		return folded;
-	}
-
-	public void getBestHand() {
-		System.out.println("getBestHand() : TODO");
-	}
-
-	public void setCurrentHand(Hand hand) {
-		this.currentHand = hand;
-	}
-
-	public Hand getCurrentHand() {
-		return currentHand;
+	public void check(Game game) {
+		if(this.currentBet != game.getCurrentBet()) {
+			throw new PlayerException("not enough tokens to check");
+		} else { 
+			
+		}
+		Event.addEvent(name + "CHECK");
 	}
 }
