@@ -29,25 +29,28 @@ public class TestPlayer {
 
 	private int quantity = 0;
 	
+	private void saveTestValues() {
+		gameTotalPot = game.getTotalPot();
+		gameCurrentPot = game.getCurrentPot();
+		gameCurrentBet = game.getCurrentBet();
+		
+		playerBet = player.getCurrentBet();
+		playerTokens = player.getCurrentTokens();
+	}
+	
+	// BEFORE / AFTER 
 	@Before
 	public void beforeTest() {
 
-		gameTotalPot = 0;
-		gameCurrentPot = 0;
-		gameCurrentBet = 0;
-		
-		playerBet = 0;
-		playerTokens = 50;
-		
-		quantity = 10;
-		
 		game = gameFactory.newGame();
 		game.updateCurrentBet(playerBet);
 		game.updateCurrentPot(gameCurrentPot);
 		
 		player = playerFactory.createUser("Lucas", "1234");
-		player.setCurrentTokens(playerTokens);
-		player.setCurrentBet(playerBet);
+		player.setCurrentTokens(50);
+		
+		saveTestValues();
+		quantity = 10;
 	}
 	
 	@After
@@ -56,6 +59,8 @@ public class TestPlayer {
 		player = null;
 	}
 
+	
+	// NAME / PWD
 	@Test
 	public void testName() {
 		assertEquals("Lucas", player.getName());
@@ -66,12 +71,6 @@ public class TestPlayer {
 		assertEquals("1234", player.getPwd());
 	}
 
-	private void saveGameBets() {
-		gameTotalPot = game.getTotalPot();
-		gameCurrentPot = game.getCurrentPot();
-		playerBet = player.getCurrentBet();
-		playerTokens = player.getCurrentTokens();
-	}
 	
 	// RAISE TESTS
 	@Test
@@ -162,7 +161,6 @@ public class TestPlayer {
 	public void testCheckEnough() {
 		game.updateCurrentBet(50);
 		player.setCurrentBet(50);
-		saveGameBets();
 		player.check(game);
 	}
 	
@@ -170,7 +168,6 @@ public class TestPlayer {
 	public void testCheckNotEnough() {
 		game.updateCurrentBet(60);
 		player.setCurrentBet(0);
-		saveGameBets();
 		player.check(game);
 	}
 }
