@@ -54,37 +54,6 @@ public class TestGame {
 
 	// DEAL CARD / ROUND
 	
-	private void initGame(){
-		game.add(player1);
-		game.add(player2);
-		game.add(player3);
-		game.add(player4);
-		game.add(player5);
-	}
-	
-	public void testNewGame() {
-		Player dealer = game.getPlayers().get(game.getDealer());
-		Player smallBlindPlayer = game.getPlayers().get(game.getSmallBlindPlayer());
-		Player bigBlindPlayer = game.getPlayers().get(game.getBigBlindPlayer());
-		Player currentPlayer = game.getPlayers().get(game.getCurrentPlayer());
-		
-		assertEquals(game.getDeck().getCards().size(), 52);
-		assertEquals(game.getFlipedCards().size(), 0);
-		
-		assertEquals(game.getCurrentBet(), 0);
-		assertEquals(game.getCurrentPot(), 0);
-		assertEquals(game.getTotalPot(), 0);
-		assertEquals(currentPlayer.getName(), player1.getName());
-		
-		assertEquals(dealer.getName(), player1.getName());
-		assertEquals(smallBlindPlayer.getName(), player2.getName());
-		assertEquals(bigBlindPlayer.getName(), player3.getName());
-		
-		assertEquals(dealer.isDealer(), true);
-		assertEquals(smallBlindPlayer.isBigBlind(), true);
-		assertEquals(bigBlindPlayer.isSmallBlind(), true);
-	}
-	
 	@Test
 	public void testDealCards() {
 		game.add(player1);
