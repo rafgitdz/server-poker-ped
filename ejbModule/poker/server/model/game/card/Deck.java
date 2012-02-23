@@ -6,14 +6,14 @@ import java.util.List;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.Event;
 
-public class Cards {
+public class Deck {
 
 	private static final int NUMBER_CARDS = 52;
 	private static final String NO_CARDS = "there isn't a cards on table !";
 
 	private List<Card> cards = null;
 
-	public Cards() {
+	public Deck() {
 		cards = new ArrayList<Card>(NUMBER_CARDS);
 		prepareCards();
 	}
@@ -60,8 +60,8 @@ public class Cards {
 		Event.addEvent("THE DECK IS SHUFFLED");
 	}
 
-	public int getSize() {
-		return cards.size();
+	public List<Card> getCards() {
+		return cards;
 	}
 
 	private void prepareCards() {

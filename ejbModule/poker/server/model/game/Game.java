@@ -2,6 +2,7 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -10,8 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
-import poker.server.model.game.card.Cards;
+import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
@@ -27,16 +29,18 @@ public class Game implements Serializable, Observer {
 
 	private transient Parameters gameType;
 
-	private transient Cards deck;
+	private transient Deck deck;
 
 	private transient List<Card> flippedCards;
 
 	private ArrayList<Player> players;
 	private int currentPlayer = 0;
-
+	private ArrayList<Player> playersRank;
+	
 	private int dealer = 0;
-	private int bigBlindPlayer = 0;
-	private int smallBlindPlayer = 0;
+	private int smallBlindPlayer = 1;
+	private int bigBlindPlayer = 2;
+	
 
 	private int smallBlind;
 	private int bigBlind;
@@ -66,9 +70,10 @@ public class Game implements Serializable, Observer {
 	}
 
 	private void buildGame() {
-		deck = new Cards();
+		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
+		playersRank = new ArrayList<Player>();
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
 		setStarted(false);
@@ -112,6 +117,22 @@ public class Game implements Serializable, Observer {
 		return currentPot;
 	}
 
+	public int getCurrentBet() {
+		return currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+	
+	public void setCurrentPot(int currentPot) {
+		this.currentPot = currentPot;
+	}
+	
+	public void setTotalPot(int totalPot) {
+		this.totalPot = totalPot;
+	}
+	
 	public int getCurrentRound() {
 		return currentRound;
 	}
@@ -120,6 +141,24 @@ public class Game implements Serializable, Observer {
 		return flippedCards;
 	}
 
+	public void setPlayerRoles() {
+		if (this.players.size() < 3) {
+			throw new GameException("not enough player to start a poker game ! (< 3)");
+		} else {
+			resetPlayers();
+			this.players.get(0).setAsDealer();
+			this.players.get(1).setAsBigBlind();
+			this.players.get(2).setAsSmallBlind();
+		}
+	}
+	
+	public void resetPlayers() {
+		for (Player p : this.players) {
+			p.setAsRegular();
+			p.unFold();
+		}
+	}
+	
 	public void nextPlayer() {
 
 		if (currentPlayer == (this.players.size() - 1))
@@ -128,38 +167,66 @@ public class Game implements Serializable, Observer {
 			currentPlayer++;
 	}
 
-	public void setDealer() {
+	public void nextDealer() {
 
 		if (this.dealer == (this.players.size() - 1))
 			this.dealer = 0;
 		else
 			this.dealer++;
 
-		Event.addEvent("THE DEALER IS : " + players.get(dealer).getName());
+		Player dealer = this.players.get(this.dealer);
+		dealer.setAsDealer();
+		
+		Event.addEvent("THE DEALER IS : " + dealer.getName());
 	}
 
-	public void setBigBlind() {
+	public void nextBigBlind() {
 
 		if (this.bigBlindPlayer == (this.players.size() - 1))
 			this.bigBlindPlayer = 0;
 		else
 			this.bigBlindPlayer++;
 
-		Event.addEvent("THE BIG BLIND IS : "
-				+ players.get(bigBlindPlayer).getName());
+		Player bigBlind = this.players.get(this.bigBlindPlayer);
+		bigBlind.setAsBigBlind();
+		
+		Event.addEvent("THE BIG BLIND IS : " + bigBlind.getName());
 	}
 
-	public void setSmallBlind() {
+	public void nextSmallBlind() {
 
 		if (smallBlindPlayer == (this.players.size() - 1))
 			smallBlindPlayer = 0;
 		else
 			smallBlindPlayer++;
 
-		Event.addEvent("THE SMALL BLIND IS : "
-				+ players.get(smallBlindPlayer).getName());
+		Player smallBlind = this.players.get(this.smallBlindPlayer);
+		smallBlind.setAsSmallBlind();
+		
+		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
+	}
+	
+	public Deck getDeck() {
+		return deck;
+	}
+	
+	public int getSmallBlind() {
+		return smallBlind;
 	}
 
+	public int getBigBlind() {
+		return bigBlind;
+	}
+
+	public boolean isStarted() {
+		return Started;
+	}
+
+	public void setStarted(boolean started) {
+		Started = started;
+	}
+	
+	
 	// ROUND MANAGEMENT
 	public Card flipCard() {
 		Card card = deck.getNextCard();
@@ -214,9 +281,12 @@ public class Game implements Serializable, Observer {
 	public void resetCurrentPot() {
 
 		this.currentPot = 0;
+		this.currentBet = 0;
+		
 		for (Player player : this.players) {
 			player.setCurrentBet(0);
 		}
+		
 		Event.addEvent("RESET BET");
 	}
 
@@ -230,6 +300,12 @@ public class Game implements Serializable, Observer {
 		Event.addEvent("UPDATE POT, POT = " + totalPot);
 	}
 
+	public void updateCurrentBet(int quantity) {
+		currentBet += quantity;
+		Event.addEvent("CURRENT BET = " + currentBet);
+	}
+	
+	
 	// OTHER
 	public void dealCards() {
 
@@ -248,43 +324,30 @@ public class Game implements Serializable, Observer {
 		Event.addEvent("START GAME");
 	}
 
-	public Cards getDeck() {
-		return deck;
-	}
-
 	public void add(Player player) {
 		players.add(player);
+	}	
+	
+	public void remove(Player player){
+		players.remove(player);
 	}
 
-	public int getSmallBlind() {
-		return smallBlind;
+	public void cleanTable() {
+		for(Iterator<Player> iter = players.iterator(); iter.hasNext();){
+			Player player = iter.next();
+			if(player.getCurrentTokens() == 0){
+				playersRank.add(0, player);
+				iter.remove();
+			}
+		}
 	}
-
-	public int getBigBlind() {
-		return bigBlind;
+	
+	public void drawRank(){
+		for(Player player : playersRank){
+			System.out.println(player.getName());
+		}
 	}
-
-	public boolean isStarted() {
-		return Started;
-	}
-
-	public void setStarted(boolean started) {
-		Started = started;
-	}
-
-	public int getCurrentBet() {
-		return currentBet;
-	}
-
-	public void setCurrentBet(int currentBet) {
-		this.currentBet = currentBet;
-	}
-
-	public void updateCurrentBet(int quantity) {
-		currentBet += quantity;
-		Event.addEvent("CURRENT BET = " + currentBet);
-	}
-
+	
 	@Override
 	public void update(Observable o, Object arg) {
 		updateBlind();

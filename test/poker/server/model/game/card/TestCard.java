@@ -15,12 +15,12 @@ import poker.server.model.game.GameFactoryLocal;
 
 public class TestCard {
 
-	private Cards cards;
+	private Deck cards;
 	private GameFactoryLocal gameFactory = new GameFactory();
 
 	@Before
 	public void beforeTest() {
-		cards = new Cards();
+		cards = new Deck();
 		gameFactory.newGame(); // to activate events only
 	}
 
@@ -33,7 +33,7 @@ public class TestCard {
 			cards.getNextCard();
 
 		int expected = 49;
-		assertEquals(expected, cards.getSize());
+		assertEquals(expected, cards.getCards().size());
 	}
 
 	@Test(expected = GameException.class)
@@ -57,7 +57,7 @@ public class TestCard {
 	public void testBurnedCard() {
 		cards.burnCard();
 		int expected = 51;
-		assertEquals(expected, cards.getSize());
+		assertEquals(expected, cards.getCards().size());
 	}
 
 	@Test(expected = GameException.class)

@@ -22,6 +22,7 @@ public class Player implements Serializable {
 	private int connectionStatus = 1;
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
+	public final static int IN_GAME = 3;
 
 	private int role = 4;
 	public final static int DEALER = 1;
@@ -34,9 +35,13 @@ public class Player implements Serializable {
 	private int currentBet = 0;
 	private int currentTokens = 0;
 	private int money = 0;
+	
+	private Game game;
 
 	Player() {
-
+		this.pwd = "guest";
+		this.name = "guest";
+		this.currentHand = new Hand();
 	}
 
 	Player(String name, String pwd) {
@@ -62,6 +67,10 @@ public class Player implements Serializable {
 	public void setAsMissing() {
 		this.connectionStatus = MISSING;
 	}
+	
+	public void setInGame() {
+		this.connectionStatus = IN_GAME;
+	}
 
 	public boolean isPresent() {
 		return this.connectionStatus == PRESENT;
@@ -69,6 +78,10 @@ public class Player implements Serializable {
 
 	public boolean isMissing() {
 		return this.connectionStatus == MISSING;
+	}
+	
+	public boolean isInGame(){
+		return this.connectionStatus == IN_GAME;
 	}
 
 	// STATUS
@@ -144,6 +157,33 @@ public class Player implements Serializable {
 
 	public void setMoney(int money) {
 		this.money = money;
+	}
+	
+	// GAME
+	public void setGame(Game game) {
+		this.game = game;
+	}
+	
+	public Game getGame() {
+		return game;
+	}
+	
+	public void connect(Game game){
+		if(!this.isPresent()) {
+			throw new PlayerException("the user is in game or missing");
+		} else {
+			game.getPlayers().add(this);
+			this.setInGame();
+			this.setGame(game);
+		}
+	}
+	
+	public void disconnect() {
+		if(!this.isInGame()) {
+			throw new PlayerException("the player is not connected to a game");
+		} else {
+			this.getGame().remove(this);
+		}
 	}
 
 	// ACTIONS
