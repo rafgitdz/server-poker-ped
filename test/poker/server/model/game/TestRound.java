@@ -34,7 +34,7 @@ public class TestRound {
 		
 	}
 	
-	private void initGame(){
+	private void initGame() {
 		game = gameFactory.newGame();
 		
 		player1 = playerFactory.createUser("rafik", "rafik");
@@ -48,16 +48,13 @@ public class TestRound {
 		game.add(player3);
 		game.add(player4);
 		game.add(player5);
+		
+		game.setPlayerRoles();
 	}
 	
 	@Test
 	public void testNewGame() {
 		initGame();
-		
-		Player dealer = game.getPlayers().get(game.getDealer());
-		Player smallBlindPlayer = game.getPlayers().get(game.getSmallBlindPlayer());
-		Player bigBlindPlayer = game.getPlayers().get(game.getBigBlindPlayer());
-		Player currentPlayer = game.getPlayers().get(game.getCurrentPlayer());
 		
 		assertEquals(game.getDeck().getCards().size(), 52);
 		assertEquals(game.getFlipedCards().size(), 0);
@@ -65,6 +62,18 @@ public class TestRound {
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
 		assertEquals(game.getTotalPot(), 0);
+		
+	}
+	
+	@Test
+	public void testNewPlayers() {
+		initGame();
+		
+		Player dealer = game.getPlayers().get(game.getDealer());
+		Player smallBlindPlayer = game.getPlayers().get(game.getSmallBlindPlayer());
+		Player bigBlindPlayer = game.getPlayers().get(game.getBigBlindPlayer());
+		Player currentPlayer = game.getPlayers().get(game.getCurrentPlayer());
+		
 		assertEquals(currentPlayer.getName(), player1.getName());
 		
 		assertEquals(dealer.getName(), player1.getName());

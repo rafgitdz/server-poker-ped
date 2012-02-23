@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
@@ -37,8 +38,9 @@ public class Game implements Serializable, Observer {
 	private ArrayList<Player> playersRank;
 	
 	private int dealer = 0;
-	private int bigBlindPlayer = 1;
-	private int smallBlindPlayer = 2;
+	private int smallBlindPlayer = 1;
+	private int bigBlindPlayer = 2;
+	
 
 	private int smallBlind;
 	private int bigBlind;
@@ -139,6 +141,17 @@ public class Game implements Serializable, Observer {
 		return flippedCards;
 	}
 
+	public void setPlayerRoles() {
+		if (this.players.size() < 3) {
+			throw new GameException("not enough player to start a poker game ! (< 3)");
+		} else {
+			resetPlayerRoles();
+			this.players.get(0).setAsDealer();
+			this.players.get(1).setAsBigBlind();
+			this.players.get(2).setAsSmallBlind();
+		}
+	}
+	
 	public void resetPlayerRoles() {
 		for (Player p : this.players) {
 			p.setAsRegular();
