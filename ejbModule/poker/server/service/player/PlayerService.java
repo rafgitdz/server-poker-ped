@@ -2,6 +2,7 @@ package poker.server.service.player;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.core.Response;
 
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.PlayerException;
@@ -57,10 +58,10 @@ public class PlayerService implements PlayerServiceRemote {
 		return player;
 	}
 
-	// @Override
-	// public Response testMessage(String message) {
-	//
-	// String result = "Restful example : " + message;
-	// return Response.status(200).entity(result).build();
-	// }
+	@Override
+	public Response testMessage(String message) {
+
+		String result = "Restful example : " + message;
+		return Response.status(200).entity(result).build();
+	}
 }
