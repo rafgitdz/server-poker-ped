@@ -57,4 +57,42 @@ public class TestGame {
 		int expected2 = 44;
 		assertEquals(expected2, game.getDeck().getSize());
 	}
+	
+	@Test
+	public void testUpdateBlind() {
+		assertEquals(10, game.getSmallBlind());
+		game.updateBlind();
+		assertEquals(20, game.getSmallBlind());
+	}
+	
+	@Test
+	public void testCleanTable() {
+		Player player1 = playerFactory.createUser("Rafik", "4533");
+		Player player2 = playerFactory.createUser("Lucas", "1234");
+		Player player3 = playerFactory.createUser("Georges", "1234");
+		
+		Game game = gameFactory.newGame();
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		
+		player1.setCurrentTokens(50);
+		player2.setCurrentTokens(50);
+		player3.setCurrentTokens(50);
+		game.cleanTable();
+		
+		int expected = 3;
+		assertEquals(expected, game.getPlayers().size());
+		
+		player1.setCurrentTokens(0);
+		game.cleanTable();
+		
+		player2.setCurrentTokens(0);
+		game.cleanTable();
+		
+		expected = 1;
+		assertEquals(expected, game.getPlayers().size());
+		
+		game.drawRank();
+	}
 }
