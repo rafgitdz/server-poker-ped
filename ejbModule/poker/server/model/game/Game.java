@@ -112,6 +112,22 @@ public class Game implements Serializable, Observer {
 		return currentPot;
 	}
 
+	public int getCurrentBet() {
+		return currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+	
+	public void setCurrentPot(int currentPot) {
+		this.currentPot = currentPot;
+	}
+	
+	public void setTotalPot(int totalPot) {
+		this.totalPot = totalPot;
+	}
+	
 	public int getCurrentRound() {
 		return currentRound;
 	}
@@ -128,7 +144,7 @@ public class Game implements Serializable, Observer {
 			currentPlayer++;
 	}
 
-	public void setDealer() {
+	public void nextDealer() {
 
 		if (this.dealer == (this.players.size() - 1))
 			this.dealer = 0;
@@ -158,14 +174,6 @@ public class Game implements Serializable, Observer {
 
 		Event.addEvent("THE SMALL BLIND IS : "
 				+ players.get(smallBlindPlayer).getName());
-	}
-
-	public int getCurrentBet() {
-		return currentBet;
-	}
-
-	public void setCurrentBet(int currentBet) {
-		this.currentBet = currentBet;
 	}
 	
 	public Cards getDeck() {
@@ -243,9 +251,12 @@ public class Game implements Serializable, Observer {
 	public void resetCurrentPot() {
 
 		this.currentPot = 0;
+		this.currentBet = 0;
+		
 		for (Player player : this.players) {
 			player.setCurrentBet(0);
 		}
+		
 		Event.addEvent("RESET BET");
 	}
 
