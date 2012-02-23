@@ -68,7 +68,9 @@ public class TestGame {
 		Player bigBlindPlayer = game.getPlayers().get(game.getBigBlindPlayer());
 		Player currentPlayer = game.getPlayers().get(game.getCurrentPlayer());
 		
-		assertEquals(game.getDeck().getSize(), 52);
+		assertEquals(game.getDeck().getCards().size(), 52);
+		assertEquals(game.getFlipedCards().size(), 0);
+		
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
 		assertEquals(game.getTotalPot(), 0);
@@ -90,7 +92,7 @@ public class TestGame {
 
 		game.dealCards();
 
-		assertEquals(game.getDeck().getSize(), 48);
+		assertEquals(game.getDeck().getCards().size(), 48);
 		assertEquals(player1.getCurrentHand().getSize(), 2);
 		assertEquals(player2.getCurrentHand().getSize(), 2);
 	}
@@ -103,7 +105,7 @@ public class TestGame {
 		game.tournant();
 		game.river();
 		int expected2 = 44;
-		assertEquals(expected2, game.getDeck().getSize());
+		assertEquals(expected2, game.getDeck().getCards().size());
 	}
 
 	

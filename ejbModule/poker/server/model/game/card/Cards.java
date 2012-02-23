@@ -60,8 +60,8 @@ public class Cards {
 		Event.addEvent("THE DECK IS SHUFFLED");
 	}
 
-	public int getSize() {
-		return cards.size();
+	public List<Card> getCards() {
+		return cards;
 	}
 
 	private void prepareCards() {
