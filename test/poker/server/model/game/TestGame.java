@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import poker.server.model.exception.GameException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
@@ -53,6 +54,42 @@ public class TestGame {
 	}
 
 	// DEAL CARD / ROUND
+	
+	@Test
+	public void testResetPlayerRoles() {
+		game.add(player1);
+		game.add(player2);
+
+		game.resetPlayerRoles();
+
+		assertEquals(player1.isRegular(), true);
+		assertEquals(player2.isRegular(), true);
+	}
+	
+	@Test
+	public void testSetPlayerRoles() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.setPlayerRoles();
+
+		assertEquals(player1.isDealer(), true);
+		assertEquals(player2.isBigBlind(), true);
+		assertEquals(player3.isSmallBlind(), true);
+		assertEquals(player4.isRegular(), true);
+		assertEquals(player5.isRegular(), true);
+	}
+	
+	@Test(expected = GameException.class)
+	public void testSetPlayerRolesNotEnough() {
+		game.add(player1);
+		game.add(player2);
+		
+		game.setPlayerRoles();
+	}
 	
 	@Test
 	public void testDealCards() {
