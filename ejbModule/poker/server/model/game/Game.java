@@ -145,16 +145,17 @@ public class Game implements Serializable, Observer {
 		if (this.players.size() < 3) {
 			throw new GameException("not enough player to start a poker game ! (< 3)");
 		} else {
-			resetPlayerRoles();
+			resetPlayers();
 			this.players.get(0).setAsDealer();
 			this.players.get(1).setAsBigBlind();
 			this.players.get(2).setAsSmallBlind();
 		}
 	}
 	
-	public void resetPlayerRoles() {
+	public void resetPlayers() {
 		for (Player p : this.players) {
 			p.setAsRegular();
+			p.unFold();
 		}
 	}
 	

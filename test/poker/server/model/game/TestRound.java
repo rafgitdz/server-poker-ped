@@ -50,14 +50,28 @@ public class TestRound {
 		game.add(player5);
 		
 		game.setPlayerRoles();
+		game.dealCards();
+	}
+	
+	private void flop() {
+		game.flop();
+	}
+	
+	private void playersPlaying() {
+		player1.raise(game, 20);
+		player2.call(game);
+		player3.fold();
+		player4.check(game);
+		player5.raise(game, 20);
+		
+		player1.call(game);
+		player2.call(game);
+		player3.call(game);
 	}
 	
 	@Test
 	public void testNewGame() {
 		initGame();
-		
-		assertEquals(game.getDeck().getCards().size(), 52);
-		assertEquals(game.getFlipedCards().size(), 0);
 		
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
@@ -66,7 +80,7 @@ public class TestRound {
 	}
 	
 	@Test
-	public void testNewPlayers() {
+	public void testNewPlayerRoles() {
 		initGame();
 		
 		Player dealer = game.getPlayers().get(game.getDealer());
@@ -83,6 +97,23 @@ public class TestRound {
 		assertEquals(dealer.isDealer(), true);
 		assertEquals(smallBlindPlayer.isBigBlind(), true);
 		assertEquals(bigBlindPlayer.isSmallBlind(), true);
+		
+		assertEquals(player4.isRegular(), true);
+		assertEquals(player5.isRegular(), true);
 	}
 
+	@Test
+	public void testNewGameCards() {
+		initGame();
+		
+		int fullDeckCardQt = 52;
+		int afterDealCardQt = fullDeckCardQt - (game.getPlayers().size() * 2);
+				
+		assertEquals(game.getDeck().getCards().size(), afterDealCardQt);
+		assertEquals(game.getFlipedCards().size(), 0);
+		
+		for (Player p : game.getPlayers()) {
+			assertEquals(p.getCurrentHand().getCards().size(), 2);
+		}
+	}
 }

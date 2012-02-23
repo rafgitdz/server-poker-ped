@@ -56,14 +56,23 @@ public class TestGame {
 	// DEAL CARD / ROUND
 	
 	@Test
-	public void testResetPlayerRoles() {
+	public void testResetPlayers() {
 		game.add(player1);
 		game.add(player2);
 
-		game.resetPlayerRoles();
+		player1.setAsDealer();
+		player1.fold();
+		
+		player2.setAsSmallBlind();
+		player2.fold();
+		
+		game.resetPlayers();
 
 		assertEquals(player1.isRegular(), true);
 		assertEquals(player2.isRegular(), true);
+		
+		assertEquals(player1.isfolded(), false);
+		assertEquals(player2.isfolded(), false);
 	}
 	
 	@Test
