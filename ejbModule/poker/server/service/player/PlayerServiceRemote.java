@@ -3,6 +3,8 @@ package poker.server.service.player;
 import javax.ejb.Remote;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import poker.server.model.player.Player;
 
@@ -20,7 +22,7 @@ public interface PlayerServiceRemote {
 
 	public Player loadPlayer(String name);
 
-	// @GET
-	// @Path("/{param}")
-	// public Response testMessage(@PathParam("param") String message);
+	 @GET
+	 @Path("/{param}")
+	 public Response testMessage(@PathParam("param") String message);
 }

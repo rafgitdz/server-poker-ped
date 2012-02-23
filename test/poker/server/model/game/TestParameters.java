@@ -2,20 +2,16 @@ package poker.server.model.game;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import poker.server.model.game.parameters.Parameters;
-import poker.server.model.player.Player;
-import poker.server.model.player.PlayerFactory;
-import poker.server.model.player.PlayerFactoryLocal;
 
 public class TestParameters {
 	
-	private PlayerFactoryLocal playerFactory = new PlayerFactory();
 	private GameFactoryLocal gameFactory = new GameFactory();
 
 	private Game game;
