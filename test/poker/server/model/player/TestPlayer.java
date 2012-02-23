@@ -1,11 +1,10 @@
 package poker.server.model.player;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.hamcrest.*;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
@@ -191,5 +190,38 @@ public class TestPlayer {
 		player.setCurrentBet(0);
 		saveTestValues();
 		player.check(game);
+	}
+	
+	// CONNECT/DISCONNECT
+	@Test
+	public void testConnect() {
+		player.connect(game);
+		
+		int expected = 1; 
+		assertEquals(expected, game.getPlayers().size());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testFailConnect() {
+		player.setInGame();
+		player.connect(game);
+	}
+	
+	@Test
+	public void testDisconnect() {
+		player.connect(game);
+		
+		int expected = 1; 
+		assertEquals(expected, game.getPlayers().size());
+		
+		player.disconnect();
+		
+		expected = 0;
+		assertEquals(expected, game.getPlayers().size());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testFailDisconnect() {
+		player.disconnect();
 	}
 }

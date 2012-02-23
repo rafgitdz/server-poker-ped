@@ -105,8 +105,7 @@ public class TestGame {
 		int expected2 = 44;
 		assertEquals(expected2, game.getDeck().getSize());
 	}
-	
-	
+
 	
 	
 	// POT / BET
@@ -194,5 +193,39 @@ public class TestGame {
 		int quantity = 30;
 		game.updateCurrentBet(quantity);
 		assertEquals(gameCurrentBet + quantity, game.getCurrentBet());
+	}
+	
+	@Test
+	public void testUpdateBlind() {
+		assertEquals(10, game.getSmallBlind());
+		game.updateBlind();
+		assertEquals(20, game.getSmallBlind());
+	}
+	
+	@Test
+	public void testCleanTable() {
+		Game game = gameFactory.newGame();
+		player1.setCurrentTokens(50);
+		player2.setCurrentTokens(50);
+		player3.setCurrentTokens(50);
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		
+		game.cleanTable();
+		
+		int expected = 3;
+		assertEquals(expected, game.getPlayers().size());
+		
+		player1.setCurrentTokens(0);
+		game.cleanTable();
+		
+		player2.setCurrentTokens(0);
+		game.cleanTable();
+		
+		expected = 1;
+		assertEquals(expected, game.getPlayers().size());
+		
+		game.drawRank();
 	}
 }

@@ -2,6 +2,7 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -33,7 +34,8 @@ public class Game implements Serializable, Observer {
 
 	private ArrayList<Player> players;
 	private int currentPlayer = 0;
-
+	private ArrayList<Player> playersRank;
+	
 	private int dealer = 0;
 	private int bigBlindPlayer = 1;
 	private int smallBlindPlayer = 2;
@@ -69,6 +71,7 @@ public class Game implements Serializable, Observer {
 		deck = new Cards();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
+		playersRank = new ArrayList<Player>();
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
 		setStarted(false);
@@ -310,7 +313,27 @@ public class Game implements Serializable, Observer {
 	public void add(Player player) {
 		players.add(player);
 	}	
+	
+	public void remove(Player player){
+		players.remove(player);
+	}
 
+	public void cleanTable() {
+		for(Iterator<Player> iter = players.iterator(); iter.hasNext();){
+			Player player = iter.next();
+			if(player.getCurrentTokens() == 0){
+				playersRank.add(0, player);
+				iter.remove();
+			}
+		}
+	}
+	
+	public void drawRank(){
+		for(Player player : playersRank){
+			System.out.println(player.getName());
+		}
+	}
+	
 	@Override
 	public void update(Observable o, Object arg) {
 		updateBlind();
