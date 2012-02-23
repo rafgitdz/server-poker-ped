@@ -35,8 +35,8 @@ public class Game implements Serializable, Observer {
 	private int currentPlayer = 0;
 
 	private int dealer = 0;
-	private int bigBlindPlayer = 0;
-	private int smallBlindPlayer = 0;
+	private int bigBlindPlayer = 1;
+	private int smallBlindPlayer = 2;
 
 	private int smallBlind;
 	private int bigBlind;
@@ -136,6 +136,12 @@ public class Game implements Serializable, Observer {
 		return flippedCards;
 	}
 
+	public void resetPlayerRoles() {
+		for (Player p : this.players) {
+			p.setAsRegular();
+		}
+	}
+	
 	public void nextPlayer() {
 
 		if (currentPlayer == (this.players.size() - 1))
@@ -151,29 +157,36 @@ public class Game implements Serializable, Observer {
 		else
 			this.dealer++;
 
-		Event.addEvent("THE DEALER IS : " + players.get(dealer).getName());
+		Player dealer = this.players.get(this.dealer);
+		dealer.setAsDealer();
+		
+		Event.addEvent("THE DEALER IS : " + dealer.getName());
 	}
 
-	public void setBigBlind() {
+	public void nextBigBlind() {
 
 		if (this.bigBlindPlayer == (this.players.size() - 1))
 			this.bigBlindPlayer = 0;
 		else
 			this.bigBlindPlayer++;
 
-		Event.addEvent("THE BIG BLIND IS : "
-				+ players.get(bigBlindPlayer).getName());
+		Player bigBlind = this.players.get(this.bigBlindPlayer);
+		bigBlind.setAsBigBlind();
+		
+		Event.addEvent("THE BIG BLIND IS : " + bigBlind.getName());
 	}
 
-	public void setSmallBlind() {
+	public void nextSmallBlind() {
 
 		if (smallBlindPlayer == (this.players.size() - 1))
 			smallBlindPlayer = 0;
 		else
 			smallBlindPlayer++;
 
-		Event.addEvent("THE SMALL BLIND IS : "
-				+ players.get(smallBlindPlayer).getName());
+		Player smallBlind = this.players.get(this.smallBlindPlayer);
+		smallBlind.setAsSmallBlind();
+		
+		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
 	}
 	
 	public Cards getDeck() {

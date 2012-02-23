@@ -36,7 +36,9 @@ public class Player implements Serializable {
 	private int money = 0;
 
 	Player() {
-
+		this.pwd = "guest";
+		this.name = "guest";
+		this.currentHand = new Hand();
 	}
 
 	Player(String name, String pwd) {
