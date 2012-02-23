@@ -12,7 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import poker.server.model.game.card.Card;
-import poker.server.model.game.card.Cards;
+import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
@@ -28,7 +28,7 @@ public class Game implements Serializable, Observer {
 
 	private transient Parameters gameType;
 
-	private transient Cards deck;
+	private transient Deck deck;
 
 	private transient List<Card> flippedCards;
 
@@ -68,7 +68,7 @@ public class Game implements Serializable, Observer {
 	}
 
 	private void buildGame() {
-		deck = new Cards();
+		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
 		playersRank = new ArrayList<Player>();
@@ -192,7 +192,7 @@ public class Game implements Serializable, Observer {
 		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
 	}
 	
-	public Cards getDeck() {
+	public Deck getDeck() {
 		return deck;
 	}
 	

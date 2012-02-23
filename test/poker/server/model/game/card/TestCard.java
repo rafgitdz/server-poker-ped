@@ -15,12 +15,12 @@ import poker.server.model.game.GameFactoryLocal;
 
 public class TestCard {
 
-	private Cards cards;
+	private Deck cards;
 	private GameFactoryLocal gameFactory = new GameFactory();
 
 	@Before
 	public void beforeTest() {
-		cards = new Cards();
+		cards = new Deck();
 		gameFactory.newGame(); // to activate events only
 	}
 
