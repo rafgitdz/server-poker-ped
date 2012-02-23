@@ -235,7 +235,7 @@ public class Hand {
 		return null;
 	}
 
-	public List<Card> getCurrentHand() {
+	public List<Card> getCards() {
 		return this.cards;
 	}
 
