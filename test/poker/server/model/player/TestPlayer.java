@@ -191,4 +191,37 @@ public class TestPlayer {
 		saveTestValues();
 		player.check(game);
 	}
+	
+	// CONNECT/DISCONNECT
+	@Test
+	public void testConnect() {
+		player.connect(game);
+		
+		int expected = 1; 
+		assertEquals(expected, game.getPlayers().size());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testFailConnect() {
+		player.setInGame();
+		player.connect(game);
+	}
+	
+	@Test
+	public void testDisconnect() {
+		player.connect(game);
+		
+		int expected = 1; 
+		assertEquals(expected, game.getPlayers().size());
+		
+		player.disconnect();
+		
+		expected = 0;
+		assertEquals(expected, game.getPlayers().size());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testFailDisconnect() {
+		player.disconnect();
+	}
 }
