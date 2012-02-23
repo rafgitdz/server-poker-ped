@@ -52,11 +52,7 @@ public class TestRound {
 		game.setPlayerRoles();
 		game.dealCards();
 	}
-	
-	private void flop() {
-		game.flop();
-	}
-	
+
 	private void playersPlaying() {
 		player1.raise(game, 20);
 		player2.call(game);
@@ -76,7 +72,6 @@ public class TestRound {
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
 		assertEquals(game.getTotalPot(), 0);
-		
 	}
 	
 	@Test
@@ -115,5 +110,15 @@ public class TestRound {
 		for (Player p : game.getPlayers()) {
 			assertEquals(p.getCurrentHand().getCards().size(), 2);
 		}
+	}
+	
+	@Test
+	public void preflop() {
+		initGame();
+		game.flop();
+		
+		playersPlaying();
+
+		
 	}
 }
