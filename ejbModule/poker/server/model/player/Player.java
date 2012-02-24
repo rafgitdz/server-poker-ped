@@ -1,6 +1,7 @@
 package poker.server.model.player;
 
 import java.io.Serializable;
+import java.util.Observable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -8,9 +9,10 @@ import javax.persistence.Id;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Event;
 import poker.server.model.game.Game;
+import poker.server.model.game.card.Card;
 
 @Entity
-public class Player implements Serializable {
+public class Player extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
 	@Id
@@ -35,7 +37,7 @@ public class Player implements Serializable {
 	private int currentBet = 0;
 	private int currentTokens = 0;
 	private int money = 0;
-	
+
 	private Game game;
 
 	Player() {
@@ -67,7 +69,7 @@ public class Player implements Serializable {
 	public void setAsMissing() {
 		this.connectionStatus = MISSING;
 	}
-	
+
 	public void setInGame() {
 		this.connectionStatus = IN_GAME;
 	}
@@ -79,8 +81,8 @@ public class Player implements Serializable {
 	public boolean isMissing() {
 		return this.connectionStatus == MISSING;
 	}
-	
-	public boolean isInGame(){
+
+	public boolean isInGame() {
 		return this.connectionStatus == IN_GAME;
 	}
 
@@ -133,7 +135,7 @@ public class Player implements Serializable {
 	public Hand getCurrentHand() {
 		return currentHand;
 	}
-	
+
 	// BET / TOKENS / MONEY
 	public int getCurrentBet() {
 		return this.currentBet;
@@ -142,7 +144,7 @@ public class Player implements Serializable {
 	public void setCurrentBet(int currentBet) {
 		this.currentBet = currentBet;
 	}
-	
+
 	public int getCurrentTokens() {
 		return this.currentTokens;
 	}
@@ -150,7 +152,7 @@ public class Player implements Serializable {
 	public void setCurrentTokens(int tokens) {
 		this.currentTokens = tokens;
 	}
-	
+
 	public int getMoney() {
 		return money;
 	}
@@ -158,18 +160,18 @@ public class Player implements Serializable {
 	public void setMoney(int money) {
 		this.money = money;
 	}
-	
+
 	// GAME
 	public void setGame(Game game) {
 		this.game = game;
 	}
-	
+
 	public Game getGame() {
 		return game;
 	}
-	
-	public void connect(Game game){
-		if(!this.isPresent()) {
+
+	public void connect(Game game) {
+		if (!this.isPresent()) {
 			throw new PlayerException("the user is in game or missing");
 		} else {
 			game.getPlayers().add(this);
@@ -177,9 +179,9 @@ public class Player implements Serializable {
 			this.setGame(game);
 		}
 	}
-	
+
 	public void disconnect() {
-		if(!this.isInGame()) {
+		if (!this.isInGame()) {
 			throw new PlayerException("the player is not connected to a game");
 		} else {
 			this.getGame().remove(this);
@@ -199,7 +201,9 @@ public class Player implements Serializable {
 			this.currentTokens -= quantity;
 			this.currentBet += quantity;
 		}
-
+		setChanged();
+		game.update(this, "raise"); // inform the game that a player raises
+		game.nextPlayer();
 		Event.addEvent(name + " RAISES " + quantity);
 	}
 
@@ -217,6 +221,7 @@ public class Player implements Serializable {
 			this.currentBet += minTokenToCall;
 		}
 
+		game.nextPlayer();
 		Event.addEvent(name + " CALLS");
 	}
 
@@ -227,12 +232,13 @@ public class Player implements Serializable {
 
 		this.currentTokens = 0;
 		this.currentBet += game.getCurrentBet();
-
+		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
 	}
 
 	public void fold() {
 		folded = true;
+		game.nextPlayer();
 		Event.addEvent(name + " FOLDS");
 	}
 
@@ -241,11 +247,17 @@ public class Player implements Serializable {
 	}
 
 	public void check(Game game) {
-		if(this.currentBet != game.getCurrentBet()) {
+
+		if (this.currentBet != game.getCurrentBet()) {
 			throw new PlayerException("not enough tokens to check");
-		} else { 
-			
+		} else {
+			// ???
 		}
-		Event.addEvent(name + "CHECK");
+		game.nextPlayer();
+		Event.addEvent(name + " CHECKS");
+	}
+
+	public void addCard(Card card) {
+		currentHand.addCard(card);
 	}
 }

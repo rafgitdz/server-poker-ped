@@ -36,11 +36,10 @@ public class Game implements Serializable, Observer {
 	private ArrayList<Player> players;
 	private int currentPlayer = 0;
 	private ArrayList<Player> playersRank;
-	
+
 	private int dealer = 0;
 	private int smallBlindPlayer = 1;
 	private int bigBlindPlayer = 2;
-	
 
 	private int smallBlind;
 	private int bigBlind;
@@ -56,7 +55,12 @@ public class Game implements Serializable, Observer {
 	public static final int TOURNANT = 2;
 	public static final int RIVER = 3;
 
+	private static final String UNKNOWN_ROUND = "unknown round !";
+
 	private boolean Started;
+
+	@SuppressWarnings("unused")
+	private int lastRaisedPlayer;
 
 	// CONSTRUCTOR
 	protected Game() {
@@ -124,15 +128,15 @@ public class Game implements Serializable, Observer {
 	public void setCurrentBet(int currentBet) {
 		this.currentBet = currentBet;
 	}
-	
+
 	public void setCurrentPot(int currentPot) {
 		this.currentPot = currentPot;
 	}
-	
+
 	public void setTotalPot(int totalPot) {
 		this.totalPot = totalPot;
 	}
-	
+
 	public int getCurrentRound() {
 		return currentRound;
 	}
@@ -142,74 +146,111 @@ public class Game implements Serializable, Observer {
 	}
 
 	public void setPlayerRoles() {
-		if (this.players.size() < 3) {
-			throw new GameException("not enough player to start a poker game ! (< 3)");
+
+		if (this.players.size() < 8) {
+			throw new GameException(
+					"not enough player to start a poker game ! (< 8)");
 		} else {
 			resetPlayers();
 			this.players.get(0).setAsDealer();
 			this.players.get(1).setAsBigBlind();
 			this.players.get(2).setAsSmallBlind();
+			this.currentPlayer = 3;
 		}
 	}
-	
+
 	public void resetPlayers() {
 		for (Player p : this.players) {
 			p.setAsRegular();
 			p.unFold();
 		}
 	}
-	
+
 	public void nextPlayer() {
 
-		if (currentPlayer == (this.players.size() - 1))
-			currentPlayer = 0;
-		else
-			currentPlayer++;
+		currentPlayer = (currentPlayer % this.players.size()) + 1;
+		if (players.get(currentPlayer).isSmallBlind())
+			nextRound();
+	}
+
+	private void nextRound() {
+
+		if (currentRound == RIVER)
+			showDown();
+
+		cleanTable();
+		resetPlayers();
+		nextDealer();
+		nextBigBlind();
+		nextSmallBlind();
+		updateRoundPot();
+		flipRoundCard();
+	}
+
+	private void showDown() {
+		// TO DO
+	}
+
+	private void flipRoundCard() {
+
+		switch (currentRound) {
+		case FLOP:
+			flop();
+			break;
+		case TOURNANT:
+			tournant();
+			break;
+		case RIVER:
+			river();
+			break;
+		default:
+			throw new GameException(UNKNOWN_ROUND);
+		}
+
+		currentRound = (currentRound % RIVER) + 1;
+	}
+
+	private void updateRoundPot() {
+
+		for (Player player : this.players)
+			player.setCurrentBet(0);
+
+		this.currentBet = 0;
+		this.totalPot = this.currentPot;
+		Event.addEvent("RESET BET");
 	}
 
 	public void nextDealer() {
 
-		if (this.dealer == (this.players.size() - 1))
-			this.dealer = 0;
-		else
-			this.dealer++;
-
+		this.dealer = (this.dealer % this.players.size()) + 1;
 		Player dealer = this.players.get(this.dealer);
 		dealer.setAsDealer();
-		
+
 		Event.addEvent("THE DEALER IS : " + dealer.getName());
 	}
 
 	public void nextBigBlind() {
 
-		if (this.bigBlindPlayer == (this.players.size() - 1))
-			this.bigBlindPlayer = 0;
-		else
-			this.bigBlindPlayer++;
-
+		this.bigBlind = (this.bigBlind % this.players.size()) + 1;
 		Player bigBlind = this.players.get(this.bigBlindPlayer);
 		bigBlind.setAsBigBlind();
-		
+
 		Event.addEvent("THE BIG BLIND IS : " + bigBlind.getName());
 	}
 
 	public void nextSmallBlind() {
 
-		if (smallBlindPlayer == (this.players.size() - 1))
-			smallBlindPlayer = 0;
-		else
-			smallBlindPlayer++;
-
+		this.smallBlind = (this.smallBlind % this.players.size()) + 1;
 		Player smallBlind = this.players.get(this.smallBlindPlayer);
 		smallBlind.setAsSmallBlind();
-		
+
 		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
 	}
-	
+
 	public Deck getDeck() {
 		return deck;
 	}
-	
+
 	public int getSmallBlind() {
 		return smallBlind;
 	}
@@ -225,8 +266,7 @@ public class Game implements Serializable, Observer {
 	public void setStarted(boolean started) {
 		Started = started;
 	}
-	
-	
+
 	// ROUND MANAGEMENT
 	public Card flipCard() {
 		Card card = deck.getNextCard();
@@ -282,11 +322,11 @@ public class Game implements Serializable, Observer {
 
 		this.currentPot = 0;
 		this.currentBet = 0;
-		
+
 		for (Player player : this.players) {
 			player.setCurrentBet(0);
 		}
-		
+
 		Event.addEvent("RESET BET");
 	}
 
@@ -304,16 +344,16 @@ public class Game implements Serializable, Observer {
 		currentBet += quantity;
 		Event.addEvent("CURRENT BET = " + currentBet);
 	}
-	
-	
+
 	// OTHER
 	public void dealCards() {
 
 		Card card;
 		for (int i = 0; i < 2; i++) {
+
 			for (Player player : players) {
 				card = deck.getNextCard();
-				player.currentHand.addCard(card);
+				player.addCard(card);
 			}
 		}
 		Event.addEvent("DEAL CARDS FOR PLAYERS");
@@ -326,30 +366,36 @@ public class Game implements Serializable, Observer {
 
 	public void add(Player player) {
 		players.add(player);
-	}	
-	
-	public void remove(Player player){
+	}
+
+	public void remove(Player player) {
 		players.remove(player);
 	}
 
 	public void cleanTable() {
-		for(Iterator<Player> iter = players.iterator(); iter.hasNext();){
+
+		for (Iterator<Player> iter = players.iterator(); iter.hasNext();) {
+
 			Player player = iter.next();
-			if(player.getCurrentTokens() == 0){
+			if (player.getCurrentTokens() == 0) {
 				playersRank.add(0, player);
 				iter.remove();
 			}
 		}
 	}
-	
-	public void drawRank(){
-		for(Player player : playersRank){
+
+	public void drawRank() {
+		for (Player player : playersRank) {
 			System.out.println(player.getName());
 		}
 	}
-	
+
 	@Override
 	public void update(Observable o, Object arg) {
-		updateBlind();
+
+		if (arg.equals("upadateBlind"))
+			updateBlind();
+		else if (arg.equals("raise"))
+			lastRaisedPlayer = currentPlayer;
 	}
 }
