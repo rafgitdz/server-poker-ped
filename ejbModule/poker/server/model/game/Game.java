@@ -2,6 +2,8 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -42,6 +44,11 @@ public class Game implements Serializable {
 	private int bet = 0;
 
 	private int currentRound = 1;
+	
+	GregorianCalendar d = new GregorianCalendar();	
+	
+	private int time = (d.get(Calendar.HOUR)*60 + d.get(Calendar.MINUTE))*60 + d.get(Calendar.SECOND);
+	private int timer = 0;
 
 	// to be used...
 	@SuppressWarnings("unused")
@@ -54,7 +61,7 @@ public class Game implements Serializable {
 	private boolean Started;
 
 	// CONSTRUCTOR
-	Game() {
+	public Game() {
 		gameType = new SitAndGo();
 		deck = new Cards();
 		flippedCards = new ArrayList<Card>();
@@ -191,9 +198,13 @@ public class Game implements Serializable {
 
 	// BLIND / BET / POT MANAGEMENT
 	public void updateBlind() {
-		int blindMultFactor = gameType.getBuyInIncreasing();
-		smallBlindPlayer = smallBlind * blindMultFactor;
-		bigBlindPlayer = bigBlind * blindMultFactor;
+		int blindMultFactor = gameType.getBuyInIncreasing();		
+		
+			if(Started & time-timer==180){
+				smallBlindPlayer = smallBlind * blindMultFactor;
+				bigBlindPlayer = bigBlind * blindMultFactor;
+				timer = time;		
+			}			
 	}
 
 	public void resetBet() {
@@ -230,6 +241,9 @@ public class Game implements Serializable {
 
 	public void start() {
 		System.out.println("start() : TODO");
+		
+		//initialisation of the timer
+		timer = time;
 	}
 
 	public Cards getDeck() {
@@ -237,7 +251,11 @@ public class Game implements Serializable {
 	}
 
 	public void add(Player player) {
+		if(players.size()!=8)
 		players.add(player);
+		else
+			this.start();
+			
 	}
 
 	public int getSmallBlind() {
