@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import poker.server.model.exception.PlayerException;
+import poker.server.model.game.Event;
 import poker.server.model.game.Game;
 
 @Entity
@@ -21,6 +22,7 @@ public class Player implements Serializable {
 	private int connectionStatus = 1;
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
+	public final static int IN_GAME = 3;
 
 	private int role = 4;
 	public final static int DEALER = 1;
@@ -30,12 +32,16 @@ public class Player implements Serializable {
 
 	public transient Hand currentHand;
 
-	public int currentBet = 0;
-	public int currentTokens = 0;
-	public int money = 0;
+	private int currentBet = 0;
+	private int currentTokens = 0;
+	private int money = 0;
+	
+	private Game game;
 
 	Player() {
-
+		this.pwd = "guest";
+		this.name = "guest";
+		this.currentHand = new Hand();
 	}
 
 	Player(String name, String pwd) {
@@ -61,6 +67,10 @@ public class Player implements Serializable {
 	public void setAsMissing() {
 		this.connectionStatus = MISSING;
 	}
+	
+	public void setInGame() {
+		this.connectionStatus = IN_GAME;
+	}
 
 	public boolean isPresent() {
 		return this.connectionStatus == PRESENT;
@@ -68,6 +78,10 @@ public class Player implements Serializable {
 
 	public boolean isMissing() {
 		return this.connectionStatus == MISSING;
+	}
+	
+	public boolean isInGame(){
+		return this.connectionStatus == IN_GAME;
 	}
 
 	// STATUS
@@ -103,64 +117,9 @@ public class Player implements Serializable {
 		return role == REGULAR;
 	}
 
-	// ACTIONS
-	public void raise(Game game, int quantity) {
-
-		int minTokenToRaise = (game.getBet() - this.currentBet)
-				* game.getGameType().getMultFactor();
-
-		if (this.currentTokens < minTokenToRaise) {
-			throw new PlayerException("not enough tokens to raise");
-		} else {
-
-			if (quantity < minTokenToRaise) {
-				quantity = minTokenToRaise;
-			}
-
-			this.currentTokens -= quantity;
-			this.currentBet += quantity;
-			game.updateBet(quantity);
-			game.updateBets(quantity);
-		}
-	}
-
-	public void call(Game game) {
-
-		int minTokenToCall = (game.getBet() - this.currentBet);
-
-		if (this.currentTokens < minTokenToCall) {
-			throw new PlayerException("not enough tokens to call");
-		} else {
-			this.currentTokens -= minTokenToCall;
-			this.currentBet += minTokenToCall;
-			game.updateBet(minTokenToCall);
-			game.updateBets(minTokenToCall);
-		}
-	}
-
-	public void allIn(Game game) {
-
-		game.updateBet(this.currentTokens);
-		game.updateBets(this.currentTokens);
-		this.currentBet += game.getBet();
-		this.currentTokens = 0;
-	}
-
-	public void fold() {
-		this.folded = true;
-	}
-
-	public void unFold() {
-		this.folded = false;
-	}
-
-	public void check() {
-		System.out.println("check() : TODO");
-	}
-
-	// OTHER
+	// HAND
 	public boolean isfolded() {
-		return this.folded;
+		return folded;
 	}
 
 	public void getBestHand() {
@@ -169,5 +128,124 @@ public class Player implements Serializable {
 
 	public void setCurrentHand(Hand hand) {
 		this.currentHand = hand;
+	}
+
+	public Hand getCurrentHand() {
+		return currentHand;
+	}
+	
+	// BET / TOKENS / MONEY
+	public int getCurrentBet() {
+		return this.currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+	
+	public int getCurrentTokens() {
+		return this.currentTokens;
+	}
+
+	public void setCurrentTokens(int tokens) {
+		this.currentTokens = tokens;
+	}
+	
+	public int getMoney() {
+		return money;
+	}
+
+	public void setMoney(int money) {
+		this.money = money;
+	}
+	
+	// GAME
+	public void setGame(Game game) {
+		this.game = game;
+	}
+	
+	public Game getGame() {
+		return game;
+	}
+	
+	public void connect(Game game){
+		if(!this.isPresent()) {
+			throw new PlayerException("the user is in game or missing");
+		} else {
+			game.getPlayers().add(this);
+			this.setInGame();
+			this.setGame(game);
+		}
+	}
+	
+	public void disconnect() {
+		if(!this.isInGame()) {
+			throw new PlayerException("the player is not connected to a game");
+		} else {
+			this.getGame().remove(this);
+		}
+	}
+
+	// ACTIONS
+	public void raise(Game game, int quantity) {
+
+		int minTokenToRaise = (game.getCurrentBet() * 2 - this.currentBet);
+
+		if (quantity > this.currentTokens || quantity < minTokenToRaise) {
+			throw new PlayerException("not enough tokens to raise");
+		} else {
+			game.updateCurrentBet(quantity);
+			game.updateCurrentPot(quantity);
+			this.currentTokens -= quantity;
+			this.currentBet += quantity;
+		}
+
+		Event.addEvent(name + " RAISES " + quantity);
+	}
+
+	public void call(Game game) {
+
+		int minTokenToCall = (game.getCurrentBet() - this.currentBet);
+
+		if (this.currentTokens < minTokenToCall) {
+			throw new PlayerException("not enough tokens to call");
+		} else {
+
+			game.updateCurrentBet(minTokenToCall);
+			game.updateCurrentPot(minTokenToCall);
+			this.currentTokens -= minTokenToCall;
+			this.currentBet += minTokenToCall;
+		}
+
+		Event.addEvent(name + " CALLS");
+	}
+
+	public void allIn(Game game) {
+
+		game.updateCurrentPot(this.currentTokens);
+		game.updateCurrentBet(this.currentTokens);
+
+		this.currentTokens = 0;
+		this.currentBet += game.getCurrentBet();
+
+		Event.addEvent(name + " ALLIN");
+	}
+
+	public void fold() {
+		folded = true;
+		Event.addEvent(name + " FOLDS");
+	}
+
+	public void unFold() {
+		folded = false;
+	}
+
+	public void check(Game game) {
+		if(this.currentBet != game.getCurrentBet()) {
+			throw new PlayerException("not enough tokens to check");
+		} else { 
+			
+		}
+		Event.addEvent(name + "CHECK");
 	}
 }

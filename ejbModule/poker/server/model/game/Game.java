@@ -2,20 +2,25 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+
+import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import poker.server.model.exception.GameException;
+import poker.server.model.game.card.Card;
+import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 @Entity
-public class Game implements Serializable {
+public class Game implements Serializable, Observer {
 
 	private static final long serialVersionUID = 2687924657560495636L;
 
@@ -25,61 +30,59 @@ public class Game implements Serializable {
 
 	private transient Parameters gameType;
 
-	private transient Cards deck;
+	private transient Deck deck;
 
 	private transient List<Card> flippedCards;
 
 	private ArrayList<Player> players;
 	private int currentPlayer = 0;
-
+	private ArrayList<Player> playersRank;
+	
 	private int dealer = 0;
-	private int bigBlindPlayer = 0;
-	private int smallBlindPlayer = 0;
+	private int smallBlindPlayer = 1;
+	private int bigBlindPlayer = 2;
+	
 
 	private int smallBlind;
 	private int bigBlind;
 
-	private int pot = 0;
-	private int bets = 0;
-	private int bet = 0;
+	private int totalPot = 0;
+	private int currentPot = 0;
+	private int currentBet = 0;
 
 	private int currentRound = 1;
 	
-	GregorianCalendar d = new GregorianCalendar();	
 	
-	private int time = (d.get(Calendar.HOUR)*60 + d.get(Calendar.MINUTE))*60 + d.get(Calendar.SECOND);
-	private int timer = 0;
-
-	// to be used...
-	@SuppressWarnings("unused")
-	private static final int FLOP = 1;
-	@SuppressWarnings("unused")
-	private static final int TOURNANT = 2;
-	@SuppressWarnings("unused")
-	private static final int RIVER = 3;
+		// to be used...
+	public static final int FLOP = 1;
+	public static final int TOURNANT = 2;
+	public static final int RIVER = 3;
 
 	private boolean Started;
 
 	// CONSTRUCTOR
-	public Game() {
+
+	
+	protected Game() {
+
 		gameType = new SitAndGo();
-		deck = new Cards();
+		buildGame();
+	}
+
+	protected Game(Parameters gameT) {
+		gameType = gameT;
+		buildGame();
+	}
+
+	private void buildGame() {
+		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
-		// update blinds from parameters
+		playersRank = new ArrayList<Player>();
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
 		setStarted(false);
-	}
-
-	Game(Parameters gameT) {
-		gameType = gameT;
-		deck = new Cards();
-		flippedCards = new ArrayList<Card>();
-		players = new ArrayList<Player>();
-		// update blinds from parameters
-		smallBlind = gameType.getSmallBlind();
-		bigBlind = gameType.getBigBlind();
+		Event.buildEvents();
 	}
 
 	// GETTERS / SETTERS
@@ -111,18 +114,30 @@ public class Game implements Serializable {
 		return smallBlindPlayer;
 	}
 
-	public int getPot() {
-		return pot;
+	public int getTotalPot() {
+		return totalPot;
 	}
 
-	public int getBets() {
-		return bets;
+	public int getCurrentPot() {
+		return currentPot;
 	}
 
-	public int getBet() {
-		return bet;
+	public int getCurrentBet() {
+		return currentBet;
 	}
 
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+	
+	public void setCurrentPot(int currentPot) {
+		this.currentPot = currentPot;
+	}
+	
+	public void setTotalPot(int totalPot) {
+		this.totalPot = totalPot;
+	}
+	
 	public int getCurrentRound() {
 		return currentRound;
 	}
@@ -131,6 +146,24 @@ public class Game implements Serializable {
 		return flippedCards;
 	}
 
+	public void setPlayerRoles() {
+		if (this.players.size() < 3) {
+			throw new GameException("not enough player to start a poker game ! (< 3)");
+		} else {
+			resetPlayers();
+			this.players.get(0).setAsDealer();
+			this.players.get(1).setAsBigBlind();
+			this.players.get(2).setAsSmallBlind();
+		}
+	}
+	
+	public void resetPlayers() {
+		for (Player p : this.players) {
+			p.setAsRegular();
+			p.unFold();
+		}
+	}
+	
 	public void nextPlayer() {
 
 		if (currentPlayer == (this.players.size() - 1))
@@ -139,125 +172,49 @@ public class Game implements Serializable {
 			currentPlayer++;
 	}
 
-	public void setDealer() {
+	public void nextDealer() {
 
 		if (this.dealer == (this.players.size() - 1))
 			this.dealer = 0;
 		else
 			this.dealer++;
+
+		Player dealer = this.players.get(this.dealer);
+		dealer.setAsDealer();
+		
+		Event.addEvent("THE DEALER IS : " + dealer.getName());
 	}
 
-	public void setBigBlind() {
+	public void nextBigBlind() {
 
 		if (this.bigBlindPlayer == (this.players.size() - 1))
 			this.bigBlindPlayer = 0;
 		else
 			this.bigBlindPlayer++;
+
+		Player bigBlind = this.players.get(this.bigBlindPlayer);
+		bigBlind.setAsBigBlind();
+		
+		Event.addEvent("THE BIG BLIND IS : " + bigBlind.getName());
 	}
 
-	public void setSmallBlind() {
+	public void nextSmallBlind() {
 
 		if (smallBlindPlayer == (this.players.size() - 1))
 			smallBlindPlayer = 0;
 		else
 			smallBlindPlayer++;
-	}
 
-	// ROUND MANAGEMENT
-	public void flipCard() {
-		Card card = deck.getNextCard();
-		flippedCards.add(card);
-	}
-
-	public void flop() {
-
-		deck.burnCard();
-
-		for (int i = 0; i < 3; i++) {
-			flipCard();
-		}
-		updatePot();
-		resetBet();
-	}
-
-	public void tournant() {
-
-		deck.burnCard();
-		flipCard();
-		updatePot();
-		resetBet();
-	}
-
-	public void river() {
-
-		deck.burnCard();
-		flipCard();
-		updatePot();
-		resetBet();
-	}
-
-	// BLIND / BET / POT MANAGEMENT
-	public void updateBlind() {
-		int blindMultFactor = gameType.getBuyInIncreasing();		
+		Player smallBlind = this.players.get(this.smallBlindPlayer);
+		smallBlind.setAsSmallBlind();
 		
-			if(Started & time-timer==180){
-				smallBlindPlayer = smallBlind * blindMultFactor;
-				bigBlindPlayer = bigBlind * blindMultFactor;
-				timer = time;		
-			}			
+		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
 	}
-
-	public void resetBet() {
-
-		bet = 0;
-		for (Player player : this.players) {
-			player.currentBet = 0;
-		}
-	}
-
-	public void updateBet(int quantity) {
-		bet += quantity;
-	}
-
-	public void updateBets(int quantity) {
-		bets += quantity;
-	}
-
-	public void updatePot() {
-		pot += bets;
-		bets = 0;
-	}
-
-	// OTHER
-	public void dealCards() {
-		Card card;
-		for (int i = 0; i < 2; i++) {
-			for (Player player : players) {
-				card = deck.getNextCard();
-				player.currentHand.addCard(card);
-			}
-		}
-	}
-
-	public void start() {
-		System.out.println("start() : TODO");
-		
-		//initialisation of the timer
-		timer = time;
-	}
-
-	public Cards getDeck() {
+	
+	public Deck getDeck() {
 		return deck;
 	}
-
-	public void add(Player player) {
-		if(players.size()!=8)
-		players.add(player);
-		else
-			this.start();
-			
-	}
-
+	
 	public int getSmallBlind() {
 		return smallBlind;
 	}
@@ -272,5 +229,147 @@ public class Game implements Serializable {
 
 	public void setStarted(boolean started) {
 		Started = started;
+	}
+	
+	
+	// ROUND MANAGEMENT
+	public Card flipCard() {
+		Card card = deck.getNextCard();
+		flippedCards.add(card);
+		return card;
+	}
+
+	public void flop() {
+
+		String eventFlop = "FLOP : ";
+		Card card;
+		deck.burnCard();
+
+		for (int i = 0; i < 3; i++) {
+			card = flipCard();
+			eventFlop += card.getValue() + " " + card.getSuit() + " , ";
+		}
+		updateTotalPot();
+		resetCurrentPot();
+		Event.addEvent(eventFlop);
+	}
+
+	public void tournant() {
+
+		deck.burnCard();
+		Card card = flipCard();
+		updateTotalPot();
+		resetCurrentPot();
+		Event.addEvent("TOURNANT : " + card.getValue() + " " + card.getSuit());
+	}
+
+	public void river() {
+
+		deck.burnCard();
+		Card card = flipCard();
+		updateTotalPot();
+		resetCurrentPot();
+		Event.addEvent("RIVER : " + card.getValue() + " " + card.getSuit());
+	}
+
+	// BLIND / BET / POT MANAGEMENT
+	public void updateBlind() {
+		
+		int blindMultFactor = gameType.getMultFactor();
+		smallBlind = smallBlind * blindMultFactor;
+		bigBlind = smallBlind * 2;
+
+		Event.addEvent("SMALL BLIND = " + smallBlind + " , BIG BLIND = "
+				+ bigBlind);
+
+	}
+
+	public void resetCurrentPot() {
+
+		this.currentPot = 0;
+		this.currentBet = 0;
+		
+		for (Player player : this.players) {
+			player.setCurrentBet(0);
+		}
+		
+		Event.addEvent("RESET BET");
+	}
+
+	public void updateCurrentPot(int quantity) {
+		this.currentPot += quantity;
+		Event.addEvent("BETS = " + currentPot);
+	}
+
+	public void updateTotalPot() {
+		this.totalPot += this.currentPot;
+		Event.addEvent("UPDATE POT, POT = " + totalPot);
+	}
+
+	public void updateCurrentBet(int quantity) {
+		currentBet += quantity;
+		Event.addEvent("CURRENT BET = " + currentBet);
+	}
+	
+	
+	// OTHER
+	public void dealCards() {
+
+		Card card;
+		for (int i = 0; i < 2; i++) {
+			for (Player player : players) {
+				card = deck.getNextCard();
+				player.currentHand.addCard(card);
+			}
+		}
+		Event.addEvent("DEAL CARDS FOR PLAYERS");
+	}
+
+	public void start() {
+		System.out.println("start() : TODO");		
+		
+	}
+
+	//public Cards getDeck() {
+		//return deck;
+
+		//Event.addEvent("START GAME");
+
+	//}
+
+	public void add(Player player) {
+		if(players.size()!=8)
+		players.add(player);
+
+		else
+			this.start();
+			
+
+	}	
+	
+	public void remove(Player player){
+		players.remove(player);
+	}
+
+	public void cleanTable() {
+		for(Iterator<Player> iter = players.iterator(); iter.hasNext();){
+			Player player = iter.next();
+			if(player.getCurrentTokens() == 0){
+				playersRank.add(0, player);
+				iter.remove();
+			}
+		}
+
+	}
+	
+	public void drawRank(){
+		for(Player player : playersRank){
+			System.out.println(player.getName());
+		}
+	}
+	
+	@Override
+	public void update(Observable o, Object arg) {
+		updateBlind();
 	}
 }

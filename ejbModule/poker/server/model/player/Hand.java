@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import poker.server.model.exception.PlayerException;
-import poker.server.model.game.Card;
-import poker.server.model.game.Cards;
+import poker.server.model.game.card.Card;
+import poker.server.model.game.card.Value;
 
 public class Hand {
 
@@ -21,24 +21,24 @@ public class Hand {
 	private static final int HIGH_CARD = 0;
 	private static final String NOT_FIVE_CARDS = "can't evaluate less than or more than five cards";
 
-	private List<Card> currentHand;
+	private List<Card> cards;
 
 	Hand() {
-		currentHand = new ArrayList<Card>();
+		cards = new ArrayList<Card>();
 	}
 
 	public void addCards(List<Card> addCards) {
 		for (Card c : addCards)
-			currentHand.add(c);
+			cards.add(c);
 	}
 
 	public void addCard(Card card) {
-		currentHand.add(card);
+		cards.add(card);
 	}
 
 	public int evaluateHand() {
 
-		if (currentHand.size() != 5)
+		if (cards.size() != 5)
 			throw new PlayerException(NOT_FIVE_CARDS);
 
 		if (isRoyalFlush())
@@ -65,21 +65,21 @@ public class Hand {
 
 	public boolean isRoyalFlush() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 
 		sort(tempCards); // sort list from the less value card to the greater
 
 		// handle the case when the Ace play the high card role
 		String suit = tempCards.get(0).getSuit();
-		if (tempCards.get(0).getValue() == Cards.ACE
+		if (tempCards.get(0).getValue() == Value.ACE
 				&& tempCards.get(0).getSuit().equals(suit)
-				&& tempCards.get(1).getValue() == Cards.TEN
+				&& tempCards.get(1).getValue() == Value.TEN
 				&& tempCards.get(1).getSuit().equals(suit)
-				&& tempCards.get(2).getValue() == Cards.JACK
+				&& tempCards.get(2).getValue() == Value.JACK
 				&& tempCards.get(2).getSuit().equals(suit)
-				&& tempCards.get(3).getValue() == Cards.QUEEN
+				&& tempCards.get(3).getValue() == Value.QUEEN
 				&& tempCards.get(3).getSuit().equals(suit)
-				&& tempCards.get(4).getValue() == Cards.KING
+				&& tempCards.get(4).getValue() == Value.KING
 				&& tempCards.get(4).getSuit().equals(suit))
 			return true;
 
@@ -88,7 +88,7 @@ public class Hand {
 
 	public boolean isStraightFlush() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 		sort(tempCards);
 
 		// handle the others cases
@@ -104,7 +104,7 @@ public class Hand {
 
 	public boolean isQuads() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 
 		// detect if for the first card, it exists a 4 suit from the remaining
 		// cards
@@ -120,7 +120,7 @@ public class Hand {
 
 		// List<Card> tempCards = currentHand;
 		int count = 1;
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 
 		Card firstCard = tempCards.get(0);
 		tempCards.remove(firstCard);
@@ -153,10 +153,10 @@ public class Hand {
 
 	public boolean isFlush() {
 
-		String suit = currentHand.get(0).getSuit();
+		String suit = cards.get(0).getSuit();
 
 		// all the cards must have the same suit
-		for (Card card : currentHand) {
+		for (Card card : cards) {
 			if (card.getSuit() != suit)
 				return false;
 		}
@@ -165,16 +165,16 @@ public class Hand {
 
 	public boolean isStraight() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 
 		sort(tempCards); // sort list from the less value card to the greater
 
 		// handle the case when the Ace play the high card role
-		if (tempCards.get(0).getValue() == Cards.ACE) {
-			if (tempCards.get(1).getValue() == Cards.TEN
-					&& tempCards.get(2).getValue() == Cards.JACK
-					&& tempCards.get(3).getValue() == Cards.QUEEN
-					&& tempCards.get(4).getValue() == Cards.KING)
+		if (tempCards.get(0).getValue() == Value.ACE) {
+			if (tempCards.get(1).getValue() == Value.TEN
+					&& tempCards.get(2).getValue() == Value.JACK
+					&& tempCards.get(3).getValue() == Value.QUEEN
+					&& tempCards.get(4).getValue() == Value.KING)
 				return true;
 		}
 
@@ -189,7 +189,7 @@ public class Hand {
 
 	public boolean isTrips() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 		// detect if for the first card, it exists a 3-suit from the remaining
 		// cards
 		for (int i = 0; i < 3; ++i) {
@@ -202,7 +202,7 @@ public class Hand {
 
 	public boolean isTwoPair() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 		// if it exists a pair, remade to search a second pair if there is
 		// else not
 		for (int i = 0; i < 4; ++i) {
@@ -218,7 +218,7 @@ public class Hand {
 
 	public boolean isOnePair() {
 
-		List<Card> tempCards = currentHand;
+		List<Card> tempCards = cards;
 
 		// detect if for the first card, it exists a 2-suit from the remaining
 		// cards
@@ -235,8 +235,8 @@ public class Hand {
 		return null;
 	}
 
-	public List<Card> getCurrentHand() {
-		return this.currentHand;
+	public List<Card> getCards() {
+		return this.cards;
 	}
 
 	private int countSuitCards(List<Card> tempCards) {
@@ -264,5 +264,9 @@ public class Hand {
 				}
 			}
 		}
+	}
+
+	public int getSize() {
+		return cards.size();
 	}
 }
