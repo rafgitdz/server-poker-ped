@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.Observable;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Event;
@@ -15,35 +18,36 @@ import poker.server.model.game.card.Card;
 public class Player extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
+
 	@Id
 	private String name;
-	private String pwd;
+	String pwd;
 
-	private boolean folded = false;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "Game_Id")
+	Game game;
 
-	private int connectionStatus = 1;
+	boolean folded = false;
+
+	int connectionStatus = 1;
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
 	public final static int IN_GAME = 3;
 
-	private int role = 4;
 	public final static int DEALER = 1;
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
 
-	public transient Hand currentHand;
+	int role;
 
-	private int currentBet = 0;
-	private int currentTokens = 0;
-	private int money = 0;
+	transient Hand currentHand;
 
-	private Game game;
+	int currentBet = 0;
+	int currentTokens = 0;
+	int money = 0;
 
 	Player() {
-		this.pwd = "guest";
-		this.name = "guest";
-		this.currentHand = new Hand();
 	}
 
 	Player(String name, String pwd) {

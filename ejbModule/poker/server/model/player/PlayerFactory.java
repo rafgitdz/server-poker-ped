@@ -12,7 +12,7 @@ public class PlayerFactory implements PlayerFactoryLocal {
 	RepositoryPlayer repositoryPlayer;
 	
 	@Override
-	public Player createUser(String name, String pwd) {
+	public Player newPlayer(String name, String pwd) {
 		Player player = new Player(name, pwd);
 		return player;
 	}

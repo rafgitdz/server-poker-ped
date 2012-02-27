@@ -19,11 +19,11 @@ public abstract class Parameters {
 	protected int bigBlind = 0;
 	protected int smallBlind = 0;
 
-	protected int playerNumber = 0;
-	protected int speakTime = 0;
+	protected int initPlayersTokens = 0;
 
-	protected int timeChangeBlind = 180; // in seconds
-	protected int timePlaying = 30; // in seconds
+	protected int playerNumber = 0;
+	protected int speakTime = 0; // in seconds
+	protected int timeChangeBlind = 0; // in seconds
 
 	protected void setPotSplit(List<Integer> percents) {
 
@@ -45,59 +45,63 @@ public abstract class Parameters {
 			}
 		}
 
-		this.buyInSplit = finalSplit;
+		buyInSplit = finalSplit;
 	}
 
 	protected void setPotAsCash() {
-		this.potType = CASH;
+		potType = CASH;
 	}
 
 	protected void setPotAsToken() {
-		this.potType = TOKEN;
+		potType = TOKEN;
 	}
 
-	protected void setBlinds(int smallBlind) {
-		this.smallBlind = smallBlind;
-		this.bigBlind = smallBlind * this.multFactor;
+	protected void setBlinds(int smallB) {
+		smallBlind = smallB;
+		bigBlind = smallBlind * multFactor;
 	}
 
 	public List<Integer> getPotSplit() {
-		return this.buyInSplit;
+		return buyInSplit;
 	}
 
 	public int getPlayerNumber() {
-		return this.playerNumber;
+		return playerNumber;
 	}
 
 	public boolean isCashPot() {
-		return this.potType == CASH;
+		return potType == CASH;
 	}
 
 	public boolean isTokenPot() {
-		return this.potType == TOKEN;
+		return potType == TOKEN;
 	}
 
 	public int getBuyIn() {
-		return this.buyIn;
+		return buyIn;
 	}
 
 	public int getBuyInIncreasing() {
-		return this.buyInIncreasing;
+		return buyInIncreasing;
 	}
 
 	public int getMultFactor() {
-		return this.multFactor;
+		return multFactor;
 	}
 
 	public int getBigBlind() {
-		return this.bigBlind;
+		return bigBlind;
 	}
 
 	public int getSmallBlind() {
-		return this.smallBlind;
+		return smallBlind;
 	}
 
 	public int getSpeakTime() {
-		return this.speakTime;
+		return speakTime;
+	}
+
+	public int getTokens() {
+		return initPlayersTokens;
 	}
 }

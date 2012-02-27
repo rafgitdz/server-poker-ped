@@ -10,6 +10,9 @@ import java.util.Observer;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.IndexColumn;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
@@ -21,46 +24,52 @@ import poker.server.model.player.Player;
 @Entity
 public class Game implements Serializable, Observer {
 
-	private static final long serialVersionUID = 2687924657560495636L;
+	static final long serialVersionUID = 2687924657560495636L;
 
 	@Id
 	@GeneratedValue
-	private int id;
+	public int id;
 
-	private transient Parameters gameType;
+	transient Parameters gameType;
 
-	private transient Deck deck;
+	transient Deck deck;
 
-	private transient List<Card> flippedCards;
+	transient List<Card> flippedCards;
 
-	private ArrayList<Player> players;
-	private int currentPlayer = 0;
-	private ArrayList<Player> playersRank;
+	@OneToMany
+	@IndexColumn(name = "PlayerIndex")
+	List<Player> players;
 
-	private int dealer = 0;
-	private int smallBlindPlayer = 1;
-	private int bigBlindPlayer = 2;
+	transient List<Player> playersRank;
 
-	private int smallBlind;
-	private int bigBlind;
+	int currentPlayer = 0;
 
-	private int totalPot = 0;
-	private int currentPot = 0;
-	private int currentBet = 0;
+	int dealer = -1;
+	int smallBlindPlayer = -1;
+	int bigBlindPlayer = -1;
 
-	private int currentRound = 1;
+	int smallBlind;
+	int bigBlind;
+
+	int totalPot = 0;
+	int currentPot = 0;
+	int currentBet = 0;
+	int prizePool = 0;
+
+	int currentRound = 1;
 
 	// to be used...
 	public static final int FLOP = 1;
 	public static final int TOURNANT = 2;
 	public static final int RIVER = 3;
 
-	private static final String UNKNOWN_ROUND = "unknown round !";
+	static final String UNKNOWN_ROUND = "unknown round !";
 
-	private boolean Started;
+	boolean Started;
 
-	@SuppressWarnings("unused")
-	private int lastRaisedPlayer;
+	int lastRaisedPlayer;
+
+	int gameLevel = 0;
 
 	// CONSTRUCTOR
 	protected Game() {
@@ -73,7 +82,8 @@ public class Game implements Serializable, Observer {
 		buildGame();
 	}
 
-	private void buildGame() {
+	void buildGame() {
+
 		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
@@ -84,77 +94,20 @@ public class Game implements Serializable, Observer {
 		Event.buildEvents();
 	}
 
-	// GETTERS / SETTERS
-	public int getId() {
-		return id;
-	}
-
-	public Parameters getGameType() {
-		return gameType;
-	}
-
-	public ArrayList<Player> getPlayers() {
-		return players;
-	}
-
-	public int getCurrentPlayer() {
-		return currentPlayer;
-	}
-
-	public int getDealer() {
-		return dealer;
-	}
-
-	public int getBigBlindPlayer() {
-		return bigBlindPlayer;
-	}
-
-	public int getSmallBlindPlayer() {
-		return smallBlindPlayer;
-	}
-
-	public int getTotalPot() {
-		return totalPot;
-	}
-
-	public int getCurrentPot() {
-		return currentPot;
-	}
-
-	public int getCurrentBet() {
-		return currentBet;
-	}
-
-	public void setCurrentBet(int currentBet) {
-		this.currentBet = currentBet;
-	}
-
-	public void setCurrentPot(int currentPot) {
-		this.currentPot = currentPot;
-	}
-
-	public void setTotalPot(int totalPot) {
-		this.totalPot = totalPot;
-	}
-
-	public int getCurrentRound() {
-		return currentRound;
-	}
-
-	public List<Card> getFlipedCards() {
-		return flippedCards;
-	}
-
 	public void setPlayerRoles() {
 
-		if (this.players.size() < 8) {
+		if (this.players.size() < gameType.getPlayerNumber()) {
 			throw new GameException(
-					"not enough player to start a poker game ! (< 8)");
+					"not enough player to start a poker game ! < "
+							+ gameType.getPlayerNumber());
 		} else {
 			resetPlayers();
 			this.players.get(0).setAsDealer();
 			this.players.get(1).setAsBigBlind();
 			this.players.get(2).setAsSmallBlind();
+			bigBlindPlayer = 1;
+			smallBlindPlayer = 2;
+			dealer = 0;
 			this.currentPlayer = 3;
 		}
 	}
@@ -173,7 +126,7 @@ public class Game implements Serializable, Observer {
 			nextRound();
 	}
 
-	private void nextRound() {
+	void nextRound() {
 
 		if (currentRound == RIVER)
 			showDown();
@@ -187,11 +140,11 @@ public class Game implements Serializable, Observer {
 		flipRoundCard();
 	}
 
-	private void showDown() {
+	void showDown() {
 		// TO DO
 	}
 
-	private void flipRoundCard() {
+	void flipRoundCard() {
 
 		switch (currentRound) {
 		case FLOP:
@@ -210,7 +163,7 @@ public class Game implements Serializable, Observer {
 		currentRound = (currentRound % RIVER) + 1;
 	}
 
-	private void updateRoundPot() {
+	void updateRoundPot() {
 
 		for (Player player : this.players)
 			player.setCurrentBet(0);
@@ -310,6 +263,7 @@ public class Game implements Serializable, Observer {
 	// BLIND / BET / POT MANAGEMENT
 	public void updateBlind() {
 
+		++gameLevel;
 		int blindMultFactor = gameType.getMultFactor();
 		smallBlind = smallBlind * blindMultFactor;
 		bigBlind = smallBlind * 2;
@@ -360,8 +314,21 @@ public class Game implements Serializable, Observer {
 	}
 
 	public void start() {
-		System.out.println("start() : TODO");
+
+		setPlayerRoles();
+		initPlayersTokens();
+		fixPrizePool();
+		++gameLevel;
+
 		Event.addEvent("START GAME");
+	}
+
+	private void initPlayersTokens() {
+
+		for (Player player : players) {
+			player.setCurrentTokens(gameType.getTokens());
+			player.setAsPresent();
+		}
 	}
 
 	public void add(Player player) {
@@ -390,6 +357,10 @@ public class Game implements Serializable, Observer {
 		}
 	}
 
+	public void fixPrizePool() {
+		prizePool = getMaxPlayers() * gameType.getBuyIn();
+	}
+
 	@Override
 	public void update(Observable o, Object arg) {
 
@@ -397,5 +368,82 @@ public class Game implements Serializable, Observer {
 			updateBlind();
 		else if (arg.equals("raise"))
 			lastRaisedPlayer = currentPlayer;
+	}
+
+	public int getNumberOfPlayers() {
+		return players.size();
+	}
+
+	// GETTERS / SETTERS
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Parameters getGameType() {
+		return gameType;
+	}
+
+	public List<Player> getPlayers() {
+		return players;
+	}
+
+	public int getCurrentPlayer() {
+		return currentPlayer;
+	}
+
+	public int getDealer() {
+		return dealer;
+	}
+
+	public int getBigBlindPlayer() {
+		return bigBlindPlayer;
+	}
+
+	public int getSmallBlindPlayer() {
+		return smallBlindPlayer;
+	}
+
+	public int getTotalPot() {
+		return totalPot;
+	}
+
+	public int getCurrentPot() {
+		return currentPot;
+	}
+
+	public int getCurrentBet() {
+		return currentBet;
+	}
+
+	public void setCurrentBet(int currentBet) {
+		this.currentBet = currentBet;
+	}
+
+	public void setCurrentPot(int currentPot) {
+		this.currentPot = currentPot;
+	}
+
+	public void setTotalPot(int totalPot) {
+		this.totalPot = totalPot;
+	}
+
+	public int getCurrentRound() {
+		return currentRound;
+	}
+
+	public List<Card> getFlipedCards() {
+		return flippedCards;
+	}
+
+	public int getGameLevel() {
+		return gameLevel;
+	}
+
+	public int getMaxPlayers() {
+		return gameType.getPlayerNumber();
 	}
 }

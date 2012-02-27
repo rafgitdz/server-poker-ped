@@ -2,14 +2,19 @@ package poker.server.service.player;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 
+@Path("/playerService")
 @Stateless
-public class PlayerService implements PlayerServiceRemote {
+public class PlayerService {
 
 	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
 	private static final String ERROR_PLAYER_ALREADY_EXISTS = "The player already exists: ";
@@ -21,32 +26,44 @@ public class PlayerService implements PlayerServiceRemote {
 	@EJB
 	PlayerFactoryLocal playerFactory;
 
-	@Override
-	public Player createUser(String name, String pwd) {
+	@GET
+	@Path("/playerCreate/{name}/{pwd}")
+	public Player createUser(@PathParam("name") String name,
+			@PathParam("pwd") String pwd) {
+
 		if (repositoryPlayer.load(name) != null) {
 			throw new PlayerException(ERROR_PLAYER_ALREADY_EXISTS + name);
 		}
 
-		return repositoryPlayer.save(playerFactory.createUser(name, pwd));
+		return repositoryPlayer.save(playerFactory.newPlayer(name, pwd));
 	}
 
-	@Override
-	public Player authentificate(String name, String pwd) {
+	@GET
+	@Path("/playerConnexion/{name}/{pwd}")
+	public Player connexion(@PathParam("name") String name,
+			@PathParam("pwd") String pwd) {
 
 		if (repositoryPlayer.load(name) == null) {
-			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
+			
 		}
 
 		Player player = repositoryPlayer.load(name);
 
-		if (player.getPwd() != pwd) {
+		if (!player.getPwd().equals(pwd)) {
 			throw new PlayerException(ERROR_WRONG_PWD);
 		}
 
 		return player;
 	}
 
-	@Override
+	@GET
+	@Path("/{param}")
+	public Response testMessage(@PathParam("param") String message) {
+
+		String result = "Restful example : " + message;
+		return Response.status(200).entity(result).build();
+	}
+
 	public Player loadPlayer(String name) {
 
 		Player player = repositoryPlayer.load(name);
