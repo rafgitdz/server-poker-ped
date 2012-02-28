@@ -48,15 +48,16 @@ public class TestRound {
 
 	private void playersPlaying() {
 
-		player1.raise(20);
+		game.start();
+		player4.raise(40);
+		player5.raise(120);
+		player1.raise(400);
 		player2.call();
 		player3.fold();
-		player4.check();
-		player5.raise(20);
 
+		player4.call();
+		player5.call();
 		player1.call();
-		player2.call();
-		player3.call();
 	}
 
 	@Test
@@ -72,13 +73,12 @@ public class TestRound {
 	public void testNewPlayerRoles() {
 		initGame();
 
-		Player dealer = game.getPlayers().get(game.getDealer());
-		Player smallBlindPlayer = game.getPlayers().get(
-				game.getSmallBlindPlayer());
-		Player bigBlindPlayer = game.getPlayers().get(game.getBigBlindPlayer());
-		Player currentPlayer = game.getPlayers().get(game.getCurrentPlayer());
+		Player dealer = game.getDealerP();
+		Player smallBlindPlayer = game.getSmallBlindP();
+		Player bigBlindPlayer = game.getBigBlindP();
+		Player currentPlayer = game.currentPlayer();
 
-		assertEquals(currentPlayer.getName(), player1.getName());
+		assertEquals(currentPlayer.getName(), player4.getName());
 
 		assertEquals(dealer.getName(), player1.getName());
 		assertEquals(smallBlindPlayer.getName(), player2.getName());
@@ -109,10 +109,9 @@ public class TestRound {
 
 	@Test
 	public void preflop() {
+
 		initGame();
 		game.flop();
-
 		playersPlaying();
-
 	}
 }

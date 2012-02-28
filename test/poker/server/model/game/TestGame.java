@@ -26,6 +26,7 @@ public class TestGame {
 	private Player player4;
 	private Player player5;
 
+	@SuppressWarnings("unused")
 	private int gameTotalPot;
 	private int gameCurrentPot;
 	private int gameCurrentBet;
@@ -57,8 +58,11 @@ public class TestGame {
 
 	@Test
 	public void testResetPlayers() {
+
 		game.add(player1);
 		game.add(player2);
+		player1.setGame(game);
+		player2.setGame(game);
 
 		player1.setAsDealer();
 		player1.fold();
@@ -126,6 +130,7 @@ public class TestGame {
 	// POT / BET
 
 	private void saveTestValues() {
+
 		gameTotalPot = game.getTotalPot();
 		gameCurrentPot = game.getCurrentPot();
 		gameCurrentBet = game.getCurrentBet();
@@ -191,21 +196,23 @@ public class TestGame {
 
 	@Test
 	public void testUpdateTotalPot() {
+
 		game.setTotalPot(10);
 		game.setCurrentPot(20);
 		saveTestValues();
-
 		game.updateRoundPotAndBets();
-		assertEquals(gameTotalPot + gameCurrentPot, game.getTotalPot());
+		
+		assertEquals(gameCurrentPot, game.getTotalPot());
 	}
 
 	@Test
 	public void testUpdateCurrentBet() {
+
 		game.setCurrentBet(10);
 		saveTestValues();
-
 		int quantity = 30;
 		game.updateCurrentBet(quantity);
+
 		assertEquals(gameCurrentBet + quantity, game.getCurrentBet());
 	}
 

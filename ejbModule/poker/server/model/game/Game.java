@@ -363,8 +363,8 @@ public class Game implements Serializable, Observer {
 			player.setCurrentBet(0);
 
 		currentBet = 0;
-		currentPot = 0;
 		totalPot = currentPot;
+		currentPot = 0;
 		Event.addEvent("RESET PLAYERS BETS AND UPDATE POT OF THE GAME");
 	}
 
@@ -421,6 +421,7 @@ public class Game implements Serializable, Observer {
 	 */
 	public void add(Player player) {
 		players.add(player);
+		player.setGame(this);
 	}
 
 	/**
@@ -442,13 +443,15 @@ public class Game implements Serializable, Observer {
 					"not enough player to start a poker game ! < "
 							+ gameType.getPlayerNumber());
 		} else {
+
 			resetPlayers();
 			players.get(0).setAsDealer();
 			players.get(1).setAsBigBlind();
 			players.get(2).setAsSmallBlind();
-			bigBlindPlayer = 1;
-			smallBlindPlayer = 2;
+
 			dealer = 0;
+			smallBlindPlayer = 1;
+			bigBlindPlayer = 2;
 			currentPlayer = 3;
 		}
 	}
@@ -587,5 +590,26 @@ public class Game implements Serializable, Observer {
 
 	public void setStarted(boolean started) {
 		Started = started;
+	}
+
+	// FOR TEST ONLY
+	protected void setCurrentPlayer() {
+
+	}
+
+	public Player getDealerP() {
+		return players.get(dealer);
+	}
+
+	public Player getSmallBlindP() {
+		return players.get(smallBlindPlayer);
+	}
+
+	public Player getBigBlindP() {
+		return players.get(bigBlindPlayer);
+	}
+
+	public Player currentPlayer() {
+		return players.get(currentPlayer);
 	}
 }

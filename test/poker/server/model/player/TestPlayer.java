@@ -41,8 +41,10 @@ public class TestPlayer {
 	// BEFORE / AFTER
 	@Before
 	public void beforeTest() {
+
 		game = gameFactory.newGame();
 		player = playerFactory.newPlayer("Lucas", "1234");
+		game.add(player);
 		saveTestValues();
 	}
 
@@ -66,6 +68,7 @@ public class TestPlayer {
 	// RAISE TESTS
 	@Test
 	public void testRaiseCurrentPot() {
+
 		quantity = 10;
 		player.setCurrentTokens(50);
 		saveTestValues();
@@ -193,36 +196,36 @@ public class TestPlayer {
 		player.check();
 	}
 
-	// CONNECT/DISCONNECT
-	@Test
-	public void testConnect() {
-
-		player.connect(game);
-		int expected = 1;
-		assertEquals(expected, game.getPlayers().size());
-	}
-
-	@Test(expected = PlayerException.class)
-	public void testFailConnect() {
-		player.setInGame();
-		player.connect(game);
-	}
-
-	@Test
-	public void testDisconnect() {
-		player.connect(game);
-
-		int expected = 1;
-		assertEquals(expected, game.getPlayers().size());
-
-		player.disconnect();
-
-		expected = 0;
-		assertEquals(expected, game.getPlayers().size());
-	}
-
-	@Test(expected = PlayerException.class)
-	public void testFailDisconnect() {
-		player.disconnect();
-	}
+	// CONNECT/DISCONNECT (IN SERVICE ==> TO BE REMOVED IN THE MODEL)
+	// @Test
+	// public void testConnect() {
+	//
+	// player.connect(game);
+	// int expected = 1;
+	// assertEquals(expected, game.getPlayers().size());
+	// }
+	//
+	// @Test(expected = PlayerException.class)
+	// public void testFailConnect() {
+	// player.setInGame();
+	// player.connect(game);
+	// }
+	//
+	// @Test
+	// public void testDisconnect() {
+	//
+	// player.connect(game);
+	// int expected = 1;
+	// assertEquals(expected, game.getPlayers().size());
+	//
+	// player.disconnect();
+	//
+	// expected = 0;
+	// assertEquals(expected, game.getPlayers().size());
+	// }
+	//
+	// @Test(expected = PlayerException.class)
+	// public void testFailDisconnect() {
+	// player.disconnect();
+	// }
 }
