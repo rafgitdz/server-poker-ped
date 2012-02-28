@@ -2,58 +2,73 @@ package poker.server.service.player;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
-import poker.server.model.player.PlayerFactoryLocal;
 
 @Stateless
-public class PlayerService implements PlayerServiceRemote {
+@Path("/playerService")
+public class PlayerService {
 
-	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player: ";
-	private static final String ERROR_PLAYER_ALREADY_EXISTS = "The player already exists: ";
-	private static final String ERROR_WRONG_PWD = "The password is not correct";
-
-	@EJB
-	RepositoryPlayer repositoryPlayer;
+	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player : ";
 
 	@EJB
-	PlayerFactoryLocal playerFactory;
+	private RepositoryPlayer repositoryPlayer;
 
-	@Override
-	public Player createUser(String name, String pwd) {
-		if (repositoryPlayer.load(name) != null) {
-			throw new PlayerException(ERROR_PLAYER_ALREADY_EXISTS + name);
-		}
+	@GET
+	@Path("/raise/{name}/{tokens}")
+	public void raise(@PathParam("name") String name,
+			@PathParam("tokens") int tokens) {
 
-		return repositoryPlayer.save(playerFactory.createUser(name, pwd));
+		Player player = getPlayer(name);
+		player.raise(tokens);
 	}
 
-	@Override
-	public Player authentificate(String name, String pwd) {
+	@GET
+	@Path("/call/{name}")
+	public void call(@PathParam("name") String name) {
 
-		if (repositoryPlayer.load(name) == null) {
-			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
-		}
-
-		Player player = repositoryPlayer.load(name);
-
-		if (player.getPwd() != pwd) {
-			throw new PlayerException(ERROR_WRONG_PWD);
-		}
-
-		return player;
+		Player player = getPlayer(name);
+		player.call();
+		repositoryPlayer.update(player);
 	}
 
-	@Override
-	public Player loadPlayer(String name) {
+	@GET
+	@Path("/check/{name}")
+	public void check(@PathParam("name") String name) {
+
+		Player player = getPlayer(name);
+		player.check();
+		repositoryPlayer.update(player);
+	}
+
+	@GET
+	@Path("/fold/{name}")
+	public void fold(@PathParam("name") String name) {
+
+		Player player = getPlayer(name);
+		player.check();
+		repositoryPlayer.update(player);
+	}
+
+	@GET
+	@Path("/allIn/{name}")
+	public void allIn(@PathParam("name") String name) {
+
+		Player player = getPlayer(name);
+		player.allIn();
+		repositoryPlayer.update(player);
+	}
+
+	private Player getPlayer(String name) {
 
 		Player player = repositoryPlayer.load(name);
-
-		if (player == null) {
+		if (player == null)
 			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
-		}
 		return player;
 	}
 }

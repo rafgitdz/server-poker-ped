@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-
 public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 
 	@PersistenceContext(unitName = "PokerServerPU")
@@ -28,6 +27,8 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 	}
 
 	public T save(T entity, TId id) {
+
+		System.out.println("Persist : " + persistentClass.getName());
 
 		if (em.find(persistentClass, id) != null)
 			em.merge(entity);

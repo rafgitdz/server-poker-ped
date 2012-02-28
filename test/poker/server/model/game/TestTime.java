@@ -3,7 +3,6 @@ package poker.server.model.game;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
-import org.junit.Test;
 
 public class TestTime {
 
@@ -15,6 +14,7 @@ public class TestTime {
 
 	}
 
+<<<<<<< HEAD
 	@Test
 	public void testTime() {
 
@@ -30,5 +30,13 @@ public class TestTime {
 		System.out.println(gameTimer.playerTime());
 		System.out.println(gameTimer.getStartTime() + 1000 * 30);
 		
+=======
+	// @Test
+	public void testTime() {
+
+		int t = gameTimer.getCurrentTime();
+		gameTimer.controlTime(t, 10);
+		assertEquals(gameTimer.getCurrentTime(), t + 10);
+>>>>>>> 5e049a596131792cd231499bf1afcd3747f2fb25
 	}
 }

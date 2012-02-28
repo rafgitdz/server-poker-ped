@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.Observable;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Event;
@@ -15,92 +18,94 @@ import poker.server.model.game.card.Card;
 public class Player extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
+
 	@Id
 	private String name;
-	private String pwd;
+	String pwd;
 
-	private boolean folded = false;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "Game_Id")
+	Game game;
 
-	private int connectionStatus = 1;
+	boolean folded = false;
+
+	int connectionStatus = 1;
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
 	public final static int IN_GAME = 3;
 
-	private int role = 4;
 	public final static int DEALER = 1;
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
 
-	public transient Hand currentHand;
+	int role;
 
-	private int currentBet = 0;
-	private int currentTokens = 0;
-	private int money = 0;
+	transient Hand currentHand;
 
-	private Game game;
+	int currentBet = 0;
+	int currentTokens = 0;
+	int money = 0;
 
 	Player() {
-		this.pwd = "guest";
-		this.name = "guest";
-		this.currentHand = new Hand();
 	}
 
-	Player(String name, String pwd) {
-		this.pwd = pwd;
-		this.name = name;
-		this.currentHand = new Hand();
+	Player(String namE, String pwD) {
+
+		name = namE;
+		pwd = pwD;
+		currentHand = new Hand();
 	}
 
 	// SIGN IN
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public String getPwd() {
-		return this.pwd;
+		return pwd;
 	}
 
 	// CONNEXION
 	public void setAsPresent() {
-		this.connectionStatus = PRESENT;
+		connectionStatus = PRESENT;
 	}
 
 	public void setAsMissing() {
-		this.connectionStatus = MISSING;
+		connectionStatus = MISSING;
 	}
 
 	public void setInGame() {
-		this.connectionStatus = IN_GAME;
+		connectionStatus = IN_GAME;
 	}
 
 	public boolean isPresent() {
-		return this.connectionStatus == PRESENT;
+		return connectionStatus == PRESENT;
 	}
 
 	public boolean isMissing() {
-		return this.connectionStatus == MISSING;
+		return connectionStatus == MISSING;
 	}
 
 	public boolean isInGame() {
-		return this.connectionStatus == IN_GAME;
+		return connectionStatus == IN_GAME;
 	}
 
 	// STATUS
 	public void setAsDealer() {
-		this.role = DEALER;
+		role = DEALER;
 	}
 
 	public void setAsBigBlind() {
-		this.role = BIG_BLIND;
+		role = BIG_BLIND;
 	}
 
 	public void setAsSmallBlind() {
-		this.role = SMALL_BLIND;
+		role = SMALL_BLIND;
 	}
 
 	public void setAsRegular() {
-		this.role = REGULAR;
+		role = REGULAR;
 	}
 
 	public boolean isDealer() {
@@ -129,7 +134,7 @@ public class Player extends Observable implements Serializable {
 	}
 
 	public void setCurrentHand(Hand hand) {
-		this.currentHand = hand;
+		currentHand = hand;
 	}
 
 	public Hand getCurrentHand() {
@@ -138,32 +143,32 @@ public class Player extends Observable implements Serializable {
 
 	// BET / TOKENS / MONEY
 	public int getCurrentBet() {
-		return this.currentBet;
+		return currentBet;
 	}
 
-	public void setCurrentBet(int currentBet) {
-		this.currentBet = currentBet;
+	public void setCurrentBet(int currentB) {
+		currentBet = currentB;
 	}
 
 	public int getCurrentTokens() {
-		return this.currentTokens;
+		return currentTokens;
 	}
 
 	public void setCurrentTokens(int tokens) {
-		this.currentTokens = tokens;
+		currentTokens = tokens;
 	}
 
 	public int getMoney() {
 		return money;
 	}
 
-	public void setMoney(int money) {
-		this.money = money;
+	public void setMoney(int moneY) {
+		money = moneY;
 	}
 
 	// GAME
-	public void setGame(Game game) {
-		this.game = game;
+	public void setGame(Game gamE) {
+		game = gamE;
 	}
 
 	public Game getGame() {
@@ -171,35 +176,37 @@ public class Player extends Observable implements Serializable {
 	}
 
 	public void connect(Game game) {
-		if (!this.isPresent()) {
+
+		if (!isPresent()) {
 			throw new PlayerException("the user is in game or missing");
 		} else {
 			game.getPlayers().add(this);
-			this.setInGame();
-			this.setGame(game);
+			setInGame();
+			setGame(game);
 		}
 	}
 
 	public void disconnect() {
-		if (!this.isInGame()) {
+		if (!isInGame()) {
 			throw new PlayerException("the player is not connected to a game");
 		} else {
-			this.getGame().remove(this);
+			getGame().remove(this);
 		}
 	}
 
 	// ACTIONS
-	public void raise(Game game, int quantity) {
+	public void raise(int quantity) {
 
-		int minTokenToRaise = (game.getCurrentBet() * 2 - this.currentBet);
+		game.verifyIsMyTurn(this);
+		int minTokenToRaise = (game.getCurrentBet() * 2 - currentBet);
 
-		if (quantity > this.currentTokens || quantity < minTokenToRaise) {
+		if (quantity > currentTokens || quantity < minTokenToRaise) {
 			throw new PlayerException("not enough tokens to raise");
 		} else {
 			game.updateCurrentBet(quantity);
 			game.updateCurrentPot(quantity);
-			this.currentTokens -= quantity;
-			this.currentBet += quantity;
+			currentTokens -= quantity;
+			currentBet += quantity;
 		}
 		setChanged();
 		game.update(this, "raise"); // inform the game that a player raises
@@ -207,36 +214,40 @@ public class Player extends Observable implements Serializable {
 		Event.addEvent(name + " RAISES " + quantity);
 	}
 
-	public void call(Game game) {
+	public void call() {
 
-		int minTokenToCall = (game.getCurrentBet() - this.currentBet);
+		game.verifyIsMyTurn(this);
+		int minTokenToCall = (game.getCurrentBet() - currentBet);
 
-		if (this.currentTokens < minTokenToCall) {
+		if (currentTokens < minTokenToCall) {
 			throw new PlayerException("not enough tokens to call");
 		} else {
 
 			game.updateCurrentBet(minTokenToCall);
 			game.updateCurrentPot(minTokenToCall);
-			this.currentTokens -= minTokenToCall;
-			this.currentBet += minTokenToCall;
+			currentTokens -= minTokenToCall;
+			currentBet += minTokenToCall;
 		}
 
 		game.nextPlayer();
 		Event.addEvent(name + " CALLS");
 	}
 
-	public void allIn(Game game) {
+	public void allIn() {
 
-		game.updateCurrentPot(this.currentTokens);
-		game.updateCurrentBet(this.currentTokens);
+		game.verifyIsMyTurn(this);
+		game.updateCurrentPot(currentTokens);
+		game.updateCurrentBet(currentTokens);
 
-		this.currentTokens = 0;
-		this.currentBet += game.getCurrentBet();
+		currentTokens = 0;
+		currentBet += game.getCurrentBet();
 		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
 	}
 
 	public void fold() {
+
+		game.verifyIsMyTurn(this);
 		folded = true;
 		game.nextPlayer();
 		Event.addEvent(name + " FOLDS");
@@ -246,9 +257,11 @@ public class Player extends Observable implements Serializable {
 		folded = false;
 	}
 
-	public void check(Game game) {
+	public void check() {
 
-		if (this.currentBet != game.getCurrentBet()) {
+		game.verifyIsMyTurn(this);
+
+		if (currentBet != game.getCurrentBet()) {
 			throw new PlayerException("not enough tokens to check");
 		} else {
 			// ???
@@ -259,5 +272,9 @@ public class Player extends Observable implements Serializable {
 
 	public void addCard(Card card) {
 		currentHand.addCard(card);
+	}
+
+	public void updateToken(int token) {
+		currentTokens-=token;
 	}
 }

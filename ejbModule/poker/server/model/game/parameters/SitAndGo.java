@@ -6,21 +6,24 @@ public class SitAndGo extends Parameters {
 
 	public SitAndGo() {
 
-		this.playerNumber = 6;
-		this.speakTime = 30;
+		playerNumber = 5;
+		speakTime = 30;
+		timeChangeBlind = 180;
 
-		this.buyIn = 10;
-		this.buyInIncreasing = 2;
-		this.multFactor = 2;
+		buyIn = 10;
+		buyInIncreasing = 2;
+		multFactor = 2;
+		
+		initPlayersTokens = 1500;
 
-		this.setBlinds(10);
-		this.setPotAsToken();
+		setBlinds(10);
+		setPotAsToken();
 
-		this.buyInSplit = new ArrayList<Integer>();
+		buyInSplit = new ArrayList<Integer>();
 		buyInSplit.add(50);
 		buyInSplit.add(35);
 		buyInSplit.add(15);
 
-		this.setPotSplit(buyInSplit);
+		setPotSplit(buyInSplit);
 	}
 }
