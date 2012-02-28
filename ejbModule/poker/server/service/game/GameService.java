@@ -6,8 +6,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryPlayer;
@@ -23,7 +23,7 @@ public class GameService {
 
 	public static final String ERROR_UNKNOWN_GAME = "Unknown Game : ";
 	private static final String AUTHENTIFICATION_ERROR = "Error in the password ! ";
-	private static final String PLAYER_HAS_ALREADY_AFFECTED = "The player is already affected in a game ! ";
+	private static final String PLAYER_ALREADY_AFFECTED = "Player already affected in game ! ";
 
 	@EJB
 	private RepositoryGame repositoryGame;
@@ -39,10 +39,8 @@ public class GameService {
 
 	@GET
 	@Path("/playerConnexion/{name}/{pwd}")
-	public String playerConnexion(@PathParam("name") String name,
+	public JSONObject playerConnexion(@PathParam("name") String name,
 			@PathParam("pwd") String pwd) {
-
-		JSONObject json = null;
 
 		Player player = repositoryPlayer.load(name);
 
@@ -50,6 +48,11 @@ public class GameService {
 			player = playerFactory.newPlayer(name, pwd);
 			repositoryPlayer.save(player);
 		} else {
+
+			if (player.isInGame())
+				throw new GameException(PLAYER_ALREADY_AFFECTED
+						+ player.getName());
+
 			if (!player.getPwd().equals(pwd))
 				throw new GameException(AUTHENTIFICATION_ERROR
 						+ player.getPwd());
@@ -59,14 +62,11 @@ public class GameService {
 
 		if (currentGame != null) {
 
-			if (player.getGame().getId() == currentGame.getId())
-				throw new GameException(PLAYER_HAS_ALREADY_AFFECTED
-						+ player.getName());
-
 			player.setGame(currentGame);
 			currentGame.add(player);
 
-			if (currentGame.getNumberOfPlayers() == currentGame.getMaxPlayers()) {
+			if (currentGame.isReadyToStart()) {
+
 				currentGame.setStarted(true);
 				currentGame.start();
 				// send to client that this game is ready to start !
@@ -82,19 +82,10 @@ public class GameService {
 			repositoryGame.save(currentGame);
 		}
 
+		JSONObject json = null;
 		String[] references = { "id" };
 		json = new JSONObject(currentGame, references);
 
-		try {
-			return String.valueOf(json.get("id"));
-		} catch (JSONException e) {
-			return e.getMessage();
-		}
-	}
-
-	@GET
-	@Path("/removePlayer/{name}/{pwd}")
-	public void removePlayer(@PathParam("name") String name) {
-		// TO DO
+		return json;
 	}
 }
