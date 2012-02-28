@@ -9,7 +9,7 @@ public abstract class Parameters {
 	public final static int TOKEN = 2;
 
 	protected int potType = CASH;
-	protected List<Integer> potSplit;
+	protected List<Integer> buyInSplit;
 
 	protected int buyIn = 0;
 	protected int buyInIncreasing = 0;
@@ -45,7 +45,7 @@ public abstract class Parameters {
 			}
 		}
 
-		this.potSplit = finalSplit;
+		this.buyInSplit = finalSplit;
 	}
 
 	protected void setPotAsCash() {
@@ -62,7 +62,7 @@ public abstract class Parameters {
 	}
 
 	public List<Integer> getPotSplit() {
-		return this.potSplit;
+		return this.buyInSplit;
 	}
 
 	public int getPlayerNumber() {

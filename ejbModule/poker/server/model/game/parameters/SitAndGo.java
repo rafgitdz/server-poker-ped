@@ -16,11 +16,11 @@ public class SitAndGo extends Parameters {
 		this.setBlinds(10);
 		this.setPotAsToken();
 
-		this.potSplit = new ArrayList<Integer>();
-		potSplit.add(50);
-		potSplit.add(35);
-		potSplit.add(15);
+		this.buyInSplit = new ArrayList<Integer>();
+		buyInSplit.add(50);
+		buyInSplit.add(35);
+		buyInSplit.add(15);
 
-		this.setPotSplit(potSplit);
+		this.setPotSplit(buyInSplit);
 	}
 }
