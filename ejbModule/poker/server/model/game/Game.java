@@ -2,11 +2,6 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-<<<<<<< HEAD
-
-import java.util.Iterator;
-=======
->>>>>>> 5e049a596131792cd231499bf1afcd3747f2fb25
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -76,26 +71,6 @@ public class Game implements Serializable, Observer {
 	int currentBet;
 	int prizePool;
 
-<<<<<<< HEAD
-	private int currentRound = 1;
-	
-	
-		// to be used...
-	public static final int FLOP = 1;
-	public static final int TOURNANT = 2;
-	public static final int RIVER = 3;
-
-	private static final String UNKNOWN_ROUND = "unknown round !";
-
-	private boolean Started;
-
-	@SuppressWarnings("unused")
-	private int lastRaisedPlayer;
-
-	// CONSTRUCTOR
-
-	
-=======
 	int currentRound;
 
 	boolean Started;
@@ -105,7 +80,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
 	 */
->>>>>>> 5e049a596131792cd231499bf1afcd3747f2fb25
+
 	protected Game() {
 
 		gameType = new SitAndGo();
@@ -509,18 +484,6 @@ public class Game implements Serializable, Observer {
 			nextRound();
 	}
 
-<<<<<<< HEAD
-	// BLIND / BET / POT MANAGEMENT
-	public void updateBlind() {
-		
-		int blindMultFactor = gameType.getMultFactor();
-		smallBlind = smallBlind * blindMultFactor;
-		bigBlind = smallBlind * 2;
-
-		Event.addEvent("SMALL BLIND = " + smallBlind + " , BIG BLIND = "
-				+ bigBlind);
-
-=======
 	/**
 	 * At the end of round river, it executed the showDown action to see all
 	 * hands of the current player and get the winner
@@ -540,7 +503,6 @@ public class Game implements Serializable, Observer {
 			updateBlind();
 		else if (arg.equals("raise"))
 			lastRaisedPlayer = currentPlayer;
->>>>>>> 5e049a596131792cd231499bf1afcd3747f2fb25
 	}
 
 	// Getters and the Setters
@@ -584,36 +546,6 @@ public class Game implements Serializable, Observer {
 		return currentPlayer;
 	}
 
-<<<<<<< HEAD
-	public void start() {
-		System.out.println("start() : TODO");		
-		
-	}
-
-	//public Cards getDeck() {
-		//return deck;
-
-		//Event.addEvent("START GAME");
-
-	//}
-
-	public void add(Player player) {
-		if(players.size()!=8)
-		players.add(player);
-
-
-		else
-			this.start();
-			
-
-	}	
-	
-	
-
-	public void remove(Player player) {
-
-		players.remove(player);
-=======
 	public int getDealer() {
 		return dealer;
 	}
@@ -628,7 +560,6 @@ public class Game implements Serializable, Observer {
 
 	public int getTotalPot() {
 		return totalPot;
->>>>>>> 5e049a596131792cd231499bf1afcd3747f2fb25
 	}
 
 	public int getCurrentPot() {
@@ -639,18 +570,8 @@ public class Game implements Serializable, Observer {
 		return currentBet;
 	}
 
-<<<<<<< HEAD
-			Player player = iter.next();
-			if (player.getCurrentTokens() == 0) {
-				playersRank.add(0, player);
-				iter.remove();
-			}
-		}
-
-=======
 	public void setId(int iD) {
 		id = iD;
->>>>>>> 5e049a596131792cd231499bf1afcd3747f2fb25
 	}
 
 	public void setCurrentBet(int currentB) {
