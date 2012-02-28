@@ -6,7 +6,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;

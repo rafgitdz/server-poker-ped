@@ -126,7 +126,7 @@ public class Game implements Serializable, Observer {
 	 * 
 	 * @see PlayerNumber in class Parameters
 	 */
-	protected void start() {
+	public void start() {
 
 		setPlayerRoles();
 		initPlayersTokens();
@@ -198,7 +198,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * First round to flip three cards on the table
 	 */
-	private void flop() {
+	protected void flop() {
 
 		String eventFlop = "FLOP : ";
 		Card card;
@@ -215,7 +215,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * Second round to flip one card and add it for the three flop's cards
 	 */
-	private void tournant() {
+	protected void tournant() {
 
 		deck.burnCard();
 		Card card = flipCard();
@@ -227,7 +227,7 @@ public class Game implements Serializable, Observer {
 	 * Third round to flip one card and add it for the four flop's and
 	 * tournant's cards
 	 */
-	private void river() {
+	protected void river() {
 
 		deck.burnCard();
 		Card card = flipCard();
@@ -327,7 +327,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * After a certain time, update the blinds and increment the level of them
 	 */
-	private void updateBlind() {
+	protected void updateBlind() {
 
 		++gameLevel;
 		int blindMultFactor = gameType.getMultFactor();
@@ -357,7 +357,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * After each showDown poker, reset all the bets of players and the pot
 	 */
-	private void updateRoundPotAndBets() {
+	protected void updateRoundPotAndBets() {
 
 		for (Player player : players)
 			player.setCurrentBet(0);
@@ -394,14 +394,14 @@ public class Game implements Serializable, Observer {
 	 * Remove the player from this current game, if he disconnect from it or he
 	 * loose
 	 */
-	protected void remove(Player player) {
+	public void remove(Player player) {
 		players.remove(player);
 	}
 
 	/**
 	 * Remove the looser's players and update ranking
 	 */
-	private void cleanTable() {
+	protected void cleanTable() {
 
 		Player player;
 		for (int i = 0; i < players.size(); ++i) {
@@ -419,7 +419,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * After each connection of player, add it to the only one non-ready game
 	 */
-	protected void add(Player player) {
+	public void add(Player player) {
 		players.add(player);
 	}
 
@@ -428,14 +428,14 @@ public class Game implements Serializable, Observer {
 	 * 
 	 * @see playerNumber in class Parameters
 	 */
-	protected boolean isReadyToStart() {
+	public boolean isReadyToStart() {
 		return players.size() == gameType.getPlayerNumber();
 	}
 
 	/**
 	 * At the begin of game, set each role for each player
 	 */
-	private void setPlayerRoles() {
+	public void setPlayerRoles() {
 
 		if (players.size() < gameType.getPlayerNumber()) {
 			throw new GameException(
@@ -456,7 +456,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * After a showDown, set all players as regular and cancel them fold's state
 	 */
-	private void resetPlayers() {
+	public void resetPlayers() {
 
 		for (Player p : players) {
 			p.setAsRegular();
