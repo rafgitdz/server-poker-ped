@@ -81,7 +81,7 @@ public class Player extends Observable implements Serializable {
 	}
 
 	/**
-	 * Add the fliped cards to the hand of the player
+	 * Add the flip cards to the hand of the player
 	 */
 	public void addCard(Card card) {
 		currentHand.addCard(card);
@@ -179,11 +179,9 @@ public class Player extends Observable implements Serializable {
 
 		game.verifyIsMyTurn(this);
 
-		if (currentBet != game.getCurrentBet()) {
+		if (currentBet != game.getCurrentBet())
 			throw new PlayerException("not enough tokens to check");
-		} else {
-			// ???
-		}
+
 		game.nextPlayer();
 		Event.addEvent(name + " CHECKS");
 	}

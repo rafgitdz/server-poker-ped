@@ -7,6 +7,7 @@ package poker.server.service.game;
  */
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
@@ -20,9 +21,9 @@ import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryPlayer;
-import poker.server.model.exception.GameException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
+import poker.server.model.game.card.Card;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 
@@ -58,19 +59,20 @@ public class GameService {
 		if (player == null) {
 			player = playerFactory.newPlayer(name, pwd);
 			repositoryPlayer.save(player);
+
 		} else {
 
-			if (player.isInGame())
-				throw new GameException(PLAYER_ALREADY_AFFECTED
-						+ player.getName());
+			if (player.isInGame()) {
+				updateJSON(json, "Authentificate", "false");
+				updateJSON(json, "Response", PLAYER_ALREADY_AFFECTED);
+				return json;
+			}
 
 			if (!player.getPwd().equals(pwd)) {
 				updateJSON(json, "Authentificate", "false");
 				updateJSON(json, "Response", AUTHENTIFICATION_ERROR);
 				return json;
 			}
-			// throw new GameException(AUTHENTIFICATION_ERROR
-			// + player.getPwd());
 		}
 
 		updateJSON(json, "Authentificate", "true");
@@ -86,10 +88,31 @@ public class GameService {
 
 				currentGame.setStarted(true);
 				currentGame.start();
+
 				// send to client that this game is ready to start !
-				@SuppressWarnings("unused")
-				Map<String, Integer> playerInfos = new HashMap<String, Integer>();
+				Game game = repositoryGame.load(currentGame.getId());
+				Map<String, String> playerInfos = new HashMap<String, String>();
+				List<Player> players = game.getPlayers();
+
+				int nb = 0;
+
+				for (Player p : players) {
+					playerInfos.put("playerName" + nb, p.getName());
+					++nb;
+				}
+
+				updateJSON(json, "playerNames", playerInfos);
+				updateJSON(json, "Dealer", currentGame.getDealerP().getName());
+				updateJSON(json, "SmallBlind", currentGame.getSmallBlindP()
+						.getName());
+				updateJSON(json, "BigBlind", currentGame.getBigBlindP()
+						.getName());
+				updateJSON(json, "Start", "true");
 			}
+
+			else
+				updateJSON(json, "Start", "false");
+
 			repositoryGame.update(currentGame);
 
 		} else {
@@ -97,11 +120,30 @@ public class GameService {
 			currentGame.add(player);
 			currentGame.setStarted(false);
 			repositoryGame.save(currentGame);
+			updateJSON(json, "Start", "false");
 		}
 		return json;
 	}
 
-	private void updateJSON(JSONObject json, String key, String value) {
+	@GET
+	@Path("/getFlipedCards/{id}")
+	public JSONObject getFlipedCards(@PathParam("id") int id) {
+
+		JSONObject json = new JSONObject();
+		Game game = repositoryGame.load(id);
+		List<Card> cards = game.getFlipedCards();
+		int nb = 0;
+
+		for (Card card : cards)
+			updateJSON(json, "id" + nb, card.getId());
+
+		return json;
+	}
+
+	/**
+	 * Method to update informations that will put in the JSON Object
+	 */
+	private void updateJSON(JSONObject json, String key, Object value) {
 
 		try {
 			json.put(key, value);

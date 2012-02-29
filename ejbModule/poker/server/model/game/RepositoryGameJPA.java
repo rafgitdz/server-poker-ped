@@ -22,7 +22,7 @@ public class RepositoryGameJPA extends RepositoryGenericJPA<Game, Integer>
 
 		Query q = em
 				.createQuery("SELECT g FROM Game g WHERE g.Started = :status");
-		
+
 		q.setParameter("status", false);
 
 		try {

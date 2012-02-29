@@ -12,6 +12,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
@@ -27,11 +30,28 @@ public class PlayerService {
 
 	@GET
 	@Path("/raise/{name}/{tokens}")
-	public void raise(@PathParam("name") String name,
+	public JSONObject raise(@PathParam("name") String name,
 			@PathParam("tokens") int tokens) {
 
+		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
 		player.raise(tokens);
+		repositoryPlayer.update(player);
+
+		updateJSON(json, "playerName", player.getName());
+		updateJSON(json, "bet", player.getCurrentBet());
+		updateJSON(json, "tokens", player.getCurrentTokens());
+		updateJSON(json, "currentPot", player.getGame().getCurrentPot());
+		updateJSON(json, "totalPot", player.getGame().getTotalPot());
+
+		updateJSON(json, "flop", player.getGame().isFlop());
+		updateJSON(json, "tournant", player.getGame().isRiver());
+		updateJSON(json, "river", player.getGame().isRiver());
+		updateJSON(json, "showdown", player.getGame().isShowDown());
+
+		updateJSON(json, "idGame", player.getGame().getId());
+
+		return json;
 	}
 
 	@GET
@@ -76,5 +96,17 @@ public class PlayerService {
 		if (player == null)
 			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
 		return player;
+	}
+
+	/**
+	 * Method to update informations that will put in the JSON Object
+	 */
+	private void updateJSON(JSONObject json, String key, Object value) {
+
+		try {
+			json.put(key, value);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }
