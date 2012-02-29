@@ -101,15 +101,17 @@ public class Player extends Observable implements Serializable {
 	public void raise(int quantity) {
 
 		game.verifyIsMyTurn(this);
-		int minTokenToRaise = (game.getCurrentBet() * 2 - currentBet);
-
-		if (quantity > currentTokens || quantity < minTokenToRaise) {
+		int minTokenToRaise = game.getCurrentBet();
+		int toCall = game.getCurrentBet() - currentBet;
+		int necessaryTokens = quantity + toCall;
+		
+		if (necessaryTokens > currentTokens || quantity < minTokenToRaise) {
 			throw new PlayerException("not enough tokens to raise");
 		} else {
-			game.updateCurrentBet(quantity);
-			game.updateCurrentPot(quantity);
-			currentTokens -= quantity;
-			currentBet += quantity;
+			game.updateCurrentBet(necessaryTokens);
+			game.updateCurrentPot(necessaryTokens);
+			currentTokens -= necessaryTokens;
+			currentBet += necessaryTokens;
 		}
 		setChanged();
 		game.update(this, "raise"); // inform the game that a player raises
@@ -124,17 +126,15 @@ public class Player extends Observable implements Serializable {
 
 		game.verifyIsMyTurn(this);
 		int minTokenToCall = (game.getCurrentBet() - currentBet);
-
+		
 		if (currentTokens < minTokenToCall) {
 			throw new PlayerException("not enough tokens to call");
 		} else {
-
-			game.updateCurrentBet(minTokenToCall);
 			game.updateCurrentPot(minTokenToCall);
-			currentTokens -= minTokenToCall;
-			currentBet += minTokenToCall;
+			this.currentTokens -= minTokenToCall;
+			this.currentBet += minTokenToCall;
 		}
-
+		
 		game.nextPlayer();
 		Event.addEvent(name + " CALLS");
 	}
@@ -283,10 +283,12 @@ public class Player extends Observable implements Serializable {
 
 	public void setAsBigBlind() {
 		role = BIG_BLIND;
+		currentBet = game.getBigBlind();
 	}
 
 	public void setAsSmallBlind() {
 		role = SMALL_BLIND;
+		currentBet = game.getSmallBlind();
 	}
 
 	public void setAsRegular() {

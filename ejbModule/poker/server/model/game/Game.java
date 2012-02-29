@@ -245,7 +245,7 @@ public class Game implements Serializable, Observer {
 
 		for (Player player : players) {
 			player.setCurrentTokens(gameType.getTokens());
-			player.setAsPresent();
+			//player.setAsPresent();
 		}
 	}
 
@@ -447,13 +447,13 @@ public class Game implements Serializable, Observer {
 
 			resetPlayers();
 			players.get(0).setAsDealer();
-			players.get(1).setAsBigBlind();
-			players.get(2).setAsSmallBlind();
+			players.get(1).setAsSmallBlind();
+			players.get(2).setAsBigBlind();
 
 			dealer = 0;
 			smallBlindPlayer = 1;
 			bigBlindPlayer = 2;
-			currentPlayer = 3;
+			currentPlayer = 1;
 		}
 	}
 
