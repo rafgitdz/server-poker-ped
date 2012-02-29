@@ -37,11 +37,11 @@ public class TestGame {
 	public void beforeTest() {
 		game = gameFactory.newGame();
 		
-		player1 = playerFactory.createUser("rafik", "rafik");
-		player2 = playerFactory.createUser("lucas", "lucas");
-		player3 = playerFactory.createUser("youga", "youga");
-		player4 = playerFactory.createUser("balla", "balla");
-		player5 = playerFactory.createUser("xan", "xan");
+		player1 = playerFactory.newPlayer("rafik", "rafik");
+		player2 = playerFactory.newPlayer("lucas", "lucas");
+		player3 = playerFactory.newPlayer("youga", "youga");
+		player4 = playerFactory.newPlayer("balla", "balla");
+		player5 = playerFactory.newPlayer("xan", "xan");
 	}
 
 	// EVENT

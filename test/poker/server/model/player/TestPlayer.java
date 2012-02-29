@@ -41,7 +41,7 @@ public class TestPlayer {
 	@Before
 	public void beforeTest() {
 		game = gameFactory.newGame();
-		player = playerFactory.createUser("Lucas", "1234");
+		player = playerFactory.newPlayer("Lucas", "1234");
 		saveTestValues();
 	}
 	
