@@ -1,5 +1,11 @@
 package poker.server.model.player;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : PlayerFactory
+ */
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -10,7 +16,7 @@ public class PlayerFactory implements PlayerFactoryLocal {
 
 	@EJB
 	RepositoryPlayer repositoryPlayer;
-	
+
 	@Override
 	public Player newPlayer(String name, String pwd) {
 		Player player = new Player(name, pwd);

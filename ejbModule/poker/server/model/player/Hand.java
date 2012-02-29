@@ -1,5 +1,11 @@
 package poker.server.model.player;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Hand
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 

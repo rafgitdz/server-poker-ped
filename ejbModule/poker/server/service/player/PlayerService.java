@@ -1,5 +1,11 @@
 package poker.server.service.player;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Service class : PlayerService
+ */
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;

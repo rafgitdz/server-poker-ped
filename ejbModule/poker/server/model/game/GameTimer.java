@@ -1,5 +1,11 @@
 package poker.server.model.game;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : GameTimer
+ */
+
 public class GameTimer   {
 
 	private  long startTime;

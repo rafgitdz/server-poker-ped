@@ -1,5 +1,11 @@
 package poker.server.model.game.card;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Suit
+ */
+
 public final class Suit {
 
 	// the types of suit's card

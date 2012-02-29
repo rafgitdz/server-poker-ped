@@ -80,7 +80,6 @@ public class Game implements Serializable, Observer {
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
 	 */
-
 	protected Game() {
 
 		gameType = new SitAndGo();

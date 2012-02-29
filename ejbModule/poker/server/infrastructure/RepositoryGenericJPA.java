@@ -1,5 +1,11 @@
 package poker.server.infrastructure;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Infrastructure class : RepositoryGenericJPA
+ */
+
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 

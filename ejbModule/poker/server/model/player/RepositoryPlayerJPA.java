@@ -1,5 +1,11 @@
 package poker.server.model.player;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model-Infrastructure class : RepositoryPlayerJPA
+ */
+
 import javax.ejb.Stateless;
 
 import poker.server.infrastructure.RepositoryGenericJPA;

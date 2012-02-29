@@ -1,5 +1,11 @@
 package poker.server.model.game.parameters;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model abstract class : Parameters
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 

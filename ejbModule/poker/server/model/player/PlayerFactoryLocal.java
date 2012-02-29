@@ -1,5 +1,11 @@
 package poker.server.model.player;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : PlayerFactoryLocal
+ */
+
 import javax.ejb.Local;
 
 @Local

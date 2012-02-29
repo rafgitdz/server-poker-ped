@@ -1,11 +1,21 @@
 package poker.server.service.game;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Service class : GameService
+ */
+
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;
@@ -41,6 +51,8 @@ public class GameService {
 	public JSONObject playerConnexion(@PathParam("name") String name,
 			@PathParam("pwd") String pwd) {
 
+		JSONObject json = new JSONObject();
+
 		Player player = repositoryPlayer.load(name);
 
 		if (player == null) {
@@ -52,16 +64,22 @@ public class GameService {
 				throw new GameException(PLAYER_ALREADY_AFFECTED
 						+ player.getName());
 
-			if (!player.getPwd().equals(pwd))
-				throw new GameException(AUTHENTIFICATION_ERROR
-						+ player.getPwd());
+			if (!player.getPwd().equals(pwd)) {
+				updateJSON(json, "Authentificate", "false");
+				updateJSON(json, "Response", AUTHENTIFICATION_ERROR);
+				return json;
+			}
+			// throw new GameException(AUTHENTIFICATION_ERROR
+			// + player.getPwd());
 		}
+
+		updateJSON(json, "Authentificate", "true");
+		updateJSON(json, "Response", null);
 
 		Game currentGame = repositoryGame.currentGame();
 
 		if (currentGame != null) {
 
-			player.setGame(currentGame);
 			currentGame.add(player);
 
 			if (currentGame.isReadyToStart()) {
@@ -69,22 +87,26 @@ public class GameService {
 				currentGame.setStarted(true);
 				currentGame.start();
 				// send to client that this game is ready to start !
-				// JSON...
+				@SuppressWarnings("unused")
+				Map<String, Integer> playerInfos = new HashMap<String, Integer>();
 			}
 			repositoryGame.update(currentGame);
 
 		} else {
 			currentGame = gameFactory.newGame();
-			player.setGame(currentGame);
 			currentGame.add(player);
 			currentGame.setStarted(false);
 			repositoryGame.save(currentGame);
 		}
-
-		JSONObject json = null;
-		String[] references = { "id" };
-		json = new JSONObject(currentGame, references);
-
 		return json;
+	}
+
+	private void updateJSON(JSONObject json, String key, String value) {
+
+		try {
+			json.put(key, value);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }

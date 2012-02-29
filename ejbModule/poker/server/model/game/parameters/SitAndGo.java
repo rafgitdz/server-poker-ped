@@ -1,5 +1,11 @@
 package poker.server.model.game.parameters;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : SitAndGo
+ */
+
 import java.util.ArrayList;
 
 public class SitAndGo extends Parameters {

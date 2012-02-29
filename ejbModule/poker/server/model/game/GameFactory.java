@@ -1,5 +1,11 @@
 package poker.server.model.game;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Event
+ */
+
 import javax.ejb.Stateless;
 
 import poker.server.model.game.parameters.Parameters;
