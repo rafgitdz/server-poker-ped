@@ -14,5 +14,4 @@ import poker.server.model.game.Game;
 public interface RepositoryGame extends RepositoryGeneric<Game, Integer> {
 
 	public Game currentGame();
-
 }

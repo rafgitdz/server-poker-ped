@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.IndexColumn;
@@ -43,12 +45,14 @@ public class Game implements Serializable, Observer {
 	private static final int FLOP = 1;
 	private static final int TOURNANT = 2;
 	private static final int RIVER = 3;
+	private static final int SHOWDOWN = 4;
 
 	@Id
 	@GeneratedValue
 	public int id; // public at this time for testing service...
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "Game_Id")
 	@IndexColumn(name = "PlayerIndex")
 	List<Player> players;
 
@@ -423,6 +427,7 @@ public class Game implements Serializable, Observer {
 	public void add(Player player) {
 		players.add(player);
 		player.setGame(this);
+		player.setInGame();
 	}
 
 	/**
@@ -612,5 +617,32 @@ public class Game implements Serializable, Observer {
 
 	public Player currentPlayer() {
 		return players.get(currentPlayer);
+	}
+
+	/**
+	 * Used to inform client to the state of the game
+	 */
+	public String isFlop() {
+		if (currentRound == FLOP)
+			return "true";
+		return "false";
+	}
+
+	public String isTournant() {
+		if (currentRound == TOURNANT)
+			return "true";
+		return "false";
+	}
+
+	public String isRiver() {
+		if (currentRound == RIVER)
+			return "true";
+		return "false";
+	}
+
+	public String isShowDown() {
+		if (currentRound == SHOWDOWN)
+			return "true";
+		return "false";
 	}
 }
