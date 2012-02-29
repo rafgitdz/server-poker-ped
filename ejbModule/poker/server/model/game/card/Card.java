@@ -1,5 +1,10 @@
 package poker.server.model.game.card;
 
+/**
+ * @author PokerServerGroup
+ * 
+ */
+
 public enum Card {
 
 	ACE_HEART(1, Value.ACE, Suit.HEART), 

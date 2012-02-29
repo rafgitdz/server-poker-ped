@@ -1,13 +1,22 @@
 package poker.server.service.game;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Service class : GameService
+ */
+
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryPlayer;
@@ -23,7 +32,7 @@ public class GameService {
 
 	public static final String ERROR_UNKNOWN_GAME = "Unknown Game : ";
 	private static final String AUTHENTIFICATION_ERROR = "Error in the password ! ";
-	private static final String PLAYER_HAS_ALREADY_AFFECTED = "The player is already affected in a game ! ";
+	private static final String PLAYER_ALREADY_AFFECTED = "Player already affected in game ! ";
 
 	@EJB
 	private RepositoryGame repositoryGame;
@@ -39,10 +48,10 @@ public class GameService {
 
 	@GET
 	@Path("/playerConnexion/{name}/{pwd}")
-	public String playerConnexion(@PathParam("name") String name,
+	public JSONObject playerConnexion(@PathParam("name") String name,
 			@PathParam("pwd") String pwd) {
 
-		JSONObject json = null;
+		JSONObject json = new JSONObject();
 
 		Player player = repositoryPlayer.load(name);
 
@@ -50,51 +59,54 @@ public class GameService {
 			player = playerFactory.newPlayer(name, pwd);
 			repositoryPlayer.save(player);
 		} else {
-			if (!player.getPwd().equals(pwd))
-				throw new GameException(AUTHENTIFICATION_ERROR
-						+ player.getPwd());
+
+			if (player.isInGame())
+				throw new GameException(PLAYER_ALREADY_AFFECTED
+						+ player.getName());
+
+			if (!player.getPwd().equals(pwd)) {
+				updateJSON(json, "Authentificate", "false");
+				updateJSON(json, "Response", AUTHENTIFICATION_ERROR);
+				return json;
+			}
+			// throw new GameException(AUTHENTIFICATION_ERROR
+			// + player.getPwd());
 		}
+
+		updateJSON(json, "Authentificate", "true");
+		updateJSON(json, "Response", null);
 
 		Game currentGame = repositoryGame.currentGame();
 
 		if (currentGame != null) {
 
-			if (player.getGame().getId() == currentGame.getId())
-				throw new GameException(PLAYER_HAS_ALREADY_AFFECTED
-						+ player.getName());
-
-			player.setGame(currentGame);
 			currentGame.add(player);
 
-			if (currentGame.getNumberOfPlayers() == currentGame.getMaxPlayers()) {
+			if (currentGame.isReadyToStart()) {
+
 				currentGame.setStarted(true);
 				currentGame.start();
 				// send to client that this game is ready to start !
-				// JSON...
+				@SuppressWarnings("unused")
+				Map<String, Integer> playerInfos = new HashMap<String, Integer>();
 			}
 			repositoryGame.update(currentGame);
 
 		} else {
 			currentGame = gameFactory.newGame();
-			player.setGame(currentGame);
 			currentGame.add(player);
 			currentGame.setStarted(false);
 			repositoryGame.save(currentGame);
 		}
-
-		String[] references = { "id" };
-		json = new JSONObject(currentGame, references);
-
-		try {
-			return String.valueOf(json.get("id"));
-		} catch (JSONException e) {
-			return e.getMessage();
-		}
+		return json;
 	}
 
-	@GET
-	@Path("/removePlayer/{name}/{pwd}")
-	public void removePlayer(@PathParam("name") String name) {
-		// TO DO
+	private void updateJSON(JSONObject json, String key, String value) {
+
+		try {
+			json.put(key, value);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }

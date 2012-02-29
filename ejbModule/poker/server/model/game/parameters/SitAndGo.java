@@ -1,12 +1,18 @@
 package poker.server.model.game.parameters;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : SitAndGo
+ */
+
 import java.util.ArrayList;
 
 public class SitAndGo extends Parameters {
 
 	public SitAndGo() {
 
-		playerNumber = 8;
+		playerNumber = 5;
 		speakTime = 30;
 		timeChangeBlind = 180;
 

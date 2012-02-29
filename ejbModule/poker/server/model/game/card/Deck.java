@@ -1,5 +1,11 @@
 package poker.server.model.game.card;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Deck
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 

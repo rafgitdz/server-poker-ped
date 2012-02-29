@@ -1,5 +1,11 @@
 package poker.server.model.game;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model-Infrastructure class : RepositoryGameJPA
+ */
+
 import javax.ejb.Stateless;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;

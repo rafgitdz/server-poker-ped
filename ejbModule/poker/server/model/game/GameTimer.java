@@ -1,44 +1,45 @@
 package poker.server.model.game;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Observable;
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : GameTimer
+ */
 
-public class GameTimer extends Observable implements Runnable {
+public class GameTimer   {
 
-	GregorianCalendar calendar;
-
-	public GameTimer() {
-		calendar = new GregorianCalendar();
+	private  long startTime;
+	public long getStartTime() {
+		return startTime;
 	}
+	
+	private  final long LIMIT_PLAYER = 30*1000;
+	private final long LIMIT_BLIND = 180*1000;
 
-	public int getCurrentTime() {
-		return ((calendar.get(Calendar.HOUR) * 60) + calendar
-				.get(Calendar.MINUTE)) * 60 + calendar.get(Calendar.SECOND);
-	}
+	
 
-	public void updateBlind() {
-
-		int limit = 180;
-		int currentTime = getCurrentTime();
-		// while (true) {
-		controlTime(currentTime, limit);
-		// }
-	}
-
-	public void playerTime() {
-
-	}
-
-	public void controlTime(int currentTime, int limit) {
-
-		while (getCurrentTime() - currentTime < limit) {
-			System.out.println("Get = " + getCurrentTime());
-			System.out.println("currentTime = " + currentTime);
+	public  long controlTime(long limit) {
+		this.start();
+		
+//		while (System.nanoTime() - startTime < limit) {
+		while (System.currentTimeMillis() - startTime < limit) {
+			
 		}
+		
+		return System.currentTimeMillis() ;
 	}
 
-	@Override
-	public void run() {
+	
+	public  void start() {
+//		startTime = System.nanoTime();
+		startTime = System.currentTimeMillis();
+	}
+
+
+	public long playerTime(){
+		return controlTime(LIMIT_PLAYER);
+	}
+	public long updateBlind(){
+		return controlTime(LIMIT_BLIND);
 	}
 }

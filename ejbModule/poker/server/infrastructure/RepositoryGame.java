@@ -1,5 +1,11 @@
 package poker.server.infrastructure;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Infrastructure interface : RepositoryGame
+ */
+
 import javax.ejb.Local;
 
 import poker.server.model.game.Game;

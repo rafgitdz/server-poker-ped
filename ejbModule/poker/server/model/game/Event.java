@@ -1,5 +1,11 @@
 package poker.server.model.game;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Event
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,11 @@
 package poker.server.infrastructure;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Infrastructure interface : RepositoryGeneric
+ */
+
 import java.util.List;
 
 public interface RepositoryGeneric<T, TId> {

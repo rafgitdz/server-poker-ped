@@ -1,5 +1,13 @@
 package poker.server.model.player;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Player
+ *         
+ *  class Player manages the behaviors of a Player
+ */
+
 import java.io.Serializable;
 import java.util.Observable;
 
@@ -19,17 +27,6 @@ public class Player extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
 
-	@Id
-	private String name;
-	String pwd;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "Game_Id")
-	Game game;
-
-	boolean folded = false;
-
-	int connectionStatus = 1;
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
 	public final static int IN_GAME = 3;
@@ -39,72 +36,189 @@ public class Player extends Observable implements Serializable {
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
 
-	int role;
+	@Id
+	private String name;
+	String pwd;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "Game_Id")
+	Game game;
 
 	transient Hand currentHand;
+	int currentBet;
+	int currentTokens;
+	int money;
 
-	int currentBet = 0;
-	int currentTokens = 0;
-	int money = 0;
+	int connectionStatus;
+	int role;
+	boolean folded;
 
+	/**
+	 * Default constructor
+	 */
 	Player() {
 	}
 
-	Player(String name, String pwd) {
-		this.pwd = pwd;
-		this.name = name;
-		this.currentHand = new Hand();
+	/**
+	 * Constructor
+	 * 
+	 * @param nameE
+	 *            name of the player
+	 * @param pwD
+	 *            password of the player
+	 * @goal build an instance of a player
+	 */
+	Player(String namE, String pwD) {
+
+		name = namE;
+		pwd = pwD;
+		currentHand = new Hand();
+		currentBet = 0;
+		currentTokens = 0;
+		money = 0;
+		connectionStatus = 1;
+		folded = false;
 	}
 
-	// SIGN IN
+	/**
+	 * Add the fliped cards to the hand of the player
+	 */
+	public void addCard(Card card) {
+		currentHand.addCard(card);
+	}
+
+	/**
+	 * Update token when the player is the smallBlind or bigBlind
+	 */
+	public void updateToken(int token) {
+		currentTokens -= token;
+	}
+
+	/**
+	 * Raise a number of tokens after verify he can do this based on the
+	 * concepts of the game (currentBet, currentTokens)
+	 */
+	public void raise(int quantity) {
+
+		game.verifyIsMyTurn(this);
+		int minTokenToRaise = (game.getCurrentBet() * 2 - currentBet);
+
+		if (quantity > currentTokens || quantity < minTokenToRaise) {
+			throw new PlayerException("not enough tokens to raise");
+		} else {
+			game.updateCurrentBet(quantity);
+			game.updateCurrentPot(quantity);
+			currentTokens -= quantity;
+			currentBet += quantity;
+		}
+		setChanged();
+		game.update(this, "raise"); // inform the game that a player raises
+		game.nextPlayer();
+		Event.addEvent(name + " RAISES " + quantity);
+	}
+
+	/**
+	 * Call the currentBet tokens if the player has an enough tokens to do it
+	 */
+	public void call() {
+
+		game.verifyIsMyTurn(this);
+		int minTokenToCall = (game.getCurrentBet() - currentBet);
+
+		if (currentTokens < minTokenToCall) {
+			throw new PlayerException("not enough tokens to call");
+		} else {
+
+			game.updateCurrentBet(minTokenToCall);
+			game.updateCurrentPot(minTokenToCall);
+			currentTokens -= minTokenToCall;
+			currentBet += minTokenToCall;
+		}
+
+		game.nextPlayer();
+		Event.addEvent(name + " CALLS");
+	}
+
+	/**
+	 * AllIn implies to bet all the tokens that the player has
+	 */
+	public void allIn() {
+
+		game.verifyIsMyTurn(this);
+		game.updateCurrentPot(currentTokens);
+		game.updateCurrentBet(currentTokens);
+
+		currentTokens = 0;
+		currentBet += game.getCurrentBet();
+		game.nextPlayer();
+		Event.addEvent(name + " ALLIN");
+	}
+
+	/**
+	 * Fold implies to retry the player from the current round of poker
+	 */
+	public void fold() {
+
+		game.verifyIsMyTurn(this);
+		folded = true;
+		game.nextPlayer();
+		Event.addEvent(name + " FOLDS");
+	}
+
+	/**
+	 * Cancel the folded state of the player after begin a new round of poker
+	 */
+	public void unFold() {
+		folded = false;
+	}
+
+	/**
+	 * Check implies that the player passed her turn without leave the game
+	 */
+	public void check() {
+
+		game.verifyIsMyTurn(this);
+
+		if (currentBet != game.getCurrentBet()) {
+			throw new PlayerException("not enough tokens to check");
+		} else {
+			// ???
+		}
+		game.nextPlayer();
+		Event.addEvent(name + " CHECKS");
+	}
+
+	// Getters and Setters
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public String getPwd() {
-		return this.pwd;
+		return pwd;
 	}
 
-	// CONNEXION
 	public void setAsPresent() {
-		this.connectionStatus = PRESENT;
+		connectionStatus = PRESENT;
 	}
 
 	public void setAsMissing() {
-		this.connectionStatus = MISSING;
+		connectionStatus = MISSING;
 	}
 
 	public void setInGame() {
-		this.connectionStatus = IN_GAME;
+		connectionStatus = IN_GAME;
 	}
 
 	public boolean isPresent() {
-		return this.connectionStatus == PRESENT;
+		return connectionStatus == PRESENT;
 	}
 
 	public boolean isMissing() {
-		return this.connectionStatus == MISSING;
+		return connectionStatus == MISSING;
 	}
 
 	public boolean isInGame() {
-		return this.connectionStatus == IN_GAME;
-	}
-
-	// STATUS
-	public void setAsDealer() {
-		this.role = DEALER;
-	}
-
-	public void setAsBigBlind() {
-		this.role = BIG_BLIND;
-	}
-
-	public void setAsSmallBlind() {
-		this.role = SMALL_BLIND;
-	}
-
-	public void setAsRegular() {
-		this.role = REGULAR;
+		return connectionStatus == IN_GAME;
 	}
 
 	public boolean isDealer() {
@@ -123,7 +237,6 @@ public class Player extends Observable implements Serializable {
 		return role == REGULAR;
 	}
 
-	// HAND
 	public boolean isfolded() {
 		return folded;
 	}
@@ -132,136 +245,79 @@ public class Player extends Observable implements Serializable {
 		System.out.println("getBestHand() : TODO");
 	}
 
-	public void setCurrentHand(Hand hand) {
-		this.currentHand = hand;
-	}
-
 	public Hand getCurrentHand() {
 		return currentHand;
 	}
 
-	// BET / TOKENS / MONEY
 	public int getCurrentBet() {
-		return this.currentBet;
-	}
-
-	public void setCurrentBet(int currentBet) {
-		this.currentBet = currentBet;
-	}
-
-	public int getCurrentTokens() {
-		return this.currentTokens;
-	}
-
-	public void setCurrentTokens(int tokens) {
-		this.currentTokens = tokens;
+		return currentBet;
 	}
 
 	public int getMoney() {
 		return money;
 	}
 
-	public void setMoney(int money) {
-		this.money = money;
-	}
-
-	// GAME
-	public void setGame(Game game) {
-		this.game = game;
+	public int getCurrentTokens() {
+		return currentTokens;
 	}
 
 	public Game getGame() {
 		return game;
 	}
 
-	public void connect(Game game) {
-		if (!this.isPresent()) {
-			throw new PlayerException("the user is in game or missing");
-		} else {
-			game.getPlayers().add(this);
-			this.setInGame();
-			this.setGame(game);
-		}
+	public void setCurrentBet(int currentB) {
+		currentBet = currentB;
 	}
 
-	public void disconnect() {
-		if (!this.isInGame()) {
-			throw new PlayerException("the player is not connected to a game");
-		} else {
-			this.getGame().remove(this);
-		}
+	public void setCurrentTokens(int tokens) {
+		currentTokens = tokens;
 	}
 
-	// ACTIONS
-	public void raise(Game game, int quantity) {
-
-		int minTokenToRaise = (game.getCurrentBet() * 2 - this.currentBet);
-
-		if (quantity > this.currentTokens || quantity < minTokenToRaise) {
-			throw new PlayerException("not enough tokens to raise");
-		} else {
-			game.updateCurrentBet(quantity);
-			game.updateCurrentPot(quantity);
-			this.currentTokens -= quantity;
-			this.currentBet += quantity;
-		}
-		setChanged();
-		game.update(this, "raise"); // inform the game that a player raises
-		game.nextPlayer();
-		Event.addEvent(name + " RAISES " + quantity);
+	public void setMoney(int moneY) {
+		money = moneY;
 	}
 
-	public void call(Game game) {
-
-		int minTokenToCall = (game.getCurrentBet() - this.currentBet);
-
-		if (this.currentTokens < minTokenToCall) {
-			throw new PlayerException("not enough tokens to call");
-		} else {
-
-			game.updateCurrentBet(minTokenToCall);
-			game.updateCurrentPot(minTokenToCall);
-			this.currentTokens -= minTokenToCall;
-			this.currentBet += minTokenToCall;
-		}
-
-		game.nextPlayer();
-		Event.addEvent(name + " CALLS");
+	public void setAsDealer() {
+		role = DEALER;
 	}
 
-	public void allIn(Game game) {
-
-		game.updateCurrentPot(this.currentTokens);
-		game.updateCurrentBet(this.currentTokens);
-
-		this.currentTokens = 0;
-		this.currentBet += game.getCurrentBet();
-		game.nextPlayer();
-		Event.addEvent(name + " ALLIN");
+	public void setAsBigBlind() {
+		role = BIG_BLIND;
 	}
 
-	public void fold() {
-		folded = true;
-		game.nextPlayer();
-		Event.addEvent(name + " FOLDS");
+	public void setAsSmallBlind() {
+		role = SMALL_BLIND;
 	}
 
-	public void unFold() {
-		folded = false;
+	public void setAsRegular() {
+		role = REGULAR;
 	}
 
-	public void check(Game game) {
-
-		if (this.currentBet != game.getCurrentBet()) {
-			throw new PlayerException("not enough tokens to check");
-		} else {
-			// ???
-		}
-		game.nextPlayer();
-		Event.addEvent(name + " CHECKS");
+	public void setCurrentHand(Hand hand) {
+		currentHand = hand;
 	}
 
-	public void addCard(Card card) {
-		currentHand.addCard(card);
+	public void setGame(Game gamE) {
+		game = gamE;
 	}
+
+	// DEVELOPED IN SERVICE (TO REMOVE)
+	// public void connect(Game game) {
+	//
+	// if (!isPresent()) {
+	// throw new PlayerException("the user is in game or missing");
+	// } else {
+	// game.getPlayers().add(this);
+	// setInGame();
+	// setGame(game);
+	// }
+	// }
+	//
+	// public void disconnect() {
+	// if (!isInGame()) {
+	// throw new PlayerException("the player is not connected to a game");
+	// } else {
+	// getGame().remove(this);
+	// }
+	// }
 }

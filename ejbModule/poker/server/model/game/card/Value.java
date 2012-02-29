@@ -1,5 +1,11 @@
 package poker.server.model.game.card;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : Value
+ */
+
 public final class Value {
 
 	// the ranks of cards
