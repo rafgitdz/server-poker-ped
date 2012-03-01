@@ -19,13 +19,11 @@ public class UpdateBlindsTimerTask {
 				System.out.println("YES");
 				this.start();
 			}
-
 		}
 	}
 
 	public void start() {
 		startTime = System.nanoTime();
-
 	}
 
 	public void playerTime() {

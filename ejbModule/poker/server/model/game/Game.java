@@ -44,6 +44,8 @@ public class Game implements Serializable, Observer {
 	private static final String UNKNOWN_ROUND = "unknown round !";
 	private static final String NOT_YOUR_TURN = "It's not your turn ";
 	private static final String NOT_END_ROUND_POKER = "It's not the end of the poker round";
+	private static final String NOT_ENOUGH_FLIPED_CARDS = "There isn't enough cards to do showDown";
+	private static final String NO_PLAYER_IN_GAME = "There is no players in game";
 
 	private static final int FLOP = 1;
 	private static final int TOURNANT = 2;
@@ -169,7 +171,6 @@ public class Game implements Serializable, Observer {
 	 */
 	protected void dealCards() {
 
-		deck.shuffle();
 		Card card;
 		for (int i = 0; i < 2; i++) {
 
@@ -510,57 +511,68 @@ public class Game implements Serializable, Observer {
 	 * At the end of round river, it executed the showDown action to see all
 	 * hands of the current player and get the winner
 	 */
-	protected List<String> showDown() {
+	protected Map<String, Integer> showDown() {
 
 		if (currentRound != SHOWDOWN)
 			throw new GameException(NOT_END_ROUND_POKER);
+		if (flippedCards.size() < 5)
+			throw new GameException(NOT_ENOUGH_FLIPED_CARDS);
+		if (players.isEmpty())
+			throw new GameException(NO_PLAYER_IN_GAME);
 
 		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
-		List<String> winners = new ArrayList<String>();
-		int bestHand = 0; // set to HighCard, that is the worst hand value
-		int result = 0;
 		int best = 0;
 
 		for (Player player : players) {
+
+			int bestHand = 0; // set to HighCard, that is the worst hand value
+			int result = 0;
+			playersBestHands.put(player.getName(), 0);
 
 			if (!player.isfolded()) {
 
 				for (int i = 0; i != 3; ++i) {
 
-					for (int j = i; j + 2 != flippedCards.size(); ++j) {
+					for (int j = i + 1; j + 1 != flippedCards.size(); ++j) {
 
-						player.addCard(flippedCards.get(i));
-						player.addCard(flippedCards.get(j + 1));
-						player.addCard(flippedCards.get(j + 2));
+						for (int k = j + 1; k != flippedCards.size(); ++k) {
 
-						result = player.evaluateHand();
+							player.addCard(flippedCards.get(i));
+							player.addCard(flippedCards.get(j));
+							player.addCard(flippedCards.get(k));
 
-						if (result > bestHand) {
+							result = player.evaluateHand();
 
-							bestHand = result;
-							playersBestHands.put(player.getName(), result);
+							if (result >= bestHand) {
+
+								bestHand = result;
+								playersBestHands.put(player.getName(), result);
+							}
+
+							if (result > best)
+								best = result;
+
+							player.removeCard(flippedCards.get(i));
+							player.removeCard(flippedCards.get(j));
+							player.removeCard(flippedCards.get(k));
 						}
-
-						if (result > best)
-							best = result;
-
-						player.removeCard(flippedCards.get(i));
-						player.removeCard(flippedCards.get(j + 1));
-						player.removeCard(flippedCards.get(j + 2));
 					}
 				}
 			}
-
-			for (int i = 0; i < playersBestHands.size(); ++i) {
-
-				String playerName = players.get(i).getName();
-				int value = playersBestHands.get(player);
-				if (value == best)
-					winners.add(playerName);
-			}
 		}
 
-		return winners;
+		HashMap<String, Integer> bestPlayers = new HashMap<String, Integer>();
+
+		for (int i = 0; i < playersBestHands.size(); ++i) {
+
+			String playerName = players.get(i).getName();
+			int value = playersBestHands.get(playerName);
+
+			if (value == best)
+				bestPlayers.put(playerName, value);
+		}
+
+		return bestPlayers;
 	}
 
 	/**
@@ -715,5 +727,9 @@ public class Game implements Serializable, Observer {
 
 	public void setCurrentRound(int i) {
 		currentRound = i;
+	}
+
+	protected void setFlipedCards(List<Card> cards) {
+		flippedCards = cards;
 	}
 }

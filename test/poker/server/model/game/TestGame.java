@@ -3,7 +3,9 @@ package poker.server.model.game;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -270,17 +272,28 @@ public class TestGame {
 		game.add(player5);
 
 		game.setCurrentRound(4);
-
 		game.dealCards();
+
+		buildFlipedCards(Card.KING_HEART, Card.FIVE_SPADE, Card.KING_DIAMOND,
+				Card.TWO_DIAMOND, Card.KING_SPADE);
+
+		game.setFlipedCards(flipedCards);
+
+		Map<String, Integer> actifWinners = new HashMap<String, Integer>();
+		actifWinners.put(player5.getName(), 7);
+
+		Map<String, Integer> expectedWinners = game.showDown();
+
+		assertEquals(expectedWinners, actifWinners);
 	}
 
 	// PRIVATE METHODS TO BES USED IN TEST
-	private void buildPlayerHand(Card card1, Card card2, Card card3,
+	private void buildFlipedCards(Card card1, Card card2, Card card3,
 			Card card4, Card card5) {
 
 		flipedCards.add(card1);
 		flipedCards.add(card2);
-		flipedCards.add(card3);
+		flipedCards.add(card3); // flop
 		flipedCards.add(card4); // tournant
 		flipedCards.add(card5); // river
 	}
