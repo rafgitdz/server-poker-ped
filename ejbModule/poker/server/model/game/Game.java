@@ -41,6 +41,7 @@ public class Game implements Serializable, Observer {
 
 	private static final String UNKNOWN_ROUND = "unknown round !";
 	private static final String NOT_YOUR_TURN = "It's not your turn ";
+	private static final String NOT_END_ROUND_POKER = "It's not the end of the poker round";
 
 	private static final int FLOP = 1;
 	private static final int TOURNANT = 2;
@@ -85,7 +86,6 @@ public class Game implements Serializable, Observer {
 	 * Default constructor of Game, takes a SitAndGo parameters
 	 */
 	protected Game() {
-
 		gameType = new SitAndGo();
 		buildGame();
 	}
@@ -114,7 +114,7 @@ public class Game implements Serializable, Observer {
 		currentPot = 0;
 		currentBet = 0;
 		prizePool = 0;
-		currentRound = 1;
+		currentRound = 0;
 		gameLevel = 0;
 		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
@@ -249,7 +249,7 @@ public class Game implements Serializable, Observer {
 
 		for (Player player : players) {
 			player.setCurrentTokens(gameType.getTokens());
-			//player.setAsPresent();
+			// player.setAsPresent();
 		}
 	}
 
@@ -484,16 +484,60 @@ public class Game implements Serializable, Observer {
 		else
 			currentPlayer = (currentPlayer % players.size()) + 1;
 
-		if (players.get(currentPlayer).isSmallBlind())
+		if ((currentRound == 0 && isCurrentPlayerAfterBigBlind())
+				|| players.get(currentPlayer).isSmallBlind())
 			nextRound();
+	}
+
+	/**
+	 * For the first round,
+	 */
+	private boolean isCurrentPlayerAfterBigBlind() {
+
+		if (currentPlayer != 0) {
+			if (currentPlayer - 1 == bigBlindPlayer)
+				return true;
+		} else if (bigBlindPlayer == players.size() - 1)
+			return true;
+
+		return false;
 	}
 
 	/**
 	 * At the end of round river, it executed the showDown action to see all
 	 * hands of the current player and get the winner
 	 */
-	private void showDown() {
-		// TO DO
+	protected void showDown() {
+
+		if (currentRound != RIVER)
+			throw new GameException(NOT_END_ROUND_POKER);
+
+		int bestHand = 0; // set to HighCard, that is the worst hand value
+
+		for (Player player : players) {
+
+			int result;
+			if (!player.isfolded()) {
+
+				for (int i = 0; i != 3; ++i) {
+
+					for (int j = i; j != i + 3; ++j) {
+
+						player.addCard(flippedCards.get(i));
+						player.addCard(flippedCards.get(j + 1));
+						player.addCard(flippedCards.get(j + 2));
+
+						result = player.evaluateHand();
+						if (result > bestHand)
+							bestHand = result;
+
+						player.removeCard(flippedCards.get(i));
+						player.removeCard(flippedCards.get(j + 1));
+						player.removeCard(flippedCards.get(j + 2));
+					}
+				}
+			}
+		}
 	}
 
 	/**

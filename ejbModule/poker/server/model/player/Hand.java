@@ -25,7 +25,7 @@ public class Hand {
 	private static final int TWO_PAIR = 2;
 	private static final int ONE_PAIR = 1;
 	private static final int HIGH_CARD = 0;
-	private static final String NOT_FIVE_CARDS = "can't evaluate less than or more than five cards";
+	private static final String NOT_FIVE_CARDS = "can't evaluate less or more than five cards";
 
 	private List<Card> cards;
 
@@ -71,6 +71,9 @@ public class Hand {
 
 	public boolean isRoyalFlush() {
 
+		System.out.println("Royal Size : " + cards.size() + " "
+				+ cards.get(0).getValue());
+
 		List<Card> tempCards = cards;
 
 		sort(tempCards); // sort list from the less value card to the greater
@@ -94,6 +97,9 @@ public class Hand {
 
 	public boolean isStraightFlush() {
 
+		System.out.println("StraightFlush Size : " + cards.size() + " "
+				+ cards.get(0).getValue());
+
 		List<Card> tempCards = cards;
 		sort(tempCards);
 
@@ -110,13 +116,16 @@ public class Hand {
 
 	public boolean isQuads() {
 
+		System.out.println("Quads Size : " + cards.size() + " "
+				+ cards.get(0).getValue());
+
 		List<Card> tempCards = cards;
 
 		// detect if for the first card, it exists a 4 suit from the remaining
 		// cards
 		for (int i = 0; i < 2; ++i) {
 
-			if (countSuitCards(tempCards) == 4)
+			if (countSuitCards(tempCards, i) == 4)
 				return true;
 		}
 		return false;
@@ -124,37 +133,31 @@ public class Hand {
 
 	public boolean isFullHouse() {
 
-		// List<Card> tempCards = currentHand;
-		int count = 1;
 		List<Card> tempCards = cards;
 
-		Card firstCard = tempCards.get(0);
-		tempCards.remove(firstCard);
+		// if it exists a pair or a trips, remade to search a second pair or
+		// trips if there is...
+		for (int i = 0; i < 4; ++i) {
 
-		for (int i = 0; i < tempCards.size();) {
+			int result = countSuitCards(tempCards, i);
 
-			if (firstCard.getValue() == tempCards.get(i).getValue()) {
-				++count;
-				tempCards.remove(tempCards.get(i));
-			} else
-				++i;
-		}
+			if (result == 2 || result == 3) {
 
-		// it found a pair, let to found a trip
-		if (count == 2) {
-			for (int i = 0; i < count; ++i) {
-				if (tempCards.get(0).getValue() != tempCards.get(i).getValue())
-					return false;
+				if (result == 2)
+					result = 3;
+				else
+					result = 2;
+
+				for (int j = 0; j < 4
+						&& tempCards.get(i).getValue() != tempCards.get(j)
+								.getValue(); ++j) {
+
+					if (countSuitCards(tempCards, j) == result)
+						return true;
+				}
 			}
-			// it found a trip, let to found a pair
-		} else if (count == 3) {
-			// verify only the two remaining cards if they are equals
-			if (tempCards.get(0).getValue() != tempCards.get(1).getValue())
-				return false;
-		} else
-			return false;
-
-		return true; // it's ok, it's a FullHouse
+		}
+		return false;
 	}
 
 	public boolean isFlush() {
@@ -170,6 +173,9 @@ public class Hand {
 	}
 
 	public boolean isStraight() {
+
+		System.out.println("Straight Size : " + cards.size() + " "
+				+ cards.get(0).getValue());
 
 		List<Card> tempCards = cards;
 
@@ -195,12 +201,15 @@ public class Hand {
 
 	public boolean isTrips() {
 
+		System.out.println("Trips Size : " + cards.size() + " "
+				+ cards.get(0).getValue());
 		List<Card> tempCards = cards;
+		cards.get(0);
 		// detect if for the first card, it exists a 3-suit from the remaining
 		// cards
 		for (int i = 0; i < 3; ++i) {
 
-			if (countSuitCards(tempCards) == 3)
+			if (countSuitCards(tempCards, i) == 3)
 				return true;
 		}
 		return false;
@@ -212,9 +221,14 @@ public class Hand {
 		// if it exists a pair, remade to search a second pair if there is
 		// else not
 		for (int i = 0; i < 4; ++i) {
-			if (countSuitCards(tempCards) == 2) {
-				for (int j = 0; j < tempCards.size() && tempCards.size() >= 2;) {
-					if (countSuitCards(tempCards) == 2)
+
+			if (countSuitCards(tempCards, i) == 2) {
+
+				for (int j = 0; j < 4
+						&& tempCards.get(i).getValue() != tempCards.get(j)
+								.getValue(); ++j) {
+
+					if (countSuitCards(tempCards, j) == 2)
 						return true;
 				}
 			}
@@ -230,28 +244,38 @@ public class Hand {
 		// cards
 		for (int i = 0; i < 4; ++i) {
 
-			if (countSuitCards(tempCards) == 2)
+			if (countSuitCards(tempCards, i) == 2)
 				return true;
 		}
 		return false;
 	}
 
-	@SuppressWarnings("unused")
-	private Card highCard() {
-		return null;
+	protected Card highCard() {
+
+		Card bestCard = cards.get(0);
+		Card current;
+
+		for (int i = 1; i < cards.size(); ++i) {
+
+			current = cards.get(i);
+			if (current.getValue() > bestCard.getValue())
+				bestCard = current;
+		}
+		return bestCard;
 	}
 
 	public List<Card> getCards() {
 		return this.cards;
 	}
 
-	private int countSuitCards(List<Card> tempCards) {
+	private int countSuitCards(List<Card> tempCards, int pos) {
 
 		int count = 1;
-		Card firstCard = tempCards.get(0);
-		tempCards.remove(firstCard);
-		for (Card card : tempCards) {
-			if (card.getValue() == firstCard.getValue())
+		Card firstCard = tempCards.get(pos);
+		// tempCards.remove(0);
+
+		for (int i = pos + 1; i < tempCards.size(); ++i) {
+			if (tempCards.get(i).getValue() == firstCard.getValue())
 				++count;
 		}
 		return count;
@@ -274,5 +298,9 @@ public class Hand {
 
 	public int getSize() {
 		return cards.size();
+	}
+
+	public void removeCard(Card card) {
+		cards.remove(card);
 	}
 }

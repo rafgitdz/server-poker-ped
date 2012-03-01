@@ -36,8 +36,9 @@ public class TestGame {
 
 	@Before
 	public void beforeTest() {
+
 		game = gameFactory.newGame();
-		
+
 		player1 = playerFactory.newPlayer("rafik", "rafik");
 		player2 = playerFactory.newPlayer("lucas", "lucas");
 		player3 = playerFactory.newPlayer("youga", "youga");
@@ -90,8 +91,8 @@ public class TestGame {
 		game.setPlayerRoles();
 
 		assertEquals(player1.isDealer(), true);
-		assertEquals(player2.isBigBlind(), true);
-		assertEquals(player3.isSmallBlind(), true);
+		assertEquals(player2.isSmallBlind(), true);
+		assertEquals(player3.isBigBlind(), true);
 		assertEquals(player4.isRegular(), true);
 		assertEquals(player5.isRegular(), true);
 	}
@@ -186,6 +187,7 @@ public class TestGame {
 
 	@Test
 	public void testUpdateCurrentPot() {
+
 		game.setCurrentPot(10);
 		saveTestValues();
 
@@ -201,7 +203,7 @@ public class TestGame {
 		game.setCurrentPot(20);
 		saveTestValues();
 		game.updateRoundPotAndBets();
-		
+
 		assertEquals(gameCurrentPot, game.getTotalPot());
 	}
 
@@ -225,6 +227,7 @@ public class TestGame {
 
 	@Test
 	public void testCleanTable() {
+
 		Game game = gameFactory.newGame();
 		player1.setCurrentTokens(50);
 		player2.setCurrentTokens(50);
@@ -246,5 +249,17 @@ public class TestGame {
 
 		expected = 1;
 		assertEquals(expected, game.getPlayers().size());
+	}
+
+	@Test(expected = GameException.class)
+	public void testFailShowDown() {
+		game.showDown();
+	}
+	
+	@Test(expected = GameException.class)
+	public void testShowDown() {
+		
+		game.currentRound = 5;
+		game.showDown();
 	}
 }

@@ -104,7 +104,7 @@ public class Player extends Observable implements Serializable {
 		int minTokenToRaise = game.getCurrentBet();
 		int toCall = game.getCurrentBet() - currentBet;
 		int necessaryTokens = quantity + toCall;
-		
+
 		if (necessaryTokens > currentTokens || quantity < minTokenToRaise) {
 			throw new PlayerException("not enough tokens to raise");
 		} else {
@@ -126,7 +126,7 @@ public class Player extends Observable implements Serializable {
 
 		game.verifyIsMyTurn(this);
 		int minTokenToCall = (game.getCurrentBet() - currentBet);
-		
+
 		if (currentTokens < minTokenToCall) {
 			throw new PlayerException("not enough tokens to call");
 		} else {
@@ -134,7 +134,7 @@ public class Player extends Observable implements Serializable {
 			this.currentTokens -= minTokenToCall;
 			this.currentBet += minTokenToCall;
 		}
-		
+
 		game.nextPlayer();
 		Event.addEvent(name + " CALLS");
 	}
@@ -299,6 +299,14 @@ public class Player extends Observable implements Serializable {
 
 	public void setGame(Game gamE) {
 		game = gamE;
+	}
+
+	public int evaluateHand() {
+		return currentHand.evaluateHand();
+	}
+
+	public void removeCard(Card card) {
+		currentHand.removeCard(card);
 	}
 
 	// DEVELOPED IN SERVICE (TO REMOVE)

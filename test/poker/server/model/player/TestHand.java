@@ -1,5 +1,6 @@
 package poker.server.model.player;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +56,7 @@ public class TestHand {
 
 		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.TWO_CLUB,
 				Card.ACE_CLUB, Card.THREE_CLUB);
-		
+
 		boolean actual = handPlayer.isStraightFlush();
 		assertFalse(actual);
 	}
@@ -180,6 +181,28 @@ public class TestHand {
 		assertFalse(actual);
 	}
 
+	@Test
+	public void testEvaluateHand() {
+
+		buildPlayerHand(Card.KING_HEART, Card.QUEEN_CLUB, Card.KING_DIAMOND,
+				Card.KING_SPADE, Card.KING_CLUB);
+
+		int actual = handPlayer.evaluateHand();
+		int expected = 7;
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testHighCard() {
+
+		buildPlayerHand(Card.THREE_CLUB, Card.JACK_SPADE, Card.SEVEN_DIAMOND,
+				Card.FIVE_CLUB, Card.NINE_CLUB);
+
+		Card expectedBestCard = Card.JACK_SPADE;
+		assertEquals(expectedBestCard, handPlayer.highCard());
+	}
+
+	// PRIVATE METHODS TO BES USED IN TEST
 	private void buildPlayerHand(Card card1, Card card2, Card card3,
 			Card card4, Card card5) {
 
