@@ -458,7 +458,7 @@ public class Game implements Serializable, Observer {
 			dealer = 0;
 			smallBlindPlayer = 1;
 			bigBlindPlayer = 2;
-			currentPlayer = 1;
+			currentPlayer = 3;
 		}
 	}
 

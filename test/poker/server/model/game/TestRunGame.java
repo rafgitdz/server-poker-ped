@@ -2,7 +2,6 @@ package poker.server.model.game;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,13 +22,6 @@ public class TestRunGame {
 	private static Player player3;
 	private static Player player4;
 	private static Player player5;	
-	
-	private int gameTotalPot;
-	private int gameCurrentPot;
-	private int gameCurrentBet;
-	
-	private int smallBlind;
-	private int bigBlind;
 	
 	@BeforeClass
 	public static void beforeTest() {
