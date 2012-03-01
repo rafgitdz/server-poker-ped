@@ -6,7 +6,7 @@ package poker.server.model.game;
  *         Model class : Timer
  */
 
-public class Timer {
+public class UpdateBlindsTimerTask {
 
 	private long startTime;
 	private final long LIMIT_PLAYER = 30 * 1000000000;
