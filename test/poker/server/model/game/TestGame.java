@@ -57,6 +57,7 @@ public class TestGame {
 	public void testEvent() {
 		game.dealCards();
 		List<String> events = new ArrayList<String>();
+		events.add("THE DECK IS SHUFFLED");
 		events.add("DEAL CARDS FOR PLAYERS");
 		assertEquals(events, Event.getEvents());
 	}
@@ -280,7 +281,7 @@ public class TestGame {
 		game.setFlipedCards(flipedCards);
 
 		Map<String, Integer> actifWinners = new HashMap<String, Integer>();
-		actifWinners.put(player5.getName(), 7);
+		actifWinners.put(player4.getName(), 7);
 
 		Map<String, Integer> expectedWinners = game.showDown();
 

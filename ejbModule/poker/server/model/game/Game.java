@@ -171,6 +171,7 @@ public class Game implements Serializable, Observer {
 	 */
 	protected void dealCards() {
 
+		deck.shuffle();
 		Card card;
 		for (int i = 0; i < 2; i++) {
 
