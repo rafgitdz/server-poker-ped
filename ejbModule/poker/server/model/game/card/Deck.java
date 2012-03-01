@@ -48,7 +48,7 @@ public class Deck {
 	}
 
 	// based on permutation between 0 and n-1, 1 and n-2,...
-	protected void shuffle() {
+	public void shuffle() {
 
 		if (cards.size() == 0)
 			throw new GameException(NO_CARDS);

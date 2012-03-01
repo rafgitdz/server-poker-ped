@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import poker.server.model.exception.GameException;
+import poker.server.model.game.card.Card;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
@@ -33,6 +34,7 @@ public class TestGame {
 
 	private int smallBlind;
 	private int bigBlind;
+	private List<Card> flipedCards;
 
 	@Before
 	public void beforeTest() {
@@ -44,6 +46,8 @@ public class TestGame {
 		player3 = playerFactory.newPlayer("youga", "youga");
 		player4 = playerFactory.newPlayer("balla", "balla");
 		player5 = playerFactory.newPlayer("xan", "xan");
+
+		flipedCards = new ArrayList<Card>();
 	}
 
 	// EVENT
@@ -255,11 +259,29 @@ public class TestGame {
 	public void testFailShowDown() {
 		game.showDown();
 	}
-	
-	@Test(expected = GameException.class)
+
+	@Test
 	public void testShowDown() {
-		
-		game.currentRound = 5;
-		game.showDown();
+
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+
+		game.setCurrentRound(4);
+
+		game.dealCards();
+	}
+
+	// PRIVATE METHODS TO BES USED IN TEST
+	private void buildPlayerHand(Card card1, Card card2, Card card3,
+			Card card4, Card card5) {
+
+		flipedCards.add(card1);
+		flipedCards.add(card2);
+		flipedCards.add(card3);
+		flipedCards.add(card4); // tournant
+		flipedCards.add(card5); // river
 	}
 }

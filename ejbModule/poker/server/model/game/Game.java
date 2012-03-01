@@ -2,7 +2,9 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -167,6 +169,7 @@ public class Game implements Serializable, Observer {
 	 */
 	protected void dealCards() {
 
+		deck.shuffle();
 		Card card;
 		for (int i = 0; i < 2; i++) {
 
@@ -507,29 +510,39 @@ public class Game implements Serializable, Observer {
 	 * At the end of round river, it executed the showDown action to see all
 	 * hands of the current player and get the winner
 	 */
-	protected void showDown() {
+	protected List<String> showDown() {
 
-		if (currentRound != RIVER)
+		if (currentRound != SHOWDOWN)
 			throw new GameException(NOT_END_ROUND_POKER);
 
+		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
+		List<String> winners = new ArrayList<String>();
 		int bestHand = 0; // set to HighCard, that is the worst hand value
+		int result = 0;
+		int best = 0;
 
 		for (Player player : players) {
 
-			int result;
 			if (!player.isfolded()) {
 
 				for (int i = 0; i != 3; ++i) {
 
-					for (int j = i; j != i + 3; ++j) {
+					for (int j = i; j + 2 != flippedCards.size(); ++j) {
 
 						player.addCard(flippedCards.get(i));
 						player.addCard(flippedCards.get(j + 1));
 						player.addCard(flippedCards.get(j + 2));
 
 						result = player.evaluateHand();
-						if (result > bestHand)
+
+						if (result > bestHand) {
+
 							bestHand = result;
+							playersBestHands.put(player.getName(), result);
+						}
+
+						if (result > best)
+							best = result;
 
 						player.removeCard(flippedCards.get(i));
 						player.removeCard(flippedCards.get(j + 1));
@@ -537,7 +550,17 @@ public class Game implements Serializable, Observer {
 					}
 				}
 			}
+
+			for (int i = 0; i < playersBestHands.size(); ++i) {
+
+				String playerName = players.get(i).getName();
+				int value = playersBestHands.get(player);
+				if (value == best)
+					winners.add(playerName);
+			}
 		}
+
+		return winners;
 	}
 
 	/**
@@ -688,5 +711,9 @@ public class Game implements Serializable, Observer {
 		if (currentRound == SHOWDOWN)
 			return "true";
 		return "false";
+	}
+
+	public void setCurrentRound(int i) {
+		currentRound = i;
 	}
 }

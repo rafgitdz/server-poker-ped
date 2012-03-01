@@ -102,12 +102,12 @@ public class GameService {
 				}
 
 				updateJSON(json, "playerNames", playerInfos);
-				updateJSON(json, "Dealer", currentGame.getDealerP().getName());
-				updateJSON(json, "SmallBlind", currentGame.getSmallBlindP()
+				updateJSON(json, "dealer", currentGame.getDealerP().getName());
+				updateJSON(json, "smallBlind", currentGame.getSmallBlindP()
 						.getName());
-				updateJSON(json, "BigBlind", currentGame.getBigBlindP()
+				updateJSON(json, "bigBlind", currentGame.getBigBlindP()
 						.getName());
-				updateJSON(json, "Start", "true");
+				updateJSON(json, "size", currentGame.getPlayers().size());
 			}
 
 			else
@@ -122,6 +122,8 @@ public class GameService {
 			repositoryGame.save(currentGame);
 			updateJSON(json, "Start", "false");
 		}
+
+		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
 		return json;
 	}
 
@@ -138,6 +140,36 @@ public class GameService {
 			updateJSON(json, "id" + nb, card.getId());
 
 		return json;
+	}
+
+	@GET
+	@Path("/getPlayers/{tableName}")
+	public JSONObject getPlayers(@PathParam("tableName") int tableName) {
+
+		// get the game that corresponding to the tableName and return the
+		// list of players
+		// JSONObject json = new JSONObject();
+		// Game game = repositoryGame.load(1);
+		// ...
+		return null;
+	}
+
+	@GET
+	@Path("/showDown/{tableName}")
+	public JSONObject showDown(@PathParam("tableName") int tableName) {
+
+		// Return 2 cards for all players
+		// Return the winner
+		// Return the value of the hand
+		return null;
+	}
+
+	@GET
+	@Path("/dealCards/{name}")
+	public JSONObject getFlipedCards(@PathParam("name") String name) {
+
+		// get the deal cards for the name player
+		return null;
 	}
 
 	/**
