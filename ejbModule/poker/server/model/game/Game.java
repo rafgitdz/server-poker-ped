@@ -489,6 +489,7 @@ public class Game implements Serializable, Observer {
 							+ gameType.getPlayerNumber());
 		} else {
 
+			// transform it to be generic (method next())
 			resetPlayers();
 			players.get(0).setAsDealer();
 			players.get(1).setAsSmallBlind();
@@ -573,7 +574,7 @@ public class Game implements Serializable, Observer {
 	 * At the end of round river, it executed the showDown action to see all
 	 * hands of the current player and get the winner(s)
 	 */
-	protected Map<String, Integer> showDown() {
+	public Map<String, Integer> showDown() {
 
 		if (currentRound != SHOWDOWN)
 			throw new GameException(NOT_END_ROUND_POKER);
