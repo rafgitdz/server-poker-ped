@@ -10,21 +10,21 @@ import poker.server.model.game.Game;
  *         Model class : Timer
  */
 
-public class UpdateBlindsTimerTask extends MethodCallTimer {
+public class UpdateBlindsMethodCall extends MethodCallTimerTask {
 
-	public UpdateBlindsTimerTask(Game game, Timer timer, long period) {
+	public UpdateBlindsMethodCall(Game game, Timer timer, long period) {
 		this.game = game;
 		this.timer = timer;
 		this.period = period;
 	}
 	
-	public UpdateBlindsTimerTask(Game game, Timer timer) {
+	public UpdateBlindsMethodCall(Game game, Timer timer) {
 		this.game = game;
 		this.timer = timer;
 		this.period = this.game.getGameType().getTimeChangeBlind() * this.millisecondMultFactor;
 	}
 	
-	public UpdateBlindsTimerTask(Game game) {
+	public UpdateBlindsMethodCall(Game game) {
 		this.game = game;
 		this.timer = new Timer();
 		this.period = this.game.getGameType().getTimeChangeBlind() * this.millisecondMultFactor;

@@ -5,7 +5,7 @@ import java.util.TimerTask;
 
 import poker.server.model.game.Game;
 
-public abstract class MethodCallTimer extends TimerTask {
+public abstract class MethodCallTimerTask extends TimerTask {
 
 //	private long startTime;
 //	private final long LIMIT_PLAYER = 30 * 1000000000;

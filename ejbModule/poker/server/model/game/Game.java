@@ -26,7 +26,7 @@ import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
-import poker.server.model.timerTask.PlayerTalkTimerTask;
+import poker.server.model.timerTask.NextPlayerMethodCall;
 
 /**
  * @author PokerServerGroup

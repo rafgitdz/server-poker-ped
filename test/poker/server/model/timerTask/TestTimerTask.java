@@ -14,8 +14,8 @@ import poker.server.model.game.card.Card;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
-import poker.server.model.timerTask.PlayerTalkTimerTask;
-import poker.server.model.timerTask.UpdateBlindsTimerTask;
+import poker.server.model.timerTask.NextPlayerMethodCall;
+import poker.server.model.timerTask.UpdateBlindsMethodCall;
 
 public class TestTimerTask {
 
@@ -39,8 +39,8 @@ public class TestTimerTask {
 	private int bigBlind;
 	private List<Card> flipedCards;
 	
-	private PlayerTalkTimerTask playerTaskTT;
-	private UpdateBlindsTimerTask updateBlindTT;
+	private NextPlayerMethodCall nextPlayerMCall;
+	private UpdateBlindsMethodCall updateBlindsMCall;
 	
 	@Before
 	public void beforeTest() {
@@ -67,8 +67,8 @@ public class TestTimerTask {
 		player4.setGame(game);
 		player5.setGame(game);
 		
-		playerTaskTT = new PlayerTalkTimerTask(game);
-		updateBlindTT = new UpdateBlindsTimerTask(game);
+		nextPlayerMCall = new NextPlayerMethodCall(game);
+		updateBlindsMCall = new UpdateBlindsMethodCall(game);
 	}
 	
 	@After
@@ -78,6 +78,6 @@ public class TestTimerTask {
 	
 	@Test
 	public void testPlayerTalkStart() {
-		this.playerTaskTT.start();
+		this.nextPlayerMCall.start();
 	}
 }

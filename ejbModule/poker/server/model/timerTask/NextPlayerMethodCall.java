@@ -5,21 +5,21 @@ import java.util.TimerTask;
 
 import poker.server.model.game.Game;
 
-public class PlayerTalkTimerTask extends MethodCallTimer  {
+public class NextPlayerMethodCall extends MethodCallTimerTask  {
 	
-	public PlayerTalkTimerTask(Game game, Timer timer, long period) {
+	public NextPlayerMethodCall(Game game, Timer timer, long period) {
 		this.game = game;
 		this.timer = timer;
 		this.period = period;
 	}
 	
-	public PlayerTalkTimerTask(Game game, Timer timer) {
+	public NextPlayerMethodCall(Game game, Timer timer) {
 		this.game = game;
 		this.timer = timer;
 		this.period = this.game.getGameType().getSpeakTime() * this.millisecondMultFactor;
 	}
 	
-	public PlayerTalkTimerTask(Game game) {
+	public NextPlayerMethodCall(Game game) {
 		this.game = game;
 		this.timer = new Timer();
 		this.period = this.game.getGameType().getSpeakTime() * this.millisecondMultFactor;
