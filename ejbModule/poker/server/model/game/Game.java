@@ -86,6 +86,8 @@ public class Game implements Serializable, Observer {
 	int lastRaisedPlayer;
 	int gameLevel;
 
+	private boolean gameEnded;
+
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
 	 */
@@ -120,6 +122,7 @@ public class Game implements Serializable, Observer {
 		prizePool = 0;
 		currentRound = 0;
 		gameLevel = 0;
+		gameEnded = false;
 		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
@@ -264,8 +267,18 @@ public class Game implements Serializable, Observer {
 	 */
 	private void nextRound() {
 
-		if (currentRound == RIVER)
+		if (currentRound == RIVER) {
 			showDown();
+			currentRound = 0;
+		}
+
+		nextRoundTasks();
+	}
+
+	/**
+	 * Method go to the next round and verify if is the end of the game
+	 */
+	private void nextRoundTasks() {
 
 		cleanTable();
 		resetPlayers();
@@ -274,6 +287,25 @@ public class Game implements Serializable, Observer {
 		nextSmallBlind();
 		updateRoundPotAndBets();
 		flipRoundCard();
+
+		if (players.size() == 1) {
+			gameEnded = true;
+			playersRank.add(players.get(0));
+			prizeForPlayers();
+		}
+	}
+
+	/**
+	 * Method to set prize for the first three players in the ranking
+	 */
+	private void prizeForPlayers() {
+
+		playersRank.get(0).setMoney(
+				(prizePool * gameType.getPotSplit().get(0)) / 100);
+		playersRank.get(1).setMoney(
+				(prizePool * gameType.getPotSplit().get(1)) / 100);
+		playersRank.get(2).setMoney(
+				(prizePool * gameType.getPotSplit().get(2)) / 100);
 	}
 
 	/**
@@ -484,6 +516,17 @@ public class Game implements Serializable, Observer {
 	 */
 	public void nextPlayer() {
 
+		// if there is only one current player, it provokes to go to the next
+		// round
+		List<Player> currentPlayers = currentPlayerInRound();
+		if (currentPlayers.size() == 1) {
+
+			currentPlayers.get(0).reward(currentPot);
+			currentRound = RIVER;
+			nextRoundTasks();
+		}
+
+		// else pass the turn the left next player
 		if (currentPlayer == players.size() - 1)
 			currentPlayer = 0;
 		else
@@ -492,6 +535,22 @@ public class Game implements Serializable, Observer {
 		if ((currentRound == 0 && isCurrentPlayerAfterBigBlind())
 				|| players.get(currentPlayer).isSmallBlind())
 			nextRound();
+	}
+
+	/**
+	 * After each player action, it verifies if there is one or more players to
+	 * stop or continue the round of poker
+	 */
+	private List<Player> currentPlayerInRound() {
+
+		List<Player> currentPlayers = new ArrayList<Player>();
+
+		for (Player p : players) {
+			if (!p.isfolded())
+				currentPlayers.add(p);
+		}
+
+		return currentPlayers;
 	}
 
 	/**
@@ -570,7 +629,7 @@ public class Game implements Serializable, Observer {
 	 */
 	private void rewardTheWinners(List<Player> playerToReward) {
 
-		int potWinner = totalPot / playerToReward.size();
+		int potWinner = currentPot / playerToReward.size();
 
 		for (Player player : playerToReward)
 			player.reward(potWinner);
@@ -777,5 +836,9 @@ public class Game implements Serializable, Observer {
 
 	protected void setFlipedCards(List<Card> cards) {
 		flippedCards = cards;
+	}
+
+	public boolean isGameEnded() {
+		return gameEnded;
 	}
 }

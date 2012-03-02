@@ -126,10 +126,11 @@ public class TestRunGame {
 	
 	@Test
 	public void testF_betA(){
+		
 		int raises = 20;
-
-		assertEquals(game.currentPlayer, 1);
-		assertEquals(game.currentPlayer().isSmallBlind(), true);
+		
+		assertEquals(game.currentPlayer, 3);
+		assertEquals(game.getPlayers().get(2).isSmallBlind(), true);
 		game.currentPlayer().call();
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "lucas CALLS");
 		

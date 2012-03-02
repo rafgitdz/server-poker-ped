@@ -291,7 +291,7 @@ public class TestGame {
 		actifWinners.put(player3.getName(), 2);
 		actifWinners.put(player4.getName(), 2);
 
-		game.setTotalPot(600);// simulate that we have a pot of 600 at the
+		game.setCurrentPot(600);// simulate that we have a pot of 600 at the
 								// show down
 
 		Map<String, Integer> expectedWinners = game.showDown();
