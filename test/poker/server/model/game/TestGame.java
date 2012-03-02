@@ -273,22 +273,42 @@ public class TestGame {
 		game.add(player5);
 
 		game.setCurrentRound(4);
-		game.dealCards();
 
-		buildFlipedCards(Card.KING_HEART, Card.FIVE_SPADE, Card.KING_DIAMOND,
-				Card.TWO_DIAMOND, Card.KING_SPADE);
+		addCards(player1, Card.TWO_CLUB, Card.KING_HEART);
+		addCards(player2, Card.ACE_DIAMOND, Card.EIGHT_CLUB);
+		addCards(player3, Card.NINE_SPADE, Card.KING_SPADE);
+		addCards(player4, Card.FIVE_CLUB, Card.NINE_HEART);
+		addCards(player5, Card.SEVEN_HEART, Card.TWO_SPADE);
+
+		buildFlipedCards(Card.NINE_DIAMOND, Card.FIVE_SPADE, Card.KING_DIAMOND,
+				Card.TWO_DIAMOND, Card.EIGHT_HEART);
 
 		game.setFlipedCards(flipedCards);
+		game.start();
 
 		Map<String, Integer> actifWinners = new HashMap<String, Integer>();
-		actifWinners.put(player4.getName(), 7);
+		actifWinners.put(player1.getName(), 2);
+		actifWinners.put(player3.getName(), 2);
+		actifWinners.put(player4.getName(), 2);
+
+		game.setTotalPot(600);// simulate that we have a pot of 600 at the
+								// show down
 
 		Map<String, Integer> expectedWinners = game.showDown();
-
 		assertEquals(expectedWinners, actifWinners);
+
+		assertEquals(player1.getCurrentTokens(), 1700);
+		assertEquals(player3.getCurrentTokens(), 1680); // bigBlind, than -20
+														// tokens at the start
+		assertEquals(player4.getCurrentTokens(), 1700);
 	}
 
 	// PRIVATE METHODS TO BES USED IN TEST
+	private void addCards(Player player, Card card1, Card card2) {
+		player.addCard(card1);
+		player.addCard(card2);
+	}
+
 	private void buildFlipedCards(Card card1, Card card2, Card card3,
 			Card card4, Card card5) {
 

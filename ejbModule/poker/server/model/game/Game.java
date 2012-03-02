@@ -510,7 +510,7 @@ public class Game implements Serializable, Observer {
 
 	/**
 	 * At the end of round river, it executed the showDown action to see all
-	 * hands of the current player and get the winner
+	 * hands of the current player and get the winner(s)
 	 */
 	protected Map<String, Integer> showDown() {
 
@@ -522,6 +522,7 @@ public class Game implements Serializable, Observer {
 			throw new GameException(NO_PLAYER_IN_GAME);
 
 		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
+		List<Player> playerToReward = new ArrayList<Player>();
 		int best = 0;
 
 		for (Player player : players) {
@@ -538,13 +539,9 @@ public class Game implements Serializable, Observer {
 
 						for (int k = j + 1; k != flippedCards.size(); ++k) {
 
-							player.addCard(flippedCards.get(i));
-							player.addCard(flippedCards.get(j));
-							player.addCard(flippedCards.get(k));
+							result = evaluate(player, i, j, k);
 
-							result = player.evaluateHand();
-
-							if (result >= bestHand) {
+							if (result > bestHand) {
 
 								bestHand = result;
 								playersBestHands.put(player.getName(), result);
@@ -552,15 +549,41 @@ public class Game implements Serializable, Observer {
 
 							if (result > best)
 								best = result;
-
-							player.removeCard(flippedCards.get(i));
-							player.removeCard(flippedCards.get(j));
-							player.removeCard(flippedCards.get(k));
 						}
 					}
 				}
 			}
 		}
+
+		Map<String, Integer> bestPlayers = getWinners(playersBestHands, best,
+				playerToReward);
+		rewardTheWinners(playerToReward);
+
+		return bestPlayers;
+	}
+
+	/**
+	 * At the end of round river, reward the winners by divide the total pot
+	 * between all the best players
+	 * 
+	 * @see <@links showDown>
+	 */
+	private void rewardTheWinners(List<Player> playerToReward) {
+
+		int potWinner = totalPot / playerToReward.size();
+
+		for (Player player : playerToReward)
+			player.reward(potWinner);
+	}
+
+	/**
+	 * At the end of round river, get the winners that have the best hand
+	 * 
+	 * @see <@links showDown>
+	 */
+	private HashMap<String, Integer> getWinners(
+			Map<String, Integer> playersBestHands, int best,
+			List<Player> playerToReward) {
 
 		HashMap<String, Integer> bestPlayers = new HashMap<String, Integer>();
 
@@ -569,11 +592,33 @@ public class Game implements Serializable, Observer {
 			String playerName = players.get(i).getName();
 			int value = playersBestHands.get(playerName);
 
-			if (value == best)
+			if (value == best) {
 				bestPlayers.put(playerName, value);
+				playerToReward.add(players.get(i));
+			}
 		}
-
 		return bestPlayers;
+	}
+
+	/**
+	 * At the end of round river, evaluate each combination of the cards and
+	 * return the value of the hand*
+	 * 
+	 * @see <@links showDown>
+	 */
+	private int evaluate(Player player, int i, int j, int k) {
+
+		player.addCard(flippedCards.get(i));
+		player.addCard(flippedCards.get(j));
+		player.addCard(flippedCards.get(k));
+
+		int result = player.evaluateHand();
+
+		player.removeCard(flippedCards.get(i));
+		player.removeCard(flippedCards.get(j));
+		player.removeCard(flippedCards.get(k));
+
+		return result;
 	}
 
 	/**
