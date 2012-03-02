@@ -128,16 +128,6 @@ public class TestRunGame {
 	public void testF_betA(){
 		int raises = 20;
 
-		assertEquals(game.currentPlayer, 1);
-		assertEquals(game.currentPlayer().isSmallBlind(), true);
-		game.currentPlayer().call();
-		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "lucas CALLS");
-		
-		assertEquals(game.currentPlayer, 2);
-		assertEquals(game.currentPlayer().isBigBlind(), true);
-		game.currentPlayer().check();
-		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "youga CHECKS");
-		
 		assertEquals(game.currentPlayer, 3);
 		game.currentPlayer().call();
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "balla CALLS");
@@ -145,22 +135,82 @@ public class TestRunGame {
 		assertEquals(game.currentPlayer, 4);
 		game.currentPlayer().fold();
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "xan FOLDS");
-		
+
 		assertEquals(game.currentPlayer, 0);
 		assertEquals(game.currentPlayer().isDealer(), true);
 		game.currentPlayer().raise(raises);
+
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "rafik RAISES " + raises);
+		
+		assertEquals(game.currentPlayer, 1);
+		assertEquals(game.currentPlayer().isSmallBlind(), true);
+		game.currentPlayer().call();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "lucas CALLS");
+		
+		assertEquals(game.currentPlayer, 2);
+		assertEquals(game.currentPlayer().isBigBlind(), true);
+		game.currentPlayer().call();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "youga CALLS");
+		
+		assertEquals(game.getCurrentRound(), 0);
 	}
 	
-	/*@Test
+	@Test
+	public void testF_betB(){
+		assertEquals(game.getDeck().getCards().size(), 42);
+		assertEquals(game.currentPlayer, 3);
+		game.currentPlayer().call();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "balla CALLS");
+		
+		assertEquals(game.players.get(4).isfolded(), true);
+		
+		assertEquals(game.currentPlayer, 0);
+		assertEquals(game.currentPlayer().isDealer(), true);
+		game.currentPlayer().check();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "rafik CHECKS");
+		
+		assertEquals(game.currentPlayer, 1);
+		assertEquals(game.currentPlayer().isSmallBlind(), true);
+		game.currentPlayer().check();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "lucas CHECKS");
+		
+		assertEquals(game.currentPlayer, 2);
+		assertEquals(game.currentPlayer().isBigBlind(), true);
+		game.currentPlayer().check();
+		assertEquals(game.getDeck().getCards().size(), 38);
+
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "youga CHECKS");
+	}
+	
+	@Test
 	public void testG_flop(){
-		game.flop();
 		int expectedDeckSize = 38;
 		
 		assertEquals(game.getDeck().getCards().size(), expectedDeckSize);
-	}*/
+		assertEquals(game.getCurrentRound(), 1);
+	}
 	
-	
+	@Test
+	public void testH_bet(){
+		assertEquals(game.currentPlayer, 3);
+		game.currentPlayer().check();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "balla CHECKS");
+		
+		assertEquals(game.currentPlayer, 0);
+		assertEquals(game.currentPlayer().isDealer(), true);
+		game.currentPlayer().check();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "rafik CHECKS");
+		
+		assertEquals(game.currentPlayer, 1);
+		assertEquals(game.currentPlayer().isSmallBlind(), true);
+		game.currentPlayer().check();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "lucas CHECKS");
+		
+		assertEquals(game.currentPlayer, 2);
+		assertEquals(game.currentPlayer().isBigBlind(), true);
+		game.currentPlayer().check();
+		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "youga CHECKS");
+	}
 }
 
 

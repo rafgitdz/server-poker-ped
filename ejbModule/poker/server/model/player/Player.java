@@ -108,7 +108,7 @@ public class Player extends Observable implements Serializable {
 		if (necessaryTokens > currentTokens || quantity < minTokenToRaise) {
 			throw new PlayerException("not enough tokens to raise");
 		} else {
-			game.updateCurrentBet(necessaryTokens);
+			game.updateCurrentBet(necessaryTokens - toCall);
 			game.updateCurrentPot(necessaryTokens);
 			currentTokens -= necessaryTokens;
 			currentBet += necessaryTokens;

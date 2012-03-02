@@ -187,20 +187,20 @@ public class Game implements Serializable, Observer {
 	private void flipRoundCard() {
 
 		switch (currentRound) {
-		case FLOP:
-			flop();
-			break;
-		case TOURNANT:
-			tournant();
-			break;
-		case RIVER:
-			river();
-			break;
-		default:
-			throw new GameException(UNKNOWN_ROUND);
+			case FLOP:
+				flop();
+				break;
+			case TOURNANT:
+				tournant();
+				break;
+			case RIVER:
+				river();
+				break;
+			default:
+				throw new GameException(UNKNOWN_ROUND);
 		}
 
-		currentRound = (currentRound % RIVER) + 1;
+		//currentRound = (currentRound % RIVER) + 1;
 	}
 
 	/**
@@ -262,16 +262,18 @@ public class Game implements Serializable, Observer {
 	 */
 	private void nextRound() {
 
-		if (currentRound == RIVER)
+		if (currentRound == RIVER){
 			showDown();
-
-		cleanTable();
-		resetPlayers();
-		nextDealer();
-		nextBigBlind();
-		nextSmallBlind();
-		updateRoundPotAndBets();
-		flipRoundCard();
+		
+			cleanTable();
+			resetPlayers();
+			nextDealer();
+			nextBigBlind();
+			nextSmallBlind();
+			updateRoundPotAndBets();
+		}
+		else
+			flipRoundCard();
 	}
 
 	/**
@@ -481,15 +483,28 @@ public class Game implements Serializable, Observer {
 	 * current player
 	 */
 	public void nextPlayer() {
-
-		if (currentPlayer == players.size() - 1)
-			currentPlayer = 0;
-		else
-			currentPlayer = (currentPlayer % players.size()) + 1;
-
-		if ((currentRound == 0 && isCurrentPlayerAfterBigBlind())
-				|| players.get(currentPlayer).isSmallBlind())
+		
+		if (players.get(currentPlayer).isBigBlind() && verifyBet()){
+			currentRound += 1;
+			currentPlayer = bigBlindPlayer + 1;
 			nextRound();
+		}
+		else{
+			if (currentPlayer == players.size() - 1)
+				currentPlayer = 0;
+			else
+				currentPlayer = (currentPlayer % players.size()) + 1;
+			if(players.get(currentPlayer).isfolded())
+				nextPlayer();
+		}
+	}
+	
+	private boolean verifyBet(){
+		for(Player player : players){
+			if(player.getCurrentBet() != getCurrentBet() && !player.isfolded())
+				return false;
+		}
+		return true;
 	}
 
 	/**
