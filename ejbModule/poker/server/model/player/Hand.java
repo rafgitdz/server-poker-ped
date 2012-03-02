@@ -71,9 +71,6 @@ public class Hand {
 
 	public boolean isRoyalFlush() {
 
-		System.out.println("Royal Size : " + cards.size() + " "
-				+ cards.get(0).getValue());
-
 		List<Card> tempCards = cards;
 
 		sort(tempCards); // sort list from the less value card to the greater
@@ -97,9 +94,6 @@ public class Hand {
 
 	public boolean isStraightFlush() {
 
-		System.out.println("StraightFlush Size : " + cards.size() + " "
-				+ cards.get(0).getValue());
-
 		List<Card> tempCards = cards;
 		sort(tempCards);
 
@@ -115,9 +109,6 @@ public class Hand {
 	}
 
 	public boolean isQuads() {
-
-		System.out.println("Quads Size : " + cards.size() + " "
-				+ cards.get(0).getValue());
 
 		List<Card> tempCards = cards;
 
@@ -174,9 +165,6 @@ public class Hand {
 
 	public boolean isStraight() {
 
-		System.out.println("Straight Size : " + cards.size() + " "
-				+ cards.get(0).getValue());
-
 		List<Card> tempCards = cards;
 
 		sort(tempCards); // sort list from the less value card to the greater
@@ -201,8 +189,6 @@ public class Hand {
 
 	public boolean isTrips() {
 
-		System.out.println("Trips Size : " + cards.size() + " "
-				+ cards.get(0).getValue());
 		List<Card> tempCards = cards;
 		cards.get(0);
 		// detect if for the first card, it exists a 3-suit from the remaining
