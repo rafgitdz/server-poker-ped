@@ -6,7 +6,6 @@ import javax.swing.Timer;
 
 public class Stopwatch {
 
-	private boolean started;
 	private int totaltime;
 	private int remaining;
 	private int delay;
@@ -16,12 +15,13 @@ public class Stopwatch {
 	ActionListener timerTask = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e1) {
-			if (started) {
+			if (timer.isRunning()) {
 				remaining--;
 			}
 			
 			if (remaining == 0) {
-				stop();
+				timer.stop();
+				remaining = totaltime; 
 			}
 		}
 	};
@@ -34,25 +34,22 @@ public class Stopwatch {
 		
 		this.totaltime = totaltime;
 		this.remaining = totaltime;
-		this.started = false;
 		this.delay = 1000;
 		
 		this.timer = new Timer(this.delay, this.timerTask);
 	}
 	
 	public void start() {
-		this.started = true;
 		this.timer.start();
 	}
 	
 	public void stop() {
-		this.started = false;
 		this.timer.stop();
 	}
 	
 	public void reset() {
-		stop();
+		this.timer.stop();
 		this.remaining = this.totaltime;
-		start();
+		this.timer.restart();
 	}
 }
