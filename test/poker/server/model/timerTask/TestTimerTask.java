@@ -71,11 +71,13 @@ public class TestTimerTask {
 		updateBlindTT = new UpdateBlindsTimerTask(game);
 	}
 	
+	@After
+	public void afterTest() {
+		
+	}
+	
 	@Test
 	public void testPlayerTalkStart() {
 		this.playerTaskTT.start();
-		while (true) {
-			
-		}
 	}
 }

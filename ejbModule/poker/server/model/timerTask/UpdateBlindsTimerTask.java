@@ -21,13 +21,13 @@ public class UpdateBlindsTimerTask extends MethodCallTimer {
 	public UpdateBlindsTimerTask(Game game, Timer timer) {
 		this.game = game;
 		this.timer = timer;
-		this.period = 180 * 1000000000;
+		this.period = this.game.getGameType().getTimeChangeBlind() * this.millisecondMultFactor;
 	}
 	
 	public UpdateBlindsTimerTask(Game game) {
 		this.game = game;
 		this.timer = new Timer();
-		this.period = 180 * 1000000000;
+		this.period = this.game.getGameType().getTimeChangeBlind() * this.millisecondMultFactor;
 	}
 	
 	@Override
