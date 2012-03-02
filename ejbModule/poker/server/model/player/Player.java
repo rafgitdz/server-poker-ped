@@ -136,6 +136,7 @@ public class Player extends Observable implements Serializable {
 		}
 
 		game.nextPlayer();
+		game.update(this, "call"); // inform the game that a player call
 		Event.addEvent(name + " CALLS");
 	}
 
@@ -151,6 +152,7 @@ public class Player extends Observable implements Serializable {
 		currentTokens = 0;
 		currentBet += game.getCurrentBet();
 		game.nextPlayer();
+		game.update(this, "allIn"); // inform the game that a player all in
 		Event.addEvent(name + " ALLIN");
 	}
 
@@ -162,6 +164,7 @@ public class Player extends Observable implements Serializable {
 		game.verifyIsMyTurn(this);
 		folded = true;
 		game.nextPlayer();
+		game.update(this, "fold"); // inform the game that a player fold
 		Event.addEvent(name + " FOLDS");
 	}
 
@@ -183,6 +186,7 @@ public class Player extends Observable implements Serializable {
 			throw new PlayerException("not enough tokens to check");
 
 		game.nextPlayer();
+		game.update(this, "check"); // inform the game that a player check
 		Event.addEvent(name + " CHECKS");
 	}
 
