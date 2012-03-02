@@ -19,13 +19,13 @@ public class SitAndGo extends Parameters {
 		buyIn = 10;
 		buyInIncreasing = 2;
 		multFactor = 2;
-		
+
 		initPlayersTokens = 1500;
 
 		setBlinds(10);
 		setPotAsToken();
 
-		buyInSplit = new ArrayList<Integer>();
+		buyInSplit = new ArrayList<Integer>(); // in percent
 		buyInSplit.add(50);
 		buyInSplit.add(35);
 		buyInSplit.add(15);

@@ -108,6 +108,7 @@ public class Player extends Observable implements Serializable {
 	public void raise(int quantity) {
 
 		game.verifyIsMyTurn(this);
+		
 		int minTokenToRaise = game.getCurrentBet();
 		int toCall = game.getCurrentBet() - currentBet;
 		int necessaryTokens = quantity + toCall;

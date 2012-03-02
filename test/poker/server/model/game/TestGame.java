@@ -69,22 +69,24 @@ public class TestGame {
 
 		game.add(player1);
 		game.add(player2);
-		player1.setGame(game);
-		player2.setGame(game);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
 
-		player1.setAsDealer();
-		player1.fold();
+		game.start();
+		player4.setAsDealer();
+		player4.fold();
 
-		player2.setAsSmallBlind();
-		player2.fold();
+		player5.setAsSmallBlind();
+		player5.fold();
 
 		game.resetPlayers();
 
-		assertEquals(player1.isRegular(), true);
-		assertEquals(player2.isRegular(), true);
+		assertEquals(player4.isRegular(), true);
+		assertEquals(player4.isRegular(), true);
 
-		assertEquals(player1.isfolded(), false);
-		assertEquals(player2.isfolded(), false);
+		assertEquals(player5.isfolded(), false);
+		assertEquals(player5.isfolded(), false);
 	}
 
 	@Test

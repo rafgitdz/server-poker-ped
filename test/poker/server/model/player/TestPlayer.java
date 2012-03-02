@@ -10,6 +10,8 @@ import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactory;
 import poker.server.model.game.GameFactoryLocal;
+import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.SitAndGo;
 
 public class TestPlayer {
 
@@ -42,10 +44,21 @@ public class TestPlayer {
 	@Before
 	public void beforeTest() {
 
-		game = gameFactory.newGame();
+		Parameters param = new SitAndGo();
+		param.setPlayerNumber(4);
+		game = gameFactory.newGame(param);
 		player = playerFactory.newPlayer("Lucas", "1234");
-		
-		game.add(player);
+
+		Player player2 = playerFactory.newPlayer("rafik", "dsd");
+		Player player3 = playerFactory.newPlayer("youga", "cvcx");
+		Player player4 = playerFactory.newPlayer("balla", "vcvx");
+
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player); // end add, to have the turn to play
+
+		game.start();
 		saveTestValues();
 	}
 
@@ -70,7 +83,7 @@ public class TestPlayer {
 	@Test
 	public void testRaiseCurrentPot() {
 
-		quantity = 10;
+		quantity = 20;
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
@@ -80,7 +93,7 @@ public class TestPlayer {
 
 	@Test
 	public void testRaiseCurrentBet() {
-		quantity = 10;
+		quantity = 20;
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
@@ -90,7 +103,7 @@ public class TestPlayer {
 
 	@Test
 	public void testRaisePlayerBet() {
-		quantity = 10;
+		quantity = 20;
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
@@ -99,7 +112,7 @@ public class TestPlayer {
 
 	@Test
 	public void testRaisePlayerTokens() {
-		quantity = 10;
+		quantity = 20;
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
@@ -184,7 +197,7 @@ public class TestPlayer {
 	@Test
 	public void testCheckEnough() {
 		game.updateCurrentBet(50);
-		player.setCurrentBet(50);
+		player.setCurrentBet(70);
 		saveTestValues();
 		player.check();
 	}

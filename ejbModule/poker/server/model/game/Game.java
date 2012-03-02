@@ -120,7 +120,7 @@ public class Game implements Serializable, Observer {
 		currentPot = 0;
 		currentBet = 0;
 		prizePool = 0;
-		currentRound = 0;
+		currentRound = 1;
 		gameLevel = 0;
 		gameEnded = false;
 		deck = new Deck();
@@ -314,10 +314,12 @@ public class Game implements Serializable, Observer {
 	 */
 	private void nextDealer() {
 
+		System.out.println("Dealer : " + dealer);
 		if (dealer == players.size() - 1)
 			dealer = 0;
 		else
 			dealer = (dealer % players.size()) + 1;
+
 		Player dealer = players.get(this.dealer);
 		dealer.setAsDealer();
 
