@@ -76,6 +76,15 @@ public class TestTimerTask {
 		
 	}
 	
+	private void wait(int seconds) {
+		
+		long start = System.currentTimeMillis();
+		long end = start + seconds*1000; // seconds * 1000 ms/sec
+		while (System.currentTimeMillis() < end) {
+		    // wait
+		}	
+	}
+
 	@Test
 	public void testPlayerTalkStart() {
 		this.nextPlayerMCall.start();
