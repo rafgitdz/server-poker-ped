@@ -9,7 +9,7 @@ public class Stopwatch {
 	private int totaltime;
 	private int remaining;
 	private int delay;
-
+	
 	Timer timer;
 	
 	ActionListener timerTask = new ActionListener() {
@@ -22,6 +22,7 @@ public class Stopwatch {
 			if (remaining == 0) {
 				timer.stop();
 				remaining = totaltime; 
+				run();
 			}
 		}
 	};
@@ -39,6 +40,22 @@ public class Stopwatch {
 		this.timer = new Timer(this.delay, this.timerTask);
 	}
 	
+	public void run() {
+		// do something
+	}
+	
+	public void setTotalTime(int totalTime) {
+		this.totaltime = totalTime;
+	}
+	
+	public int getTotalTime() {
+		return this.totaltime;
+	}
+	
+	public int getRemaining() {
+		return this.remaining;
+	}
+	
 	public void start() {
 		this.timer.start();
 	}
@@ -51,5 +68,9 @@ public class Stopwatch {
 		this.timer.stop();
 		this.remaining = this.totaltime;
 		this.timer.restart();
+	}
+	
+	public boolean isRunning() {
+		return this.timer.isRunning();
 	}
 }
