@@ -7,10 +7,7 @@ import poker.server.model.game.Game;
 
 public abstract class MethodCallTimerTask extends TimerTask {
 
-//	private long startTime;
-//	private final long LIMIT_PLAYER = 30 * 1000000000;
-//	private final long LIMIT_BLIND = 180 * 1000000000;
-	protected final long millisecondMultFactor = 1000000000;
+	protected final long millisecondMultFactor = 1000;
 	
 	protected Game game;
 	protected Timer timer;
@@ -41,23 +38,4 @@ public abstract class MethodCallTimerTask extends TimerTask {
 		System.out.println("MethodCallTimer -> stop() ");
 		this.timer.cancel();
 	}
-	
-//	public void controlTime(long limit) {
-//		startTime = System.nanoTime();
-//		
-//		while (true) {
-//			if (System.nanoTime() - startTime == limit) {
-//				System.out.println("YES");
-//				startTime = System.nanoTime();
-//			}
-//		}
-//	}
-//
-//	public void playerTime() {
-//		controlTime(LIMIT_PLAYER);
-//	}
-//
-//	public void updateBlind() {
-//		controlTime(LIMIT_BLIND);
-//	}
 }

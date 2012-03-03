@@ -88,5 +88,6 @@ public class TestTimerTask {
 	@Test
 	public void testPlayerTalkStart() {
 		this.nextPlayerMCall.start();
+		wait(40);
 	}
 }
