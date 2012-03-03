@@ -117,4 +117,15 @@ public class testStopWatch {
 		assertEquals(false, stopSwatch.isRunning());
 		assertEquals(10, stopSwatch.getRemaining());
 	}
+	
+	@Test
+	public void testReset() {
+		
+		this.stopSwatch.start();
+		wait(4);
+		this.stopSwatch.reset();
+		this.stopSwatch.stop();
+		
+		assertEquals(10, stopSwatch.getRemaining());
+	}
 }
