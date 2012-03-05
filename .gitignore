@@ -12,3 +12,11 @@ pokerserver-ds.xml
 pom.xml
 build
 META-INF
+.metadata
+jboss-as-7.1.0.CR1b
+PokerServer/.settings
+PokerServer/target
+PokerServer/.classpath
+PokerServer/.factorypath
+PokerServer/.project
+PokerServer/readme.md

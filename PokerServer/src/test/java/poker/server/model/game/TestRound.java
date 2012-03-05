@@ -85,8 +85,8 @@ public class TestRound {
 		assertEquals(bigBlindPlayer.getName(), player3.getName());
 
 		assertEquals(dealer.isDealer(), true);
-		assertEquals(smallBlindPlayer.isBigBlind(), true);
-		assertEquals(bigBlindPlayer.isSmallBlind(), true);
+		assertEquals(smallBlindPlayer.isSmallBlind(), true);
+		assertEquals(bigBlindPlayer.isBigBlind(), true);
 
 		assertEquals(player4.isRegular(), true);
 		assertEquals(player5.isRegular(), true);

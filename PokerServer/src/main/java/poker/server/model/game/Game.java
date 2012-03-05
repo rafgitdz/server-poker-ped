@@ -196,22 +196,22 @@ public class Game implements Serializable, Observer {
 	private void flipRoundCard() {
 
 		switch (currentRound) {
-			case FLOP:
-				flop();
-				break;
-			case TOURNANT:
-				tournant();
-				break;
-			case RIVER:
-				river();
-				break;
-			case SHOWDOWN:
-				break;
-			default:
-				throw new GameException(UNKNOWN_ROUND);
+		case FLOP:
+			flop();
+			break;
+		case TOURNANT:
+			tournant();
+			break;
+		case RIVER:
+			river();
+			break;
+		case SHOWDOWN:
+			break;
+		default:
+			throw new GameException(UNKNOWN_ROUND);
 		}
 
-		//currentRound = (currentRound % RIVER) + 1;
+		// currentRound = (currentRound % RIVER) + 1;
 	}
 
 	/**
@@ -276,11 +276,10 @@ public class Game implements Serializable, Observer {
 			showDown();
 			currentRound = 0;
 			nextRoundTasks();
-		}
-		else{
-			currentRound ++;
+		} else {
+			currentRound++;
 			flipRoundCard();
-		}	
+		}
 	}
 
 	/**
@@ -537,26 +536,24 @@ public class Game implements Serializable, Observer {
 			currentPlayers.get(0).reward(currentPot);
 			currentRound = RIVER;
 			nextRoundTasks();
-		}
-		else{
-			if(players.get(currentPlayer).isBigBlind() && verifyBet()){
+		} else {
+			if (players.get(currentPlayer).isBigBlind() && verifyBet()) {
 				currentPlayer = (currentPlayer % players.size()) + 1;
 				nextRound();
-			}
-			else{
+			} else {
 				if (currentPlayer == players.size() - 1)
 					currentPlayer = 0;
 				else
 					currentPlayer = (currentPlayer % players.size()) + 1;
-				if(players.get(currentPlayer).isfolded())
+				if (players.get(currentPlayer).isfolded())
 					nextPlayer();
 			}
 		}
 	}
-	
-	private boolean verifyBet(){
-		for(Player player : players){
-			if(player.getCurrentBet() != getCurrentBet() && !player.isfolded())
+
+	private boolean verifyBet() {
+		for (Player player : players) {
+			if (player.getCurrentBet() != getCurrentBet() && !player.isfolded())
 				return false;
 		}
 		return true;
