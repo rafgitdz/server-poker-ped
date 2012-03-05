@@ -95,12 +95,20 @@ public class Player extends Observable implements Serializable {
 	}
 
 	/**
+	 * Method to set the tokens win by the player if it has the best hand cards
+	 */
+	public void reward(int potWinner) {
+		currentTokens += potWinner;
+	}
+
+	/**
 	 * Raise a number of tokens after verify he can do this based on the
 	 * concepts of the game (currentBet, currentTokens)
 	 */
 	public void raise(int quantity) {
 
 		game.verifyIsMyTurn(this);
+		
 		int minTokenToRaise = game.getCurrentBet();
 		int toCall = game.getCurrentBet() - currentBet;
 		int necessaryTokens = quantity + toCall;
@@ -146,10 +154,10 @@ public class Player extends Observable implements Serializable {
 
 		game.verifyIsMyTurn(this);
 		game.updateCurrentPot(currentTokens);
-		game.updateCurrentBet(currentTokens);
+		game.updateCurrentBet(currentTokens + currentBet - game.getCurrentBet());
 
+		currentBet += currentTokens; //game.getCurrentBet();
 		currentTokens = 0;
-		currentBet += game.getCurrentBet();
 		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
 	}

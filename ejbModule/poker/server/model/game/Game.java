@@ -44,6 +44,8 @@ public class Game implements Serializable, Observer {
 	private static final String UNKNOWN_ROUND = "unknown round !";
 	private static final String NOT_YOUR_TURN = "It's not your turn ";
 	private static final String NOT_END_ROUND_POKER = "It's not the end of the poker round";
+	private static final String NOT_ENOUGH_FLIPED_CARDS = "There isn't enough cards to do showDown";
+	private static final String NO_PLAYER_IN_GAME = "There is no players in game";
 
 	private static final int FLOP = 1;
 	private static final int TOURNANT = 2;
@@ -84,6 +86,8 @@ public class Game implements Serializable, Observer {
 	int lastRaisedPlayer;
 	int gameLevel;
 
+	private boolean gameEnded;
+
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
 	 */
@@ -118,6 +122,7 @@ public class Game implements Serializable, Observer {
 		prizePool = 0;
 		currentRound = 0;
 		gameLevel = 0;
+		gameEnded = false;
 		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
@@ -196,6 +201,8 @@ public class Game implements Serializable, Observer {
 			case RIVER:
 				river();
 				break;
+			case SHOWDOWN:
+				break;
 			default:
 				throw new GameException(UNKNOWN_ROUND);
 		}
@@ -261,19 +268,47 @@ public class Game implements Serializable, Observer {
 	 * new dealer, new smallBlind,...etc
 	 */
 	private void nextRound() {
-
-		if (currentRound == RIVER){
+		if (currentRound == SHOWDOWN) {
 			showDown();
-		
-			cleanTable();
-			resetPlayers();
-			nextDealer();
-			nextBigBlind();
-			nextSmallBlind();
-			updateRoundPotAndBets();
+			currentRound = 0;
+			nextRoundTasks();
 		}
-		else
+		else{
+			currentRound ++;
 			flipRoundCard();
+		}	
+	}
+
+	/**
+	 * Method go to the next round and verify if is the end of the game
+	 */
+	private void nextRoundTasks() {
+		cleanTable();
+		resetPlayers();
+		nextDealer();
+		nextBigBlind();
+		nextSmallBlind();
+		updateRoundPotAndBets();
+		flipRoundCard();
+
+		if (players.size() == 1) {
+			gameEnded = true;
+			playersRank.add(players.get(0));
+			prizeForPlayers();
+		}
+	}
+
+	/**
+	 * Method to set prize for the first three players in the ranking
+	 */
+	private void prizeForPlayers() {
+
+		playersRank.get(0).setMoney(
+				(prizePool * gameType.getPotSplit().get(0)) / 100);
+		playersRank.get(1).setMoney(
+				(prizePool * gameType.getPotSplit().get(1)) / 100);
+		playersRank.get(2).setMoney(
+				(prizePool * gameType.getPotSplit().get(2)) / 100);
 	}
 
 	/**
@@ -282,10 +317,12 @@ public class Game implements Serializable, Observer {
 	 */
 	private void nextDealer() {
 
+		System.out.println("Dealer : " + dealer);
 		if (dealer == players.size() - 1)
 			dealer = 0;
 		else
 			dealer = (dealer % players.size()) + 1;
+
 		Player dealer = players.get(this.dealer);
 		dealer.setAsDealer();
 
@@ -373,7 +410,7 @@ public class Game implements Serializable, Observer {
 			player.setCurrentBet(0);
 
 		currentBet = 0;
-		totalPot = currentPot;
+		totalPot += currentPot;
 		currentPot = 0;
 		Event.addEvent("RESET PLAYERS BETS AND UPDATE POT OF THE GAME");
 	}
@@ -483,19 +520,27 @@ public class Game implements Serializable, Observer {
 	 * current player
 	 */
 	public void nextPlayer() {
-		
-		if (players.get(currentPlayer).isBigBlind() && verifyBet()){
-			currentRound += 1;
-			currentPlayer = bigBlindPlayer + 1;
-			nextRound();
+		// if there is only one current player, it provokes to go to the next
+		// round
+		List<Player> currentPlayers = currentPlayerInRound();
+		if (currentPlayers.size() == 1) {
+			currentPlayers.get(0).reward(currentPot);
+			currentRound = RIVER;
+			nextRoundTasks();
 		}
 		else{
-			if (currentPlayer == players.size() - 1)
-				currentPlayer = 0;
-			else
+			if(players.get(currentPlayer).isBigBlind() && verifyBet()){
 				currentPlayer = (currentPlayer % players.size()) + 1;
-			if(players.get(currentPlayer).isfolded())
-				nextPlayer();
+				nextRound();
+			}
+			else{
+				if (currentPlayer == players.size() - 1)
+					currentPlayer = 0;
+				else
+					currentPlayer = (currentPlayer % players.size()) + 1;
+				if(players.get(currentPlayer).isfolded())
+					nextPlayer();
+			}
 		}
 	}
 	
@@ -505,6 +550,22 @@ public class Game implements Serializable, Observer {
 				return false;
 		}
 		return true;
+	}
+
+	/**
+	 * After each player action, it verifies if there is one or more players to
+	 * stop or continue the round of poker
+	 */
+	private List<Player> currentPlayerInRound() {
+
+		List<Player> currentPlayers = new ArrayList<Player>();
+
+		for (Player p : players) {
+			if (!p.isfolded())
+				currentPlayers.add(p);
+		}
+
+		return currentPlayers;
 	}
 
 	/**
@@ -523,59 +584,115 @@ public class Game implements Serializable, Observer {
 
 	/**
 	 * At the end of round river, it executed the showDown action to see all
-	 * hands of the current player and get the winner
+	 * hands of the current player and get the winner(s)
 	 */
-	protected List<String> showDown() {
+	protected Map<String, Integer> showDown() {
 
-		if (currentRound != SHOWDOWN)
+		if (currentRound != RIVER)
 			throw new GameException(NOT_END_ROUND_POKER);
+		if (flippedCards.size() < 5)
+			throw new GameException(NOT_ENOUGH_FLIPED_CARDS);
+		if (players.isEmpty())
+			throw new GameException(NO_PLAYER_IN_GAME);
 
 		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
-		List<String> winners = new ArrayList<String>();
-		int bestHand = 0; // set to HighCard, that is the worst hand value
-		int result = 0;
+		List<Player> playerToReward = new ArrayList<Player>();
 		int best = 0;
 
 		for (Player player : players) {
+
+			int bestHand = 0; // set to HighCard, that is the worst hand value
+			int result = 0;
+			playersBestHands.put(player.getName(), 0);
 
 			if (!player.isfolded()) {
 
 				for (int i = 0; i != 3; ++i) {
 
-					for (int j = i; j + 2 != flippedCards.size(); ++j) {
+					for (int j = i + 1; j + 1 != flippedCards.size(); ++j) {
 
-						player.addCard(flippedCards.get(i));
-						player.addCard(flippedCards.get(j + 1));
-						player.addCard(flippedCards.get(j + 2));
+						for (int k = j + 1; k != flippedCards.size(); ++k) {
 
-						result = player.evaluateHand();
+							result = evaluate(player, i, j, k);
 
-						if (result > bestHand) {
+							if (result > bestHand) {
 
-							bestHand = result;
-							playersBestHands.put(player.getName(), result);
+								bestHand = result;
+								playersBestHands.put(player.getName(), result);
+							}
+
+							if (result > best)
+								best = result;
 						}
-
-						if (result > best)
-							best = result;
-
-						player.removeCard(flippedCards.get(i));
-						player.removeCard(flippedCards.get(j + 1));
-						player.removeCard(flippedCards.get(j + 2));
 					}
 				}
 			}
-
-			for (int i = 0; i < playersBestHands.size(); ++i) {
-
-				String playerName = players.get(i).getName();
-				int value = playersBestHands.get(player);
-				if (value == best)
-					winners.add(playerName);
-			}
 		}
 
-		return winners;
+		Map<String, Integer> bestPlayers = getWinners(playersBestHands, best,
+				playerToReward);
+		rewardTheWinners(playerToReward);
+
+		return bestPlayers;
+	}
+
+	/**
+	 * At the end of round river, reward the winners by divide the total pot
+	 * between all the best players
+	 * 
+	 * @see <@links showDown>
+	 */
+	private void rewardTheWinners(List<Player> playerToReward) {
+
+		int potWinner = currentPot / playerToReward.size();
+
+		for (Player player : playerToReward)
+			player.reward(potWinner);
+	}
+
+	/**
+	 * At the end of round river, get the winners that have the best hand
+	 * 
+	 * @see <@links showDown>
+	 */
+	private HashMap<String, Integer> getWinners(
+			Map<String, Integer> playersBestHands, int best,
+			List<Player> playerToReward) {
+
+		HashMap<String, Integer> bestPlayers = new HashMap<String, Integer>();
+
+		for (int i = 0; i < playersBestHands.size(); ++i) {
+
+			String playerName = players.get(i).getName();
+			int value = playersBestHands.get(playerName);
+
+			if (value == best) {
+				bestPlayers.put(playerName, value);
+				playerToReward.add(players.get(i));
+			}
+		}
+		return bestPlayers;
+	}
+
+	/**
+	 * At the end of round river, evaluate each combination of the cards and
+	 * return the value of the hand*
+	 * 
+	 * @see <@links showDown>
+	 */
+	private int evaluate(Player player, int i, int j, int k) {
+
+		player.addCard(flippedCards.get(i));
+		player.addCard(flippedCards.get(j));
+		player.addCard(flippedCards.get(k));
+
+		int result = player.evaluateHand();
+
+		player.removeCard(flippedCards.get(i));
+		player.removeCard(flippedCards.get(j));
+		player.removeCard(flippedCards.get(k));
+
+		return result;
 	}
 
 	/**
@@ -730,5 +847,13 @@ public class Game implements Serializable, Observer {
 
 	public void setCurrentRound(int i) {
 		currentRound = i;
+	}
+
+	protected void setFlipedCards(List<Card> cards) {
+		flippedCards = cards;
+	}
+
+	public boolean isGameEnded() {
+		return gameEnded;
 	}
 }

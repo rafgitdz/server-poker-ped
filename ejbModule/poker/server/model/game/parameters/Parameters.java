@@ -14,22 +14,22 @@ public abstract class Parameters {
 	public final static int CASH = 1;
 	public final static int TOKEN = 2;
 
-	protected int potType = CASH;
+	protected int potType;
 	protected List<Integer> buyInSplit;
 
-	protected int buyIn = 0;
-	protected int buyInIncreasing = 0;
+	protected int buyIn;
+	protected int buyInIncreasing;
 
-	protected int multFactor = 2; // between smallBlind -> bigBlind AND Call ->
-									// Raise
-	protected int bigBlind = 0;
-	protected int smallBlind = 0;
+	protected int multFactor; // between smallBlind -> bigBlind AND Call ->
+								// Raise
+	protected int bigBlind;
+	protected int smallBlind;
 
-	protected int initPlayersTokens = 0;
+	protected int initPlayersTokens;
 
-	protected int playerNumber = 0;
-	protected int speakTime = 0; // in seconds
-	protected int timeChangeBlind = 0; // in seconds
+	protected int playerNumber;
+	protected int speakTime; // in seconds
+	protected int timeChangeBlind; // in seconds
 
 	protected void setPotSplit(List<Integer> percents) {
 
@@ -65,6 +65,10 @@ public abstract class Parameters {
 	protected void setBlinds(int smallB) {
 		smallBlind = smallB;
 		bigBlind = smallBlind * multFactor;
+	}
+
+	public void setPlayerNumber(int playerNumb) {
+		playerNumber = playerNumb;
 	}
 
 	public List<Integer> getPotSplit() {
