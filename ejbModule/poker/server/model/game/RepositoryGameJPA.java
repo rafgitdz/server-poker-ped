@@ -14,16 +14,16 @@ import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryGenericJPA;
 
 @Stateless
-public class RepositoryGameJPA extends RepositoryGenericJPA<Game, Integer>
+public class RepositoryGameJPA extends RepositoryGenericJPA<Game, String>
 		implements RepositoryGame {
 
 	@Override
 	public Game currentGame() {
 
 		Query q = em
-				.createQuery("SELECT g FROM Game g WHERE g.Started = :status");
+				.createQuery("SELECT g FROM Game g WHERE g.status = :status");
 
-		q.setParameter("status", false);
+		q.setParameter("status", Game.WAITING);
 
 		try {
 			return (Game) q.getSingleResult();

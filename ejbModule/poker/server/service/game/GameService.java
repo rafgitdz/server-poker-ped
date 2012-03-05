@@ -35,6 +35,8 @@ public class GameService {
 	public static final String ERROR_UNKNOWN_GAME = "Unknown Game : ";
 	private static final String AUTHENTIFICATION_ERROR = "Error in the password ! ";
 	private static final String PLAYER_ALREADY_AFFECTED = "Player is already affected in game ! ";
+	private static final String GAME_NOT_READY_TO_START = "The game isn't ready to start";
+	private static final String GAME_ALREADY_STARTED = "The game is already started";
 
 	@EJB
 	private RepositoryGame repositoryGame;
@@ -67,7 +69,7 @@ public class GameService {
 	 */
 	@GET
 	@Path("/playerConnection/{name}/{pwd}")
-	public JSONObject playerConnecion(@PathParam("name") String name,
+	public JSONObject playerConnection(@PathParam("name") String name,
 			@PathParam("pwd") String pwd) {
 
 		JSONObject json = new JSONObject();
@@ -81,19 +83,19 @@ public class GameService {
 		} else {
 
 			if (!player.getPwd().equals(pwd)) {
-				updateJSON(json, "Authentificate", "false");
-				updateJSON(json, "Response", AUTHENTIFICATION_ERROR);
+				updateJSON(json, "signed", "false");
+				updateJSON(json, "message", AUTHENTIFICATION_ERROR);
 				return json;
 			}
 
 			if (player.isInGame()) {
-				updateJSON(json, "Authentificate", "true");
-				updateJSON(json, "Response", PLAYER_ALREADY_AFFECTED);
+				updateJSON(json, "signed", "true");
+				updateJSON(json, "message", PLAYER_ALREADY_AFFECTED);
 				return json;
 			}
 		}
 
-		updateJSON(json, "Authentificate", "true");
+		updateJSON(json, "signed", "true");
 
 		Game currentGame = repositoryGame.currentGame();
 
@@ -101,16 +103,17 @@ public class GameService {
 
 			currentGame.add(player);
 			repositoryGame.update(currentGame);
+
 			if (currentGame.isReadyToStart())
-				currentGame.setStarted(true);
+				currentGame.setAsReady();
 
 		} else {
 			currentGame = gameFactory.newGame();
 			currentGame.add(player);
-			currentGame.setStarted(false);
 			repositoryGame.save(currentGame);
 		}
 
+		updateJSON(json, "nameTable", currentGame.getName());
 		updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
 		updateJSON(json, "size", currentGame.getPlayers().size());
 		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
@@ -124,15 +127,15 @@ public class GameService {
 	 * return a {@code JSONObject} with {@code startGame = false}
 	 */
 	@GET
-	@Path("/startGame/{id}")
-	public JSONObject startGame(@PathParam("id") int id) {
+	@Path("/startGame/{tableName}")
+	public JSONObject startGame(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
-		Game currentGame = repositoryGame.load(id);
+		Game currentGame = repositoryGame.load(tableName);
 
 		if (currentGame != null) {
 
-			if (currentGame.isStarted()) {
+			if (currentGame.isReady()) {
 
 				currentGame.start();
 
@@ -143,8 +146,15 @@ public class GameService {
 				updateJSON(json, "bigBlind", currentGame.getBigBlindP()
 						.getName());
 
-			} else {
-				updateJSON(json, "startGame", false);
+			} else if (currentGame.isStarted()) {
+
+				errorJSON(json, GAME_ALREADY_STARTED);
+				return json;
+
+			} else if (!currentGame.isReady()) {
+
+				errorJSON(json, GAME_NOT_READY_TO_START);
+				return json;
 			}
 
 			updateJSON(json, "playerNames", getPlayerNames(currentGame));
@@ -152,25 +162,29 @@ public class GameService {
 			updateJSON(json, "playerBudget", currentGame.getGameType()
 					.getTokens());
 
-		} else {
-			updateJSON(json, "error", true);
-			updateJSON(json, "message", "The game " + id + " doesn't exist");
-		}
+		} else
+			errorJSON(json, "The game " + tableName + " doesn't exist");
+
 		return json;
 	}
 
 	/**
-	 * Returns the fliped cards related on the current round of the game
+	 * Returns the flip cards related on the current round of the game
 	 */
 	@GET
-	@Path("/getFlipedCards/{id}")
-	public JSONObject getFlipedCards(@PathParam("id") int id) {
+	@Path("/getFlipedCards/{tableName}")
+	public JSONObject getFlipedCards(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
-		Game game = repositoryGame.load(id);
+		Game game = repositoryGame.load(tableName);
+
 		if (game == null) {
-			updateJSON(json, "error", true);
-			updateJSON(json, "message", "The game " + id + " doesn't exist");
+			errorJSON(json, "The game " + tableName + " doesn't exist");
+			return json;
+		}
+
+		if (!game.isReady()) {
+			errorJSON(json, GAME_NOT_READY_TO_START);
 			return json;
 		}
 
@@ -183,14 +197,19 @@ public class GameService {
 	 * game
 	 */
 	@GET
-	@Path("/getPlayers/{id}")
-	public JSONObject getPlayers(@PathParam("id") int id) {
+	@Path("/getPlayers/{tableName}")
+	public JSONObject getPlayers(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
-		Game game = repositoryGame.load(id);
+		Game game = repositoryGame.load(tableName);
+
 		if (game == null) {
-			updateJSON(json, "error", true);
-			updateJSON(json, "message", "The game " + id + " doesn't exist");
+			errorJSON(json, "The game " + tableName + " doesn't exist");
+			return json;
+		}
+
+		if (!game.isReady()) {
+			errorJSON(json, GAME_NOT_READY_TO_START);
 			return json;
 		}
 
@@ -204,16 +223,20 @@ public class GameService {
 	 * Returns the winners after a show down
 	 */
 	@GET
-	@Path("/showDown/{id}")
-	public JSONObject showDown(@PathParam("id") int id) {
+	@Path("/showDown/{tableName}")
+	public JSONObject showDown(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
-		Game game = repositoryGame.load(id);
+		Game game = repositoryGame.load(tableName);
 
 		// it must to make in place a system to detect errors
 		if (game == null) {
-			updateJSON(json, "error", true);
-			updateJSON(json, "message", "The game " + id + " doesn't exist");
+			errorJSON(json, "The game " + tableName + " doesn't exist");
+			return json;
+		}
+
+		if (!game.isReady()) {
+			errorJSON(json, GAME_NOT_READY_TO_START);
 			return json;
 		}
 
@@ -271,6 +294,19 @@ public class GameService {
 
 		try {
 			json.put(key, value);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Build and return a JSONObject error message
+	 */
+	private void errorJSON(JSONObject json, String message) {
+
+		try {
+			json.put("error", true);
+			json.put("message", message);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
