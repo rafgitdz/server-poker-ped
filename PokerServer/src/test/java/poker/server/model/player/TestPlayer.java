@@ -87,7 +87,9 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
-		assertEquals(gameCurrentPot + quantity, player.getGame()
+		
+		int tokensRaised = quantity + (gameCurrentBet - playerBet);
+		assertEquals(gameCurrentPot + tokensRaised, player.getGame()
 				.getCurrentPot());
 	}
 
@@ -107,7 +109,9 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
-		assertEquals(playerBet + quantity, player.getCurrentBet());
+		
+		int tokensRaised = quantity + (gameCurrentBet - playerBet);
+		assertEquals(playerBet + tokensRaised, player.getCurrentBet());
 	}
 
 	@Test
@@ -116,7 +120,9 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
-		assertEquals(playerTokens - quantity, player.getCurrentTokens());
+		
+		int tokensRaised = quantity + (gameCurrentBet - playerBet);
+		assertEquals(playerTokens - tokensRaised, player.getCurrentTokens());
 	}
 
 	@Test(expected = PlayerException.class)
@@ -133,7 +139,9 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.call();
-		assertEquals(gameCurrentPot + quantity, player.getGame()
+		
+		int nbTokenToCall = (gameCurrentBet - playerBet);
+		assertEquals(gameCurrentPot + nbTokenToCall, player.getGame()
 				.getCurrentPot());
 	}
 
@@ -151,7 +159,9 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.call();
-		assertEquals(playerBet + quantity, player.getCurrentBet());
+		
+		int nbTokenToCall = (gameCurrentBet - playerBet);
+		assertEquals(playerBet + nbTokenToCall, player.getCurrentBet());
 	}
 
 	@Test
@@ -159,7 +169,9 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.call();
-		assertEquals(playerTokens - quantity, player.getCurrentTokens());
+		
+		int nbTokenToCall = (gameCurrentBet - playerBet);
+		assertEquals(playerTokens - nbTokenToCall, player.getCurrentTokens());
 	}
 
 	@Test(expected = PlayerException.class)
