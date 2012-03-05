@@ -1,7 +1,6 @@
 package poker.server.model.timerTask;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import poker.server.model.game.Game;
 

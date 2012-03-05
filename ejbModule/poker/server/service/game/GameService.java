@@ -111,7 +111,7 @@ public class GameService {
 			repositoryGame.save(currentGame);
 		}
 
-		// buyIn to be added...
+		updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
 		updateJSON(json, "size", currentGame.getPlayers().size());
 		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
 

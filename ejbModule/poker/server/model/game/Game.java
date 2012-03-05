@@ -1,6 +1,5 @@
 package poker.server.model.game;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
-
 import org.hibernate.annotations.IndexColumn;
 
 import poker.server.model.exception.GameException;
@@ -26,7 +24,6 @@ import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
-import poker.server.model.timerTask.NextPlayerMethodCall;
 
 /**
  * @author PokerServerGroup
@@ -149,7 +146,7 @@ public class Game implements Serializable, Observer {
 		setPlayerInGame();
 		setInitBetGame();
 		++gameLevel;
-		
+
 		Event.addEvent("START GAME");
 	}
 
@@ -696,7 +693,7 @@ public class Game implements Serializable, Observer {
 		if (arg.equals("updateBlind")) {
 			updateBlind();
 		} else {
-			if (arg.equals("raise")) 
+			if (arg.equals("raise"))
 				lastRaisedPlayer = currentPlayer;
 		}
 	}
