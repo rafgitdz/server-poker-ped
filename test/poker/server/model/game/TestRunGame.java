@@ -76,9 +76,9 @@ public class TestRunGame {
 		int expectedBigBlind = 20;
 		int expectedBet = 20;
 
-		assertEquals(expectedSmallBlind, game.smallBlind);
-		assertEquals(expectedBigBlind, game.bigBlind);
-		assertEquals(expectedBet, game.currentBet);
+		assertEquals(expectedSmallBlind, game.getSmallBlind());
+		assertEquals(expectedBigBlind, game.getBigBlind());
+		assertEquals(expectedBet, game.getCurrentBet());
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class TestRunGame {
 	public void testD_fixPrizePool() {
 		int expected = 50;
 
-		assertEquals(expected, game.prizePool);
+		assertEquals(expected, game.getPrizePool());
 	}
 
 	@Test
@@ -130,7 +130,12 @@ public class TestRunGame {
 
 		int raises = 20;
 
+<<<<<<< HEAD
 		assertEquals(game.currentPlayer, 3);
+=======
+		assertEquals(game.getCurrentPlayer(), 3);
+		assertEquals(game.getPlayers().get(2).isSmallBlind(), true);
+>>>>>>> b9bea81997b453b6d12d7ef8b66addb990fce717
 		game.currentPlayer().call();
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "balla CALLS");
 		assertEquals(game.players.get(3).getCurrentTokens(), 1480);
@@ -156,7 +161,7 @@ public class TestRunGame {
 		assertEquals(game.players.get(1).getCurrentTokens(), 1460);
 		assertEquals(game.players.get(1).getCurrentBet(), 40);
 
-		assertEquals(game.currentPlayer, 2);
+		assertEquals(game.getCurrentPlayer(), 2);
 		assertEquals(game.currentPlayer().isBigBlind(), true);
 		game.currentPlayer().call();
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "youga CALLS");
@@ -181,6 +186,7 @@ public class TestRunGame {
 		assertEquals(game.currentPlayer, 0);
 		assertEquals(game.currentPlayer().isDealer(), true);
 		game.currentPlayer().check();
+<<<<<<< HEAD
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "rafik CHECKS");
 		assertEquals(game.players.get(0).getCurrentTokens(), 1460);
 		
@@ -245,6 +251,22 @@ public class TestRunGame {
 		assertEquals(game.getCurrentBet(), 1460);
 		
 		assertEquals(game.currentPlayer, 0);
+=======
+		assertEquals(Event.getEvents().get(Event.allEvents.size() - 1),
+				"youga CHECKS");
+
+		assertEquals(game.getCurrentPlayer(), 3);
+		game.currentPlayer().call();
+		assertEquals(Event.getEvents().get(Event.allEvents.size() - 1),
+				"balla CALLS");
+
+		assertEquals(game.getCurrentPlayer(), 4);
+		game.currentPlayer().fold();
+		assertEquals(Event.getEvents().get(Event.allEvents.size() - 1),
+				"xan FOLDS");
+
+		assertEquals(game.getCurrentPlayer(), 0);
+>>>>>>> b9bea81997b453b6d12d7ef8b66addb990fce717
 		assertEquals(game.currentPlayer().isDealer(), true);
 		game.currentPlayer().call();
 		assertEquals(Event.getEvents().get(Event.allEvents.size()-1), "rafik CALLS");

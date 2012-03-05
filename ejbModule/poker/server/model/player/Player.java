@@ -30,6 +30,7 @@ public class Player extends Observable implements Serializable {
 	public final static int PRESENT = 1;
 	public final static int MISSING = 2;
 	public final static int IN_GAME = 3;
+	public final static int WAITING = 4;
 
 	public final static int DEALER = 1;
 	public final static int BIG_BLIND = 2;
@@ -108,7 +109,7 @@ public class Player extends Observable implements Serializable {
 	public void raise(int quantity) {
 
 		game.verifyIsMyTurn(this);
-		
+
 		int minTokenToRaise = game.getCurrentBet();
 		int toCall = game.getCurrentBet() - currentBet;
 		int necessaryTokens = quantity + toCall;
@@ -144,6 +145,7 @@ public class Player extends Observable implements Serializable {
 		}
 
 		game.nextPlayer();
+		game.update(this, "call"); // inform the game that a player call
 		Event.addEvent(name + " CALLS");
 	}
 
@@ -159,6 +161,7 @@ public class Player extends Observable implements Serializable {
 		currentBet += currentTokens; //game.getCurrentBet();
 		currentTokens = 0;
 		game.nextPlayer();
+		game.update(this, "allIn"); // inform the game that a player all in
 		Event.addEvent(name + " ALLIN");
 	}
 
@@ -170,6 +173,7 @@ public class Player extends Observable implements Serializable {
 		game.verifyIsMyTurn(this);
 		folded = true;
 		game.nextPlayer();
+		game.update(this, "fold"); // inform the game that a player fold
 		Event.addEvent(name + " FOLDS");
 	}
 
@@ -191,6 +195,7 @@ public class Player extends Observable implements Serializable {
 			throw new PlayerException("not enough tokens to check");
 
 		game.nextPlayer();
+		game.update(this, "check"); // inform the game that a player check
 		Event.addEvent(name + " CHECKS");
 	}
 
@@ -215,6 +220,10 @@ public class Player extends Observable implements Serializable {
 		connectionStatus = IN_GAME;
 	}
 
+	public void setWaiting() {
+		connectionStatus = WAITING;
+	}
+
 	public boolean isPresent() {
 		return connectionStatus == PRESENT;
 	}
@@ -225,6 +234,11 @@ public class Player extends Observable implements Serializable {
 
 	public boolean isInGame() {
 		return connectionStatus == IN_GAME;
+	}
+
+	public boolean isWaiting() {
+
+		return connectionStatus == WAITING;
 	}
 
 	public boolean isDealer() {
@@ -316,24 +330,4 @@ public class Player extends Observable implements Serializable {
 	public void removeCard(Card card) {
 		currentHand.removeCard(card);
 	}
-
-	// DEVELOPED IN SERVICE (TO REMOVE)
-	// public void connect(Game game) {
-	//
-	// if (!isPresent()) {
-	// throw new PlayerException("the user is in game or missing");
-	// } else {
-	// game.getPlayers().add(this);
-	// setInGame();
-	// setGame(game);
-	// }
-	// }
-	//
-	// public void disconnect() {
-	// if (!isInGame()) {
-	// throw new PlayerException("the player is not connected to a game");
-	// } else {
-	// getGame().remove(this);
-	// }
-	// }
 }

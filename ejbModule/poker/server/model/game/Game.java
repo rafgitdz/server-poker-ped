@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -26,11 +26,10 @@ import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
 /**
- * @author PokerServerGroup
+ * @author PokerServerGroup <br/>
+ * <br/>
  * 
- *         Model Class : Game
- * 
- *         Manage all the entities and actions related to the poker game The
+ *         Manages all the entities and actions related to the poker game The
  *         type of poker is Texas Holde'em Poker and the variant is SitAndGo
  *         Note that it can affect other variant than SitAndGo (Entity :
  *         gameType)
@@ -52,9 +51,15 @@ public class Game implements Serializable, Observer {
 	private static final int RIVER = 3;
 	private static final int SHOWDOWN = 4;
 
+	public final static int STARTED = 1;
+	public final static int READY_TO_START = 2;
+	public final static int ENDED = 3;
+	public final static int WAITING = 4;
+
+	private static final String GENERATED_NAME = "LabriTexasHoldem_";
+
 	@Id
-	@GeneratedValue
-	public int id; // public at this time for testing service...
+	private String name; // public at this time for testing service...
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "Game_Id")
@@ -67,26 +72,25 @@ public class Game implements Serializable, Observer {
 	private transient Deck deck;
 	private transient List<Card> flippedCards;
 
-	int currentPlayer;
-	int dealer;
-	int smallBlindPlayer;
-	int bigBlindPlayer;
+	private int currentPlayer;
+	private int dealer;
+	private int smallBlindPlayer;
+	private int bigBlindPlayer;
 
-	int smallBlind;
-	int bigBlind;
+	private int smallBlind;
+	private int bigBlind;
 
-	int totalPot;
-	int currentPot;
-	int currentBet;
-	int prizePool;
+	private int totalPot;
+	private int currentPot;
+	private int currentBet;
+	private int prizePool;
 
-	int currentRound;
+	private int currentRound;
 
-	boolean Started;
 	int lastRaisedPlayer;
-	int gameLevel;
+	private int gameLevel;
 
-	private boolean gameEnded;
+	private int status;
 
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
@@ -112,6 +116,7 @@ public class Game implements Serializable, Observer {
 	 */
 	private void buildGame() {
 
+		name = GENERATED_NAME + UUID.randomUUID().toString();
 		currentPlayer = 0;
 		dealer = -1;
 		smallBlindPlayer = -1;
@@ -122,14 +127,13 @@ public class Game implements Serializable, Observer {
 		prizePool = 0;
 		currentRound = 0;
 		gameLevel = 0;
-		gameEnded = false;
 		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
 		playersRank = new ArrayList<Player>();
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
-		setStarted(false);
+		status = WAITING;
 		Event.buildEvents();
 	}
 
@@ -146,7 +150,7 @@ public class Game implements Serializable, Observer {
 		setPlayerInGame();
 		setInitBetGame();
 		++gameLevel;
-
+		status = STARTED;
 		Event.addEvent("START GAME");
 	}
 
@@ -292,9 +296,10 @@ public class Game implements Serializable, Observer {
 		flipRoundCard();
 
 		if (players.size() == 1) {
-			gameEnded = true;
+
 			playersRank.add(players.get(0));
 			prizeForPlayers();
+			status = ENDED;
 		}
 	}
 
@@ -374,7 +379,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * After a certain time, update the blinds and increment the level of them
 	 */
-	protected void updateBlind() {
+	public void updateBlind() {
 
 		++gameLevel;
 		int blindMultFactor = gameType.getMultFactor();
@@ -478,7 +483,11 @@ public class Game implements Serializable, Observer {
 	 * @see playerNumber in class Parameters
 	 */
 	public boolean isReadyToStart() {
-		return players.size() == gameType.getPlayerNumber();
+
+		if (players.size() == gameType.getPlayerNumber())
+			return true;
+
+		return false;
 	}
 
 	/**
@@ -492,6 +501,7 @@ public class Game implements Serializable, Observer {
 							+ gameType.getPlayerNumber());
 		} else {
 
+			// transform it to be generic (method next())
 			resetPlayers();
 			players.get(0).setAsDealer();
 			players.get(1).setAsSmallBlind();
@@ -586,7 +596,7 @@ public class Game implements Serializable, Observer {
 	 * At the end of round river, it executed the showDown action to see all
 	 * hands of the current player and get the winner(s)
 	 */
-	protected Map<String, Integer> showDown() {
+	public Map<String, Integer> showDown() {
 
 		if (currentRound != RIVER)
 			throw new GameException(NOT_END_ROUND_POKER);
@@ -702,10 +712,12 @@ public class Game implements Serializable, Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 
-		if (arg.equals("upadateBlind"))
+		if (arg.equals("updateBlind")) {
 			updateBlind();
-		else if (arg.equals("raise"))
-			lastRaisedPlayer = currentPlayer;
+		} else {
+			if (arg.equals("raise"))
+				lastRaisedPlayer = currentPlayer;
+		}
 	}
 
 	// Getters and the Setters
@@ -719,10 +731,6 @@ public class Game implements Serializable, Observer {
 
 	public int getBigBlind() {
 		return bigBlind;
-	}
-
-	public int getId() {
-		return id;
 	}
 
 	public Parameters getGameType() {
@@ -773,10 +781,6 @@ public class Game implements Serializable, Observer {
 		return currentBet;
 	}
 
-	public void setId(int iD) {
-		id = iD;
-	}
-
 	public void setCurrentBet(int currentB) {
 		currentBet = currentB;
 	}
@@ -787,14 +791,6 @@ public class Game implements Serializable, Observer {
 
 	public void setTotalPot(int totalP) {
 		totalPot = totalP;
-	}
-
-	public boolean isStarted() {
-		return Started;
-	}
-
-	public void setStarted(boolean started) {
-		Started = started;
 	}
 
 	// FOR TEST ONLY
@@ -853,7 +849,35 @@ public class Game implements Serializable, Observer {
 		flippedCards = cards;
 	}
 
+	public boolean isEnded() {
+		return status == ENDED;
+	}
+
+	public boolean isReady() {
+		return status == READY_TO_START;
+	}
+
+	public void setAsReady() {
+		status = READY_TO_START;
+	}
+
+	public boolean isStarted() {
+		return status == STARTED;
+	}
+
+	public boolean isWaiting() {
+		return status == WAITING;
+	}
+
 	public boolean isGameEnded() {
-		return gameEnded;
+		return status == ENDED;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getPrizePool() {
+		return prizePool;
 	}
 }

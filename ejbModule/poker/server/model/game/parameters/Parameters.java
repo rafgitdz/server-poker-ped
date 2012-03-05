@@ -114,4 +114,8 @@ public abstract class Parameters {
 	public int getTokens() {
 		return initPlayersTokens;
 	}
+	
+	public int getTimeChangeBlind() {
+		return timeChangeBlind;
+	}
 }
