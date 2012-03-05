@@ -213,7 +213,7 @@ public class TestGame {
 		saveTestValues();
 		game.updateRoundPotAndBets();
 
-		assertEquals(gameCurrentPot, game.getTotalPot());
+		assertEquals(0, game.getCurrentPot());
 	}
 
 	@Test
