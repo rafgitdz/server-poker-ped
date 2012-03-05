@@ -272,10 +272,11 @@ public class Game implements Serializable, Observer {
 	 * new dealer, new smallBlind,...etc
 	 */
 	private void nextRound() {
-		if (currentRound == SHOWDOWN) {
+		if (currentRound == RIVER) {
+			currentRound++;
 			showDown();
-			currentRound = 0;
 			nextRoundTasks();
+			currentRound = 0;
 		} else {
 			currentRound++;
 			flipRoundCard();
@@ -292,7 +293,7 @@ public class Game implements Serializable, Observer {
 		nextBigBlind();
 		nextSmallBlind();
 		updateRoundPotAndBets();
-		flipRoundCard();
+		//flipRoundCard();
 
 		if (players.size() == 1) {
 
@@ -320,8 +321,6 @@ public class Game implements Serializable, Observer {
 	 * position of the old dealer
 	 */
 	private void nextDealer() {
-
-		System.out.println("Dealer : " + dealer);
 		if (dealer == players.size() - 1)
 			dealer = 0;
 		else
@@ -414,7 +413,10 @@ public class Game implements Serializable, Observer {
 			player.setCurrentBet(0);
 
 		currentBet = 0;
-		totalPot += currentPot;
+		if(currentRound != SHOWDOWN)
+			totalPot += currentPot;
+		else
+			totalPot = 0;
 		currentPot = 0;
 		Event.addEvent("RESET PLAYERS BETS AND UPDATE POT OF THE GAME");
 	}
@@ -453,16 +455,16 @@ public class Game implements Serializable, Observer {
 	 * Remove the looser's players and update ranking
 	 */
 	protected void cleanTable() {
-
 		Player player;
-		for (int i = 0; i < players.size(); ++i) {
+		int size = players.size();
+		for (int i = 0; i < size ; ++i) {
 
 			player = players.get(i);
+			
 			if (player.getCurrentTokens() == 0) {
-
 				playersRank.add(0, player);
 				players.remove(player);
-				--i;
+				//--i;
 			}
 		}
 	}
@@ -534,7 +536,7 @@ public class Game implements Serializable, Observer {
 		List<Player> currentPlayers = currentPlayerInRound();
 		if (currentPlayers.size() == 1) {
 			currentPlayers.get(0).reward(currentPot);
-			currentRound = RIVER;
+			currentRound = SHOWDOWN;
 			nextRoundTasks();
 		} else {
 			if (players.get(currentPlayer).isBigBlind() && verifyBet()) {
@@ -595,7 +597,7 @@ public class Game implements Serializable, Observer {
 	 */
 	public Map<String, Integer> showDown() {
 
-		if (currentRound != RIVER)
+		if (currentRound != SHOWDOWN)
 			throw new GameException(NOT_END_ROUND_POKER);
 		if (flippedCards.size() < 5)
 			throw new GameException(NOT_ENOUGH_FLIPED_CARDS);
@@ -651,7 +653,7 @@ public class Game implements Serializable, Observer {
 	 */
 	private void rewardTheWinners(List<Player> playerToReward) {
 
-		int potWinner = currentPot / playerToReward.size();
+		int potWinner = totalPot / playerToReward.size();
 
 		for (Player player : playerToReward)
 			player.reward(potWinner);

@@ -298,11 +298,16 @@ public class TestRunGame {
 		assertEquals(game.getCurrentPlayer(), 0);
 		game.currentPlayer().check();
 	}
-	
 
 	@Test
 	public void testM_end(){
-		assertEquals(game.getTotalPot(), 3200);
-		assertEquals(game.getCurrentRound(), 4);
+		assertEquals(game.getTotalPot(), 0);
+		assertEquals(game.getCurrentRound(), 0);
+
+		assertEquals(game.players.get(0).getCurrentTokens(), 1600);
+		assertEquals(game.players.get(1).getCurrentTokens(), 1400);
+		assertEquals(game.players.get(2).getCurrentTokens(), 1400);
+		assertEquals(game.players.get(3).getCurrentTokens(), 1600);
+		assertEquals(game.players.get(4).getCurrentTokens(), 1500);
 	}
 }
