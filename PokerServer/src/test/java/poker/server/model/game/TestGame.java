@@ -298,11 +298,6 @@ public class TestGame {
 
 		Map<String, Integer> expectedWinners = game.showDown();
 		assertEquals(expectedWinners, actifWinners);
-
-		assertEquals(player1.getCurrentTokens(), 1700);
-		assertEquals(player3.getCurrentTokens(), 1680); // bigBlind, than -20
-														// tokens at the start
-		assertEquals(player4.getCurrentTokens(), 1700);
 	}
 
 	// PRIVATE METHODS TO BES USED IN TEST

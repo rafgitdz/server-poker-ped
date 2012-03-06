@@ -293,7 +293,7 @@ public class Game implements Serializable, Observer {
 		nextBigBlind();
 		nextSmallBlind();
 		updateRoundPotAndBets();
-		//flipRoundCard();
+		// flipRoundCard();
 
 		if (players.size() == 1) {
 
@@ -413,7 +413,7 @@ public class Game implements Serializable, Observer {
 			player.setCurrentBet(0);
 
 		currentBet = 0;
-		if(currentRound != SHOWDOWN)
+		if (currentRound != SHOWDOWN)
 			totalPot += currentPot;
 		else
 			totalPot = 0;
@@ -455,16 +455,16 @@ public class Game implements Serializable, Observer {
 	 * Remove the looser's players and update ranking
 	 */
 	protected void cleanTable() {
+
 		Player player;
-		int size = players.size();
-		for (int i = 0; i < size ; ++i) {
+		for (int i = 0; i < players.size(); ++i) {
 
 			player = players.get(i);
-			
+
 			if (player.getCurrentTokens() == 0) {
 				playersRank.add(0, player);
 				players.remove(player);
-				//--i;
+				--i;
 			}
 		}
 	}
@@ -580,6 +580,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * For the first round,
 	 */
+	@SuppressWarnings("unused")
 	private boolean isCurrentPlayerAfterBigBlind() {
 
 		if (currentPlayer != 0) {
