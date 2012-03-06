@@ -35,8 +35,10 @@ public class GameService {
 	public static final String ERROR_UNKNOWN_GAME = "Unknown Game : ";
 	private static final String AUTHENTIFICATION_ERROR = "Error in the password ! ";
 	private static final String PLAYER_ALREADY_AFFECTED = "Player is already affected in game ! ";
-	private static final String GAME_NOT_READY_TO_START = "The game isn't ready to start";
+	private static final String GAME_NOT_READY_TO_START = "The game isn't ready to start ! ";
 	private static final String GAME_ALREADY_STARTED = "The game is already started";
+	private static final String GAME_NOT_EXIST = "The game doesn't exist ! ";
+	private static final String GAME_NOT_FINISH = "The game isn't finished";
 
 	@EJB
 	private RepositoryGame repositoryGame;
@@ -77,6 +79,7 @@ public class GameService {
 		Player player = repositoryPlayer.load(name);
 
 		if (player == null) {
+
 			player = playerFactory.newPlayer(name, pwd);
 			repositoryPlayer.save(player);
 
@@ -135,7 +138,7 @@ public class GameService {
 
 		if (currentGame != null) {
 
-			if (currentGame.isReady()) {
+			if (currentGame.isReady() && allPlayersReady(currentGame)) {
 
 				currentGame.start();
 
@@ -163,8 +166,41 @@ public class GameService {
 					.getTokens());
 
 		} else
-			errorJSON(json, "The game " + tableName + " doesn't exist");
+			errorJSON(json, GAME_NOT_EXIST + tableName);
 
+		return json;
+	}
+
+	/**
+	 * Sets the player name as ready
+	 */
+	@GET
+	@Path("/setReady/{tableName}/{namePlayer}")
+	public JSONObject setReady(@PathParam("tableName") String tableName,
+			@PathParam("namePlayer") String namePlayer) {
+
+		JSONObject json = new JSONObject();
+		Player player = repositoryPlayer.load(namePlayer);
+
+		if (player == null) {
+			errorJSON(json, "The player doesn't exist !");
+			return json;
+		}
+
+		Game game = player.getGame();
+
+		if (game != null) {
+
+			// if the game hasn't the N players, it returns an error message,
+			// set player ready "sit down" otherwise
+			if (!game.isReady())
+				errorJSON(json, "The game is not ready to start !");
+			else
+				player.setAsReady();
+
+		} else {
+			errorJSON(json, GAME_NOT_EXIST + tableName);
+		}
 		return json;
 	}
 
@@ -179,7 +215,7 @@ public class GameService {
 		Game game = repositoryGame.load(tableName);
 
 		if (game == null) {
-			errorJSON(json, "The game " + tableName + " doesn't exist");
+			errorJSON(json, GAME_NOT_EXIST + tableName);
 			return json;
 		}
 
@@ -204,7 +240,7 @@ public class GameService {
 		Game game = repositoryGame.load(tableName);
 
 		if (game == null) {
-			errorJSON(json, "The game " + tableName + " doesn't exist");
+			errorJSON(json, GAME_NOT_EXIST + tableName);
 			return json;
 		}
 
@@ -229,15 +265,20 @@ public class GameService {
 		JSONObject json = new JSONObject();
 		Game game = repositoryGame.load(tableName);
 
-		// it must to make in place a system to detect errors
 		if (game == null) {
-			errorJSON(json, "The game " + tableName + " doesn't exist");
+			errorJSON(json, GAME_NOT_EXIST + tableName);
 			return json;
-		}
+		} else {
 
-		if (!game.isReady()) {
-			errorJSON(json, GAME_NOT_READY_TO_START);
-			return json;
+			if (!game.isStarted()) {
+				errorJSON(json, GAME_NOT_READY_TO_START + tableName);
+				return json;
+			}
+
+			if (!game.isEnded()) {
+				errorJSON(json, GAME_NOT_FINISH + tableName);
+				return json;
+			}
 		}
 
 		Map<String, Integer> winners = game.showDown();
@@ -310,5 +351,18 @@ public class GameService {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Verifies if all players are connected and ready to start the game
+	 */
+	private boolean allPlayersReady(Game currentGame) {
+
+		List<Player> players = currentGame.getPlayers();
+		for (Player player : players) {
+			if (!player.isReady())
+				return false;
+		}
+		return true;
 	}
 }

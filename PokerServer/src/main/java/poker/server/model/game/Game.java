@@ -85,9 +85,14 @@ public class Game implements Serializable, Observer {
 	private int currentBet;
 	private int prizePool;
 
+	@SuppressWarnings("unused")
+	private int ante;
+
 	private int currentRound;
 
-	int lastRaisedPlayer;
+	@SuppressWarnings("unused")
+	private int lastRaisedPlayer;
+
 	private int gameLevel;
 
 	private int status;
@@ -124,7 +129,6 @@ public class Game implements Serializable, Observer {
 		totalPot = 0;
 		currentPot = 0;
 		currentBet = 0;
-		prizePool = 0;
 		currentRound = 0;
 		gameLevel = 0;
 		deck = new Deck();
@@ -133,6 +137,7 @@ public class Game implements Serializable, Observer {
 		playersRank = new ArrayList<Player>();
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
+		fixPrizePool();
 		status = WAITING;
 		Event.buildEvents();
 	}
@@ -261,10 +266,8 @@ public class Game implements Serializable, Observer {
 	 */
 	private void initPlayersTokens() {
 
-		for (Player player : players) {
+		for (Player player : players)
 			player.setCurrentTokens(gameType.getTokens());
-			// player.setAsPresent();
-		}
 	}
 
 	/**
@@ -272,6 +275,7 @@ public class Game implements Serializable, Observer {
 	 * new dealer, new smallBlind,...etc
 	 */
 	private void nextRound() {
+
 		if (currentRound == RIVER) {
 			currentRound++;
 			showDown();
@@ -287,13 +291,13 @@ public class Game implements Serializable, Observer {
 	 * Method go to the next round and verify if is the end of the game
 	 */
 	private void nextRoundTasks() {
+
 		cleanTable();
 		resetPlayers();
 		nextDealer();
 		nextBigBlind();
 		nextSmallBlind();
 		updateRoundPotAndBets();
-		// flipRoundCard();
 
 		if (players.size() == 1) {
 
@@ -444,8 +448,7 @@ public class Game implements Serializable, Observer {
 	}
 
 	/**
-	 * Remove the player from this current game, if he disconnect from it or he
-	 * loose
+	 * Remove the player from this current game, if he looses
 	 */
 	public void remove(Player player) {
 		players.remove(player);
@@ -475,7 +478,6 @@ public class Game implements Serializable, Observer {
 	public void add(Player player) {
 		players.add(player);
 		player.setGame(this);
-		player.setInGame();
 	}
 
 	/**
