@@ -31,6 +31,16 @@ public abstract class Parameters {
 	protected int speakTime; // in seconds
 	protected int timeChangeBlind; // in seconds
 
+	public boolean isCashPot() {
+		return potType == CASH;
+	}
+
+	public boolean isTokenPot() {
+		return potType == TOKEN;
+	}
+
+	// SET/GET
+	
 	protected void setPotSplit(List<Integer> percents) {
 
 		List<Integer> finalSplit = new ArrayList<Integer>();
@@ -78,15 +88,7 @@ public abstract class Parameters {
 	public int getPlayerNumber() {
 		return playerNumber;
 	}
-
-	public boolean isCashPot() {
-		return potType == CASH;
-	}
-
-	public boolean isTokenPot() {
-		return potType == TOKEN;
-	}
-
+	
 	public int getBuyIn() {
 		return buyIn;
 	}

@@ -29,7 +29,7 @@ import poker.server.model.player.Player;
  * @author PokerServerGroup <br/>
  * <br/>
  * 
- *         Manages all the entities and actions related to the poker game The
+ *         Manages all the entities and actions related to the poker game. The
  *         type of poker is Texas Holde'em Poker and the variant is SitAndGo
  *         Note that it can affect other variant than SitAndGo (Entity :
  *         gameType)
@@ -72,10 +72,10 @@ public class Game implements Serializable, Observer {
 	private transient Deck deck;
 	private transient List<Card> flippedCards;
 
-	private int currentPlayer;
-	private int dealer;
-	private int smallBlindPlayer;
-	private int bigBlindPlayer;
+	private int currentPlayerInt;
+	private int dealerPlayerInt;
+	private int smallBlindPlayerInt;
+	private int bigBlindPlayerInt;
 
 	private int smallBlind;
 	private int bigBlind;
@@ -90,12 +90,11 @@ public class Game implements Serializable, Observer {
 
 	private int currentRound;
 
-	@SuppressWarnings("unused")
-	private int lastRaisedPlayer;
-
 	private int gameLevel;
 
 	private int status;
+
+	private int lastPlayerToPlay;
 
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
@@ -122,10 +121,10 @@ public class Game implements Serializable, Observer {
 	private void buildGame() {
 
 		name = GENERATED_NAME + UUID.randomUUID().toString();
-		currentPlayer = 0;
-		dealer = -1;
-		smallBlindPlayer = -1;
-		bigBlindPlayer = -1;
+		currentPlayerInt = 0;
+		dealerPlayerInt = -1;
+		smallBlindPlayerInt = -1;
+		bigBlindPlayerInt = -1;
 		totalPot = 0;
 		currentPot = 0;
 		currentBet = 0;
@@ -148,7 +147,7 @@ public class Game implements Serializable, Observer {
 	 * @see PlayerNumber in class Parameters
 	 */
 	public void start() {
-
+		
 		setPlayerRoles();
 		initPlayersTokens();
 		fixPrizePool();
@@ -160,12 +159,38 @@ public class Game implements Serializable, Observer {
 	}
 
 	/**
-	 * If the game is started, set that all players are connected to a game (to
-	 * avoid double connection of players)
+	 * At the begin of game, set each role for each player
 	 */
-	private void setPlayerInGame() {
-		for (Player player : players)
-			player.setInGame();
+	public void setPlayerRoles() {
+		
+		if (players.size() < gameType.getPlayerNumber()) {
+			throw new GameException(
+					"not enough player to start a poker game ! < "
+							+ gameType.getPlayerNumber());
+		} else {
+			resetPlayers();
+			players.get(0).setAsDealer();
+			players.get(1).setAsSmallBlind();
+			players.get(2).setAsBigBlind();
+
+			dealerPlayerInt = 0;
+			smallBlindPlayerInt = 1;
+			bigBlindPlayerInt = 2;
+			currentPlayerInt = 3;
+			lastPlayerToPlay = bigBlindPlayerInt;
+		}
+	}
+
+	/**
+	 * At the start of the game, give for each player a number of tokens
+	 * 
+	 * @see tokens in class Parameters
+	 */
+	private void initPlayersTokens() {
+
+		for (Player player : players) {
+			player.setCurrentTokens(gameType.getTokens());
+		}
 	}
 
 	/**
@@ -179,10 +204,43 @@ public class Game implements Serializable, Observer {
 	}
 
 	/**
+	 * If the game is started, set that all players are connected to a game (to
+	 * avoid double connection of players)
+	 */
+	private void setPlayerInGame() {
+		for (Player player : players)
+			player.setInGame();
+	}	
+
+	/**
+	 * Initialize the bet, the pot and update the current tokens for the players
+	 * concerned (smallBlind and the bigBlind)
+	 */
+	private void setInitBetGame() {
+
+		currentBet = bigBlind;
+		currentPot = smallBlind + bigBlind;
+		players.get(smallBlindPlayerInt).updateToken(smallBlind);
+		players.get(bigBlindPlayerInt).updateToken(bigBlind);
+	}
+
+	/**
+	 * Method to set prize for the first three players in the ranking
+	 */
+	protected void setPrizeForPlayers() {
+
+		playersRank.get(0).setMoney(
+				(prizePool * gameType.getPotSplit().get(0)) / 100);
+		playersRank.get(1).setMoney(
+				(prizePool * gameType.getPotSplit().get(1)) / 100);
+		playersRank.get(2).setMoney(
+				(prizePool * gameType.getPotSplit().get(2)) / 100);
+	}
+	
+	/**
 	 * At the begin of game, give for each player two cards
 	 */
 	protected void dealCards() {
-
 		deck.shuffle();
 		Card card;
 		for (int i = 0; i < 2; i++) {
@@ -193,30 +251,6 @@ public class Game implements Serializable, Observer {
 			}
 		}
 		Event.addEvent("DEAL CARDS FOR PLAYERS");
-	}
-
-	/**
-	 * At each round, flip a card(s) according to the conform round
-	 */
-	private void flipRoundCard() {
-
-		switch (currentRound) {
-		case FLOP:
-			flop();
-			break;
-		case TOURNANT:
-			tournant();
-			break;
-		case RIVER:
-			river();
-			break;
-		case SHOWDOWN:
-			break;
-		default:
-			throw new GameException(UNKNOWN_ROUND);
-		}
-
-		// currentRound = (currentRound % RIVER) + 1;
 	}
 
 	/**
@@ -260,28 +294,39 @@ public class Game implements Serializable, Observer {
 	}
 
 	/**
-	 * At the start of the game, give for each player a number of tokens
-	 * 
-	 * @see tokens in class Parameters
+	 * Give the next card from the deck
 	 */
-	private void initPlayersTokens() {
-
-		for (Player player : players)
-			player.setCurrentTokens(gameType.getTokens());
+	private Card flipCard() {
+		Card card = deck.getNextCard();
+		flippedCards.add(card);
+		return card;
 	}
 
 	/**
 	 * Between each round, reset all the concepts of the poker </br> Update the
 	 * new dealer, new smallBlind,...etc
 	 */
-	private void nextRound() {
+	protected void nextRound() {
+		List<Player> currentPlayers = currentPlayerInRound();
 
-		if (currentRound == RIVER) {
+		if (currentPlayers.size() == 1) {
+			currentPlayers.get(0).reward(currentPot + totalPot);
+			currentRound = SHOWDOWN;
+			nextRoundTasks();
+			currentRound = 0;
+		}
+		else if (currentRound == RIVER) {
 			currentRound++;
 			showDown();
 			nextRoundTasks();
 			currentRound = 0;
-		} else {
+		} 
+		else if (isPlayersAllIn()) {
+			currentRound++;
+			flipRoundCard();
+			nextRound();
+		}
+		else {
 			currentRound++;
 			flipRoundCard();
 		}
@@ -294,94 +339,158 @@ public class Game implements Serializable, Observer {
 
 		cleanTable();
 		resetPlayers();
-		nextDealer();
-		nextBigBlind();
-		nextSmallBlind();
+		nextDealerPlayer();
+		nextSmallBlindPlayer();
+		nextBigBlindPlayer();
 		updateRoundPotAndBets();
 
 		if (players.size() == 1) {
-
 			playersRank.add(players.get(0));
-			prizeForPlayers();
+			setPrizeForPlayers();
 			status = ENDED;
 		}
 	}
 
 	/**
-	 * Method to set prize for the first three players in the ranking
+	 * Remove the looser's players and update ranking
 	 */
-	private void prizeForPlayers() {
+	protected void cleanTable() {
 
-		playersRank.get(0).setMoney(
-				(prizePool * gameType.getPotSplit().get(0)) / 100);
-		playersRank.get(1).setMoney(
-				(prizePool * gameType.getPotSplit().get(1)) / 100);
-		playersRank.get(2).setMoney(
-				(prizePool * gameType.getPotSplit().get(2)) / 100);
+		Player player;
+		for (int i = 0; i < players.size(); ++i) {
+
+			player = players.get(i);
+
+			if (player.getCurrentTokens() == 0) {
+				playersRank.add(0, player);
+				players.remove(player);
+				--i;
+			}
+		}
+	}
+
+	/**
+	 * After a showDown, set all players as regular and cancel them fold's state
+	 */
+	protected void resetPlayers() {
+
+		for (Player p : players) {
+			p.setAsRegular();
+			p.unFold();
+		}
 	}
 
 	/**
 	 * For each round, set the next dealer by increment the index, the right
 	 * position of the old dealer
 	 */
-	private void nextDealer() {
-		if (dealer == players.size() - 1)
-			dealer = 0;
+	private void nextDealerPlayer() {
+		if (dealerPlayerInt == players.size() - 1)
+			dealerPlayerInt = 0;
 		else
-			dealer = (dealer % players.size()) + 1;
+			dealerPlayerInt = (dealerPlayerInt % players.size()) + 1;
 
-		Player dealer = players.get(this.dealer);
-		dealer.setAsDealer();
+		lastPlayerToPlay = dealerPlayerInt;
 
-		Event.addEvent("THE DEALER IS : " + dealer.getName());
+		Player dealerPlayer = players.get(this.dealerPlayerInt);
+		dealerPlayer.setAsDealer();
+
+		Event.addEvent("THE DEALER IS : " + dealerPlayer.getName());
 	}
 
 	/**
 	 * For each round, set the next bigBlind by increment the index, the right
 	 * position of the old bigBlind
 	 */
-	private void nextBigBlind() {
+	private void nextBigBlindPlayer() {
 
-		if (bigBlind == players.size() - 1)
-			bigBlind = 0;
+		if (bigBlindPlayerInt == players.size() - 1)
+			bigBlindPlayerInt = 0;
 		else
-			bigBlind = (bigBlind % players.size()) + 1;
-		Player bigBlind = players.get(bigBlindPlayer);
-		bigBlind.setAsBigBlind();
+			bigBlindPlayerInt = (bigBlindPlayerInt % players.size()) + 1;
+		
+		Player bigBlindPlayer = players.get(bigBlindPlayerInt);
+		bigBlindPlayer.setAsBigBlind();
 
-		Event.addEvent("THE BIG BLIND IS : " + bigBlind.getName());
+		Event.addEvent("THE BIG BLIND IS : " + bigBlindPlayer.getName());
 	}
 
 	/**
 	 * For each round, set the next samllBlind by increment the index, the right
 	 * position of the old smallBlind
 	 */
-	private void nextSmallBlind() {
+	private void nextSmallBlindPlayer() {
 
-		if (smallBlind == players.size() - 1)
-			smallBlind = 0;
+		if (smallBlindPlayerInt == players.size() - 1)
+			smallBlindPlayerInt = 0;
 		else
-			smallBlind = (smallBlind % players.size()) + 1;
+			smallBlindPlayerInt = (smallBlindPlayerInt % players.size()) + 1;
 
-		Player smallBlind = players.get(smallBlindPlayer);
-		smallBlind.setAsSmallBlind();
+		Player smallBlindPlayer = players.get(smallBlindPlayerInt);
+		smallBlindPlayer.setAsSmallBlind();
+		currentPlayerInt = smallBlindPlayerInt;
 
-		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
+		Event.addEvent("THE SMALL BLIND IS : " + smallBlindPlayer.getName());
 	}
 
 	/**
-	 * Give the next card from the deck
+	 * After each showDown poker, reset all the bets of players and the pot
 	 */
-	private Card flipCard() {
-		Card card = deck.getNextCard();
-		flippedCards.add(card);
-		return card;
+	protected void updateRoundPotAndBets() {
+
+		for (Player player : players)
+			player.setCurrentBet(0);
+		
+		if (currentRound != SHOWDOWN)
+			totalPot += currentPot;
+		else
+			totalPot = 0;
+		
+		currentBet = 0;
+		currentPot = 0;
+		
+		Event.addEvent("RESET PLAYERS BETS AND UPDATE POT OF THE GAME");
+	}
+
+	/**
+	 * At each round, flip a card(s) according to the conform round
+	 */
+	private void flipRoundCard() {
+		switch (currentRound) {
+		case FLOP:
+			flop();
+			break;
+		case TOURNANT:
+			tournant();
+			break;
+		case RIVER:
+			river();
+			break;
+		case SHOWDOWN:
+			break;
+		default:
+			throw new GameException(UNKNOWN_ROUND);
+		}
+	}
+
+	/**
+	 * Verify if all players are all in. Return true if it is, false if not.
+	 */
+	private boolean isPlayersAllIn(){
+		List<Player> currentPlayerInRound = currentPlayerInRound();
+
+		for (Player p : currentPlayerInRound) {
+			if (!p.isAllIn())
+				return false;
+		}
+
+		return true;
 	}
 
 	/**
 	 * After a certain time, update the blinds and increment the level of them
 	 */
-	public void updateBlind() {
+	protected void updateBlind() {
 
 		++gameLevel;
 		int blindMultFactor = gameType.getMultFactor();
@@ -408,22 +517,6 @@ public class Game implements Serializable, Observer {
 		Event.addEvent("CURRENT BET = " + currentBet);
 	}
 
-	/**
-	 * After each showDown poker, reset all the bets of players and the pot
-	 */
-	protected void updateRoundPotAndBets() {
-
-		for (Player player : players)
-			player.setCurrentBet(0);
-
-		currentBet = 0;
-		if (currentRound != SHOWDOWN)
-			totalPot += currentPot;
-		else
-			totalPot = 0;
-		currentPot = 0;
-		Event.addEvent("RESET PLAYERS BETS AND UPDATE POT OF THE GAME");
-	}
 
 	/**
 	 * Before a player action, it verify is it his turn </br> Launch a game
@@ -431,101 +524,25 @@ public class Game implements Serializable, Observer {
 	 */
 	public void verifyIsMyTurn(Player player) {
 
-		if (currentPlayer != players.indexOf(player))
+		if (currentPlayerInt != players.indexOf(player))
 			throw new GameException(NOT_YOUR_TURN + player.getName());
-	}
-
-	/**
-	 * Initialize the bet, the pot and update the current tokens for the players
-	 * concerned (smallBlind and the bigBlind)
-	 */
-	private void setInitBetGame() {
-
-		currentBet = bigBlind;
-		currentPot = smallBlind + bigBlind;
-		players.get(smallBlindPlayer).updateToken(smallBlind);
-		players.get(bigBlindPlayer).updateToken(bigBlind);
-	}
-
-	/**
-	 * Remove the player from this current game, if he looses
-	 */
-	public void remove(Player player) {
-		players.remove(player);
-	}
-
-	/**
-	 * Remove the looser's players and update ranking
-	 */
-	protected void cleanTable() {
-
-		Player player;
-		for (int i = 0; i < players.size(); ++i) {
-
-			player = players.get(i);
-
-			if (player.getCurrentTokens() == 0) {
-				playersRank.add(0, player);
-				players.remove(player);
-				--i;
-			}
-		}
 	}
 
 	/**
 	 * After each connection of player, add it to the only one non-ready game
 	 */
 	public void add(Player player) {
-		players.add(player);
+		players.add(player);	
 		player.setGame(this);
+		player.setInGame();
 	}
 
 	/**
-	 * Verify if a game is ready to begin if it reaches the number of player
-	 * 
-	 * @see playerNumber in class Parameters
+	 * Remove the player from this current game, if he disconnect from it or he
+	 * loose
 	 */
-	public boolean isReadyToStart() {
-
-		if (players.size() == gameType.getPlayerNumber())
-			return true;
-
-		return false;
-	}
-
-	/**
-	 * At the begin of game, set each role for each player
-	 */
-	public void setPlayerRoles() {
-
-		if (players.size() < gameType.getPlayerNumber()) {
-			throw new GameException(
-					"not enough player to start a poker game ! < "
-							+ gameType.getPlayerNumber());
-		} else {
-
-			// transform it to be generic (method next())
-			resetPlayers();
-			players.get(0).setAsDealer();
-			players.get(1).setAsSmallBlind();
-			players.get(2).setAsBigBlind();
-
-			dealer = 0;
-			smallBlindPlayer = 1;
-			bigBlindPlayer = 2;
-			currentPlayer = 3;
-		}
-	}
-
-	/**
-	 * After a showDown, set all players as regular and cancel them fold's state
-	 */
-	public void resetPlayers() {
-
-		for (Player p : players) {
-			p.setAsRegular();
-			p.unFold();
-		}
+	protected void remove(Player player) {
+		players.remove(player);
 	}
 
 	/**
@@ -533,25 +550,32 @@ public class Game implements Serializable, Observer {
 	 * current player
 	 */
 	public void nextPlayer() {
-		// if there is only one current player, it provokes to go to the next
-		// round
-		List<Player> currentPlayers = currentPlayerInRound();
-		if (currentPlayers.size() == 1) {
-			currentPlayers.get(0).reward(currentPot);
-			currentRound = SHOWDOWN;
-			nextRoundTasks();
+		if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
+			currentPlayerInt = smallBlindPlayerInt;
+			nextPlayerToStart();		
+			nextRound();
 		} else {
-			if (players.get(currentPlayer).isBigBlind() && verifyBet()) {
-				currentPlayer = (currentPlayer % players.size()) + 1;
-				nextRound();
-			} else {
-				if (currentPlayer == players.size() - 1)
-					currentPlayer = 0;
-				else
-					currentPlayer = (currentPlayer % players.size()) + 1;
-				if (players.get(currentPlayer).isfolded())
-					nextPlayer();
+			if (currentPlayerInt == players.size() - 1)
+				currentPlayerInt = 0;
+			else
+				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
+			if (players.get(currentPlayerInt).isfolded() || players.get(currentPlayerInt).getCurrentTokens() == 0 || players.get(currentPlayerInt).isMissing()) {
+				nextPlayer();
 			}
+		}
+	}
+
+	private void nextPlayerToStart(){
+		if(players.get(currentPlayerInt).isfolded()){
+			if (currentPlayerInt == players.size() - 1){
+				currentPlayerInt = 0;
+				lastPlayerToPlay = players.size() - 1;
+			}			
+			else{
+				lastPlayerToPlay = currentPlayerInt;
+				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
+			}
+			nextPlayerToStart();
 		}
 	}
 
@@ -577,21 +601,6 @@ public class Game implements Serializable, Observer {
 		}
 
 		return currentPlayers;
-	}
-
-	/**
-	 * For the first round,
-	 */
-	@SuppressWarnings("unused")
-	private boolean isCurrentPlayerAfterBigBlind() {
-
-		if (currentPlayer != 0) {
-			if (currentPlayer - 1 == bigBlindPlayer)
-				return true;
-		} else if (bigBlindPlayer == players.size() - 1)
-			return true;
-
-		return false;
 	}
 
 	/**
@@ -649,20 +658,6 @@ public class Game implements Serializable, Observer {
 	}
 
 	/**
-	 * At the end of round river, reward the winners by divide the total pot
-	 * between all the best players
-	 * 
-	 * @see <@links showDown>
-	 */
-	private void rewardTheWinners(List<Player> playerToReward) {
-
-		int potWinner = totalPot / playerToReward.size();
-
-		for (Player player : playerToReward)
-			player.reward(potWinner);
-	}
-
-	/**
 	 * At the end of round river, get the winners that have the best hand
 	 * 
 	 * @see <@links showDown>
@@ -706,6 +701,19 @@ public class Game implements Serializable, Observer {
 
 		return result;
 	}
+	
+	/**
+	 * At the end of round river, reward the winners by divide the total pot
+	 * between all the best players
+	 * 
+	 * @see <@links showDown>
+	 */
+	private void rewardTheWinners(List<Player> playerToReward) {
+		int potWinner = totalPot / playerToReward.size();
+
+		for (Player player : playerToReward)
+			player.reward(potWinner);
+	}
 
 	/**
 	 * Class Game is an observer, and informed when an event occurred in the
@@ -717,12 +725,19 @@ public class Game implements Serializable, Observer {
 		if (arg.equals("updateBlind")) {
 			updateBlind();
 		} else {
-			if (arg.equals("raise"))
-				lastRaisedPlayer = currentPlayer;
+			if (arg.equals("raise") || arg.equals("allIn"))
+				updateLastPlayerToPlay();
 		}
 	}
 
-	// Getters and the Setters
+	public void updateLastPlayerToPlay() {
+		if (currentPlayerInt == 0)
+			lastPlayerToPlay = players.size() - 1;
+		else
+			lastPlayerToPlay = (currentPlayerInt % players.size()) - 1;
+	}
+
+	// Getters and Setters
 	public Deck getDeck() {
 		return deck;
 	}
@@ -755,20 +770,24 @@ public class Game implements Serializable, Observer {
 		return gameLevel;
 	}
 
-	public int getCurrentPlayer() {
-		return currentPlayer;
+	public int getCurrentPlayerInt() {
+		return currentPlayerInt;
 	}
 
-	public int getDealer() {
-		return dealer;
+	public Player getCurrentPlayer() {
+		return players.get(currentPlayerInt);
 	}
 
-	public int getBigBlindPlayer() {
-		return bigBlindPlayer;
+	public int getDealerInt() {
+		return dealerPlayerInt;
 	}
 
-	public int getSmallBlindPlayer() {
-		return smallBlindPlayer;
+	public int getBigBlindPlayerInt() {
+		return bigBlindPlayerInt;
+	}
+
+	public int getSmallBlindPlayerInt() {
+		return smallBlindPlayerInt;
 	}
 
 	public int getTotalPot() {
@@ -783,6 +802,42 @@ public class Game implements Serializable, Observer {
 		return currentBet;
 	}
 
+	public int getLastPlayerToPlay() {
+		return lastPlayerToPlay;
+	}
+
+	public Player getDealerPlayer() {
+		return players.get(dealerPlayerInt);
+	}
+
+	public Player getSmallBlindPlayer() {
+		return players.get(smallBlindPlayerInt);
+	}
+
+	public Player getBigBlindPlayer() {
+		return players.get(bigBlindPlayerInt);
+	}
+	
+	public Player getAfterPlayer(Player player) {
+		int playerInt = this.players.indexOf(player);
+		if (playerInt == players.size() - 1)
+			return players.get(0);
+		else
+			return players.get((playerInt % players.size()) + 1);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getPrizePool() {
+		return prizePool;
+	}
+	
+	public List<Player> getPlayersRank() {
+		return playersRank;
+	}
+
 	public void setCurrentBet(int currentB) {
 		currentBet = currentB;
 	}
@@ -795,52 +850,12 @@ public class Game implements Serializable, Observer {
 		totalPot = totalP;
 	}
 
-	// FOR TEST ONLY
-	protected void setCurrentPlayer() {
-
+	public void setLastPlayerToPlay(int lrp) {
+		lastPlayerToPlay = lrp;
 	}
-
-	public Player getDealerP() {
-		return players.get(dealer);
-	}
-
-	public Player getSmallBlindP() {
-		return players.get(smallBlindPlayer);
-	}
-
-	public Player getBigBlindP() {
-		return players.get(bigBlindPlayer);
-	}
-
-	public Player currentPlayer() {
-		return players.get(currentPlayer);
-	}
-
-	/**
-	 * Used to inform client to the state of the game
-	 */
-	public String isFlop() {
-		if (currentRound == FLOP)
-			return "true";
-		return "false";
-	}
-
-	public String isTournant() {
-		if (currentRound == TOURNANT)
-			return "true";
-		return "false";
-	}
-
-	public String isRiver() {
-		if (currentRound == RIVER)
-			return "true";
-		return "false";
-	}
-
-	public String isShowDown() {
-		if (currentRound == SHOWDOWN)
-			return "true";
-		return "false";
+	
+	public void setCurrentPlayer(int cp) {
+		currentPlayerInt = cp;
 	}
 
 	public void setCurrentRound(int i) {
@@ -850,36 +865,103 @@ public class Game implements Serializable, Observer {
 	protected void setFlipedCards(List<Card> cards) {
 		flippedCards = cards;
 	}
+	
+	public void setSmallBlindPlayer(int i){
+		smallBlindPlayerInt = i;
+	}
+	
+	public void setBigBlindPlayer(int i){
+		bigBlindPlayerInt = i;
+	}
 
+	/**
+	 * Used to inform client to the state of the game
+	 */
+	public void setAsReady() {
+		status = READY_TO_START;
+	}
+	
+	/**
+	 * Verify if a game is ready to begin if it reaches the number of player
+	 * 
+	 * @see playerNumber in class Parameters
+	 */
+	public boolean isReadyToStart() {
+
+		if (players.size() == gameType.getPlayerNumber())
+			return true;
+
+		return false;
+	}	
+	
+	/**
+	 * Verify if a game is at flop
+	 */
+	public String isFlop() {
+		if (currentRound == FLOP)
+			return "true";
+		return "false";
+	}
+
+	/**
+	 * Verify if a game is at tournant
+	 */
+	public String isTournant() {
+		if (currentRound == TOURNANT)
+			return "true";
+		return "false";
+	}
+
+	/**
+	 * Verify if a game is at river
+	 */
+	public String isRiver() {
+		if (currentRound == RIVER)
+			return "true";
+		return "false";
+	}
+
+	/**
+	 * Verify if a game is at showDown
+	 */
+	public String isShowDown() {
+		if (currentRound == SHOWDOWN)
+			return "true";
+		return "false";
+	}
+
+	/**
+	 * Verify if a game is ended
+	 */
 	public boolean isEnded() {
 		return status == ENDED;
 	}
 
+	/**
+	 * Verify if a game is ready to start
+	 */
 	public boolean isReady() {
 		return status == READY_TO_START;
 	}
 
-	public void setAsReady() {
-		status = READY_TO_START;
-	}
-
+	/**
+	 * Verify if a game is started
+	 */
 	public boolean isStarted() {
 		return status == STARTED;
 	}
 
+	/**
+	 * Verify if a game is waiting
+	 */
 	public boolean isWaiting() {
 		return status == WAITING;
 	}
 
+	/**
+	 * Verify if a game is ended
+	 */
 	public boolean isGameEnded() {
 		return status == ENDED;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public int getPrizePool() {
-		return prizePool;
 	}
 }

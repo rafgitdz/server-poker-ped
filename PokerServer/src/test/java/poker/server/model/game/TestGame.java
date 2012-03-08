@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
+import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
@@ -51,8 +53,23 @@ public class TestGame {
 
 		flipedCards = new ArrayList<Card>();
 	}
+	
+	@Test
+	public void testNewGame() {
+		assertEquals(game.getCurrentBet(), 0);
+		assertEquals(game.getCurrentPot(), 0);
+		assertEquals(game.getTotalPot(), 0);
+	}
+	
+	@Test
+	public void testNewGameParameters() {
+		Game gameParameters;
+		Parameters params = new SitAndGo();
+		gameParameters = gameFactory.newGame(params);
+		
+		assertEquals(params, gameParameters.getGameType());
+	}
 
-	// EVENT
 	@Test
 	public void testEvent() {
 		game.dealCards();
@@ -61,32 +78,23 @@ public class TestGame {
 		events.add("DEAL CARDS FOR PLAYERS");
 		assertEquals(events, Event.getEvents());
 	}
-
-	// DEAL CARD / ROUND
-
+	
 	@Test
-	public void testResetPlayers() {
-
+	public void testAddPlayer() {
 		game.add(player1);
-		game.add(player2);
-		game.add(player3);
-		game.add(player4);
-		game.add(player5);
-
-		game.start();
-		player4.setAsDealer();
-		player4.fold();
-
-		player5.setAsSmallBlind();
-		player5.fold();
-
-		game.resetPlayers();
-
-		assertEquals(player4.isRegular(), true);
-		assertEquals(player4.isRegular(), true);
-
-		assertEquals(player5.isfolded(), false);
-		assertEquals(player5.isfolded(), false);
+		
+		assertEquals(1, game.players.size());
+		assertEquals(game.getName(), game.players.get(0).getGame().getName());
+		assertEquals(true, game.players.get(0).isInGame());
+	}
+	
+	@Test
+	public void testRemovePlayer() {
+		game.add(player1);		
+		assertEquals(1, game.players.size());
+		
+		game.remove(player1);
+		assertEquals(0, game.players.size());
 	}
 
 	@Test
@@ -97,7 +105,7 @@ public class TestGame {
 		game.add(player4);
 		game.add(player5);
 
-		game.setPlayerRoles();
+		game.start();
 
 		assertEquals(player1.isDealer(), true);
 		assertEquals(player2.isSmallBlind(), true);
@@ -105,13 +113,103 @@ public class TestGame {
 		assertEquals(player4.isRegular(), true);
 		assertEquals(player5.isRegular(), true);
 	}
-
+	
 	@Test(expected = GameException.class)
 	public void testSetPlayerRolesNotEnough() {
 		game.add(player1);
 		game.add(player2);
 
-		game.setPlayerRoles();
+		game.start();
+	}
+	
+	@Test
+	public void testInitPlayersTokens() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		assertEquals(game.getGameType().getTokens(), player1.getCurrentTokens());
+		assertEquals(game.getGameType().getTokens() - game.getGameType().getSmallBlind(), player2.getCurrentTokens() - smallBlind);
+		assertEquals(game.getGameType().getTokens() - game.getGameType().getBigBlind(), player3.getCurrentTokens() - bigBlind);
+		assertEquals(game.getGameType().getTokens(), player4.getCurrentTokens());
+		assertEquals(game.getGameType().getTokens(), player5.getCurrentTokens());
+	}
+	
+	@Test
+	public void testFixPrizePool() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		int expectedPrizePool = game.getGameType().getPlayerNumber() * game.getGameType().getBuyIn();
+		assertEquals(expectedPrizePool, game.getPrizePool());
+	}
+	
+	@Test
+	public void testSetPrizeForPlayer() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		game.getPlayersRank().add(player1);
+		game.getPlayersRank().add(player2);
+		game.getPlayersRank().add(player3);
+		
+		int prizePool = game.getGameType().getPlayerNumber() * game.getGameType().getBuyIn();
+		int expectedPrize1 = (prizePool * game.getGameType().getPotSplit().get(0)) / 100;
+		int expectedPrize2 = (prizePool * game.getGameType().getPotSplit().get(1)) / 100;
+		int expectedPrize3 = (prizePool * game.getGameType().getPotSplit().get(2)) / 100;	
+
+		game.setPrizeForPlayers();
+		
+		assertEquals(expectedPrize1, player1.getMoney());
+		assertEquals(expectedPrize2, player2.getMoney());
+		assertEquals(expectedPrize3, player3.getMoney());
+	}
+	
+	@Test
+	public void testSetPlayersInGame() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		assertEquals(true, player1.isInGame());
+		assertEquals(true, player2.isInGame());
+		assertEquals(true, player3.isInGame());
+		assertEquals(true, player4.isInGame());
+		assertEquals(true, player5.isInGame());
+	}
+	
+	@Test
+	public void testSetInitBetGame() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		int expectedCurrentPot = game.getGameType().getBigBlind() + game.getGameType().getSmallBlind();
+		
+		assertEquals(game.getGameType().getBigBlind(), game.getBigBlind());
+		assertEquals(expectedCurrentPot, game.getCurrentPot());
 	}
 
 	@Test
@@ -119,121 +217,21 @@ public class TestGame {
 		game.add(player1);
 		game.add(player2);
 
+		int expectedFullDeckCard = 52;
+		assertEquals(expectedFullDeckCard, game.getDeck().getCards().size());
+			
 		game.dealCards();
+		
+		int expectedDeckAfterDealCard = expectedFullDeckCard - (game.getPlayers().size() * 2);
 
-		assertEquals(game.getDeck().getCards().size(), 48);
-		assertEquals(player1.getCurrentHand().getSize(), 2);
-		assertEquals(player2.getCurrentHand().getSize(), 2);
-	}
-
-	@Test
-	// the burnCard test is included in this test
-	public void testRoundsGame() {
-
-		game.flop();
-		game.tournant();
-		game.river();
-		int expected2 = 44;
-		assertEquals(expected2, game.getDeck().getCards().size());
-	}
-
-	// POT / BET
-
-	private void saveTestValues() {
-
-		gameTotalPot = game.getTotalPot();
-		gameCurrentPot = game.getCurrentPot();
-		gameCurrentBet = game.getCurrentBet();
-
-		smallBlind = game.getSmallBlind();
-		bigBlind = game.getBigBlind();
-	}
-
-	@Test
-	public void testUpdateSmallBlind() {
-		int multFactor = game.getGameType().getMultFactor();
-		saveTestValues();
-
-		game.updateBlind();
-		assertEquals(smallBlind * multFactor, game.getSmallBlind());
-	}
-
-	@Test
-	public void testUpdateBigBlind() {
-		int multFactor = game.getGameType().getMultFactor();
-		saveTestValues();
-
-		game.updateBlind();
-		assertEquals(bigBlind * multFactor, game.getBigBlind());
-	}
-
-	@Test
-	public void testResetCurrentPot() {
-
-		game.setCurrentBet(30);
-		game.setCurrentPot(10);
-		game.updateRoundPotAndBets();
-		assertEquals(0, game.getCurrentBet());
-		assertEquals(0, game.getCurrentPot());
-	}
-
-	@Test
-	public void testResetPlayerBets() {
-		game.add(player1);
-		game.add(player2);
-		game.add(player3);
-
-		player1.setCurrentBet(30);
-		player2.setCurrentBet(20);
-		player3.setCurrentBet(50);
-
-		game.updateRoundPotAndBets();
+		assertEquals(expectedDeckAfterDealCard, game.getDeck().getCards().size());
+		assertEquals(0, game.getFlipedCards().size());
 
 		for (Player p : game.getPlayers()) {
-			assertEquals(p.getCurrentBet(), 0);
+			assertEquals(2, p.getCurrentHand().getCards().size());
 		}
 	}
-
-	@Test
-	public void testUpdateCurrentPot() {
-
-		game.setCurrentPot(10);
-		saveTestValues();
-
-		int quantity = 30;
-		game.updateCurrentPot(quantity);
-		assertEquals(gameCurrentPot + quantity, game.getCurrentPot());
-	}
-
-	@Test
-	public void testUpdateTotalPot() {
-
-		game.setTotalPot(10);
-		game.setCurrentPot(20);
-		saveTestValues();
-		game.updateRoundPotAndBets();
-
-		assertEquals(0, game.getCurrentPot());
-	}
-
-	@Test
-	public void testUpdateCurrentBet() {
-
-		game.setCurrentBet(10);
-		saveTestValues();
-		int quantity = 30;
-		game.updateCurrentBet(quantity);
-
-		assertEquals(gameCurrentBet + quantity, game.getCurrentBet());
-	}
-
-	@Test
-	public void testUpdateBlind() {
-		assertEquals(10, game.getSmallBlind());
-		game.updateBlind();
-		assertEquals(20, game.getSmallBlind());
-	}
-
+	
 	@Test
 	public void testCleanTable() {
 
@@ -258,6 +256,31 @@ public class TestGame {
 
 		expected = 1;
 		assertEquals(expected, game.getPlayers().size());
+	}
+	
+	@Test
+	public void testResetPlayers() {
+
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+
+		game.start();
+		player4.setAsDealer();
+		player4.fold();
+
+		player5.setAsSmallBlind();
+		player5.fold();
+
+		game.resetPlayers();
+
+		assertEquals(player4.isRegular(), true);
+		assertEquals(player4.isRegular(), true);
+
+		assertEquals(player5.isfolded(), false);
+		assertEquals(player5.isfolded(), false);
 	}
 
 	@Test(expected = GameException.class)
@@ -299,8 +322,306 @@ public class TestGame {
 		Map<String, Integer> expectedWinners = game.showDown();
 		assertEquals(expectedWinners, actifWinners);
 	}
+	
+	@Test 
+	public void testVerifyIsMyTurn() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+				
+		game.verifyIsMyTurn(player4);
+	}
+	
+	@Test(expected = GameException.class)
+	public void testFailVerifyIsMyTurn() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+				
+		game.verifyIsMyTurn(player3);
+	}
+
+	@Test
+	public void testNextPlayer() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		assertEquals(player4, game.getCurrentPlayer());
+		
+		game.nextPlayer();	
+		assertEquals(player5, game.getCurrentPlayer());
+		
+		game.nextPlayer();
+		assertEquals(player1, game.getCurrentPlayer());	
+	}
+	
+	@Test
+	public void testNextPlayerFolded() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		assertEquals(player4, game.getCurrentPlayer());
+		
+		player5.setAsFolded();
+		game.nextPlayer();
+		
+		assertEquals(player1, game.getCurrentPlayer());		
+	}
+	
+	@Test
+	public void testNextPlayerNoTokens() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		assertEquals(player4, game.getCurrentPlayer());
+		
+		player5.setCurrentTokens(0);
+		game.nextPlayer();
+		
+		assertEquals(player1, game.getCurrentPlayer());		
+	}
+	
+	@Test
+	public void testNextPlayerVerifyBetFalse() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		player1.setCurrentBet(30);
+		player2.setCurrentBet(20);
+		player3.setCurrentBet(20);
+		player4.setCurrentBet(20);
+		player5.setCurrentBet(20);
+	
+		assertEquals(player4, game.getCurrentPlayer());
+		assertEquals(player3, game.players.get(game.getLastPlayerToPlay()));
+
+		game.nextPlayer();	
+		assertEquals(player5, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(player1, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(player2, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(player3, game.getCurrentPlayer());	
+		
+		game.nextPlayer();
+		assertEquals(player4, game.getCurrentPlayer());		
+	}
+	
+	@Test
+	public void testNextPlayerIsMissing() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		assertEquals(player4, game.getCurrentPlayer());
+		
+		player5.setAsMissing();
+		game.nextPlayer();
+		
+		assertEquals(player1, game.getCurrentPlayer());		
+	}
+
+	@Test
+	public void testNextPlayerLastPlayer() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		player1.setCurrentBet(20);
+		player2.setCurrentBet(20);
+		player3.setCurrentBet(20);
+		player4.setCurrentBet(20);
+		player5.setCurrentBet(20);
+	
+		assertEquals(player4, game.getCurrentPlayer());
+		assertEquals(player3, game.players.get(game.getLastPlayerToPlay()));
+
+		game.nextPlayer();	
+		assertEquals(player5, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(player1, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(player2, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(player3, game.getCurrentPlayer());	
+		
+		game.nextPlayer();
+		assertEquals(game.getSmallBlindPlayer(), game.getCurrentPlayer());	
+	}
+	
+	@Test
+	public void testNextPlayerToStart() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+		
+		game.start();
+		
+		player1.setAsRegular();
+		player2.setAsDealer();
+		player3.setAsSmallBlind();
+		player4.setAsBigBlind();
+		
+		game.setLastPlayerToPlay(3);
+		game.setCurrentPlayer(4);
+		
+		player1.setCurrentBet(20);
+		player2.setCurrentBet(20);
+		player3.setAsFolded();
+		player4.setCurrentBet(20);
+		player5.setAsFolded();
+		
+		assertEquals(0, game.getCurrentRound());
+		assertEquals(player4, game.players.get(game.getLastPlayerToPlay()));	
+		assertEquals(player5, game.getCurrentPlayer());
+		
+		game.nextPlayer();	
+		assertEquals(player1, game.getCurrentPlayer());	
+		
+		game.nextPlayer();	
+		assertEquals(player2, game.getCurrentPlayer());	
+		
+		game.nextPlayer();	
+		assertEquals(player4, game.getCurrentPlayer());		
+		
+		game.nextPlayer();	
+		assertEquals(1, game.getCurrentRound());
+		assertEquals(player4, game.getCurrentPlayer());	
+		player4.setAsFolded();
+		
+		game.nextPlayer();	
+		assertEquals(player1, game.getCurrentPlayer());
+		
+		game.nextPlayer();
+		assertEquals(player2, game.getCurrentPlayer());	
+		
+		game.nextPlayer();
+		assertEquals(2, game.getCurrentRound());
+		assertEquals(player1, game.getCurrentPlayer());	
+	}
+	
+	// POT / BET		
+	@Test
+	public void testUpdateCurrentPotAndBets() {
+
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		
+		game.setTotalPot(50);
+		game.setCurrentPot(10);	
+		game.setCurrentBet(30);	
+		player1.setCurrentBet(30);
+		player2.setCurrentBet(20);
+		player3.setCurrentBet(50);
+		
+		game.updateRoundPotAndBets();
+		
+		assertEquals(0, game.getCurrentBet());
+		assertEquals(0, game.getCurrentPot());
+		assertEquals(60, game.getTotalPot());
+		
+		for (Player p : game.getPlayers()) {
+			assertEquals(0, p.getCurrentBet());
+		}
+		
+		game.setCurrentRound(4);
+		game.updateRoundPotAndBets();
+		
+		assertEquals(0, game.getTotalPot());
+	}
+	
+	@Test
+	public void testUpdateBlind() {
+		int expectedSmallBlindBefore = game.getGameType().getSmallBlind();
+		int expectedBigBlindBefore = game.getGameType().getBigBlind();
+		
+		assertEquals(expectedSmallBlindBefore, game.getSmallBlind());
+		assertEquals(expectedBigBlindBefore, game.getBigBlind());
+		
+		game.updateBlind();
+		
+		int expectedSmallBlind = expectedSmallBlindBefore * game.getGameType().getMultFactor();
+		int expectedBigBlind = expectedBigBlindBefore * game.getGameType().getMultFactor();
+
+		assertEquals(expectedSmallBlind, game.getSmallBlind());
+		assertEquals(expectedBigBlind, game.getBigBlind());
+	}
+	
+	@Test
+	public void testUpdateCurrentPot() {
+
+		game.setCurrentPot(10);
+		saveTestValues();
+
+		int quantity = 30;
+		game.updateCurrentPot(quantity);
+		assertEquals(gameCurrentPot + quantity, game.getCurrentPot());
+	}
+
+	@Test
+	public void testUpdateCurrentBet() {
+
+		game.setCurrentBet(10);
+		saveTestValues();
+		int quantity = 30;
+		game.updateCurrentBet(quantity);
+
+		assertEquals(gameCurrentBet + quantity, game.getCurrentBet());
+	}
 
 	// PRIVATE METHODS TO BES USED IN TEST
+	private void saveTestValues() {
+
+		gameTotalPot = game.getTotalPot();
+		gameCurrentPot = game.getCurrentPot();
+		gameCurrentBet = game.getCurrentBet();
+
+		smallBlind = game.getSmallBlind();
+		bigBlind = game.getBigBlind();
+	}
+	
 	private void addCards(Player player, Card card1, Card card2) {
 		player.addCard(card1);
 		player.addCard(card2);

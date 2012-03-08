@@ -221,6 +221,29 @@ public class TestPlayer {
 		saveTestValues();
 		player.check();
 	}
+	
+	// BUY IN
+	@Test
+	public void testBuyIn() {
+		Player playerBuyIn = new Player("test", "test");
+		int expectedMoney = 50;
+		assertEquals(expectedMoney, playerBuyIn.getMoney());
+		
+		game.add(playerBuyIn);
+		
+		expectedMoney = 50 - game.getGameType().getBuyIn();
+		assertEquals(expectedMoney, playerBuyIn.getMoney());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testBuyInNotEnough() {
+		Player playerBuyIn = new Player("test", "test");
+		playerBuyIn.setMoney(5);
+		int expectedMoney = playerBuyIn.getMoney();
+		assertEquals(expectedMoney, playerBuyIn.getMoney());
+
+		game.add(playerBuyIn);
+	}
 
 	// CONNECT/DISCONNECT (IN SERVICE ==> TO BE REMOVED IN THE MODEL)
 	// @Test
