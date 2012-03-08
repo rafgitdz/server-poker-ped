@@ -120,6 +120,34 @@ public class PlayerService {
 	}
 
 	/**
+	 * Executes the allIn action for player with the name given as parameter
+	 */
+	@GET
+	@Path("/missing/{name}")
+	public JSONObject missing(@PathParam("name") String name) {
+
+		JSONObject json = new JSONObject();
+		Player player = getPlayer(name);
+		player.setAsMissing();
+		repositoryPlayer.update(player);
+		return json;
+	}
+
+	/**
+	 * Executes the allIn action for player with the name given as parameter
+	 */
+	@GET
+	@Path("/reconnect/{name}")
+	public JSONObject reconnect(@PathParam("name") String name) {
+
+		JSONObject json = new JSONObject();
+		Player player = getPlayer(name);
+		player.setInGame();
+		repositoryPlayer.update(player);
+		return json;
+	}
+
+	/**
 	 * Returns the player if he exists, launch an exception otherwise
 	 */
 	private boolean isPlayerInGame(JSONObject json, Player player) {

@@ -85,6 +85,9 @@ public class Game implements Serializable, Observer {
 	private int currentBet;
 	private int prizePool;
 
+	@SuppressWarnings("unused")
+	private int ante;
+
 	private int currentRound;
 
 	private int gameLevel;
@@ -125,7 +128,6 @@ public class Game implements Serializable, Observer {
 		totalPot = 0;
 		currentPot = 0;
 		currentBet = 0;
-		prizePool = 0;
 		currentRound = 0;
 		gameLevel = 0;
 		deck = new Deck();
@@ -134,6 +136,7 @@ public class Game implements Serializable, Observer {
 		playersRank = new ArrayList<Player>();
 		smallBlind = gameType.getSmallBlind();
 		bigBlind = gameType.getBigBlind();
+		fixPrizePool();
 		status = WAITING;
 		Event.buildEvents();
 	}
@@ -332,6 +335,7 @@ public class Game implements Serializable, Observer {
 	 * Method go to the next round and verify if is the end of the game
 	 */
 	private void nextRoundTasks() {
+
 		cleanTable();
 		resetPlayers();
 		nextDealer();
@@ -530,7 +534,6 @@ public class Game implements Serializable, Observer {
 		int money = player.getMoney() - this.getGameType().getBuyIn();
 		player.setMoney(money);
 		player.setGame(this);
-		player.setInGame();
 	}
 
 	/**
