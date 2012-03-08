@@ -143,10 +143,10 @@ public class GameService {
 				currentGame.start();
 
 				updateJSON(json, "startGame", true);
-				updateJSON(json, "dealer", currentGame.getDealerP().getName());
-				updateJSON(json, "smallBlind", currentGame.getSmallBlindP()
+				updateJSON(json, "dealer", currentGame.getDealerPlayer().getName());
+				updateJSON(json, "smallBlind", currentGame.getSmallBlindPlayer()
 						.getName());
-				updateJSON(json, "bigBlind", currentGame.getBigBlindP()
+				updateJSON(json, "bigBlind", currentGame.getBigBlindPlayer()
 						.getName());
 
 			} else if (currentGame.isStarted()) {

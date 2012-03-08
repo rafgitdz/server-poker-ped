@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import poker.server.model.exception.GameException;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactory;
@@ -242,7 +241,7 @@ public class TestPlayer {
 		playerBuyIn.setMoney(5);
 		int expectedMoney = playerBuyIn.getMoney();
 		assertEquals(expectedMoney, playerBuyIn.getMoney());
-		
+
 		game.add(playerBuyIn);
 	}
 

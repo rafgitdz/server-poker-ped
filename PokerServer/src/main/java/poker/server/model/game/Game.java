@@ -72,10 +72,10 @@ public class Game implements Serializable, Observer {
 	private transient Deck deck;
 	private transient List<Card> flippedCards;
 
-	private int currentPlayer;
-	private int dealer;
-	private int smallBlindPlayer;
-	private int bigBlindPlayer;
+	private int currentPlayerInt;
+	private int dealerPlayerInt;
+	private int smallBlindPlayerInt;
+	private int bigBlindPlayerInt;
 
 	private int smallBlind;
 	private int bigBlind;
@@ -121,10 +121,10 @@ public class Game implements Serializable, Observer {
 	private void buildGame() {
 
 		name = GENERATED_NAME + UUID.randomUUID().toString();
-		currentPlayer = 0;
-		dealer = -1;
-		smallBlindPlayer = -1;
-		bigBlindPlayer = -1;
+		currentPlayerInt = 0;
+		dealerPlayerInt = -1;
+		smallBlindPlayerInt = -1;
+		bigBlindPlayerInt = -1;
 		totalPot = 0;
 		currentPot = 0;
 		currentBet = 0;
@@ -173,11 +173,11 @@ public class Game implements Serializable, Observer {
 			players.get(1).setAsSmallBlind();
 			players.get(2).setAsBigBlind();
 
-			dealer = 0;
-			smallBlindPlayer = 1;
-			bigBlindPlayer = 2;
-			currentPlayer = 3;
-			lastPlayerToPlay = bigBlindPlayer;
+			dealerPlayerInt = 0;
+			smallBlindPlayerInt = 1;
+			bigBlindPlayerInt = 2;
+			currentPlayerInt = 3;
+			lastPlayerToPlay = bigBlindPlayerInt;
 		}
 	}
 
@@ -220,8 +220,8 @@ public class Game implements Serializable, Observer {
 
 		currentBet = bigBlind;
 		currentPot = smallBlind + bigBlind;
-		players.get(smallBlindPlayer).updateToken(smallBlind);
-		players.get(bigBlindPlayer).updateToken(bigBlind);
+		players.get(smallBlindPlayerInt).updateToken(smallBlind);
+		players.get(bigBlindPlayerInt).updateToken(bigBlind);
 	}
 
 	/**
@@ -310,9 +310,10 @@ public class Game implements Serializable, Observer {
 		List<Player> currentPlayers = currentPlayerInRound();
 
 		if (currentPlayers.size() == 1) {
-			currentPlayers.get(0).reward(currentPot);
+			currentPlayers.get(0).reward(currentPot + totalPot);
 			currentRound = SHOWDOWN;
 			nextRoundTasks();
+			currentRound = 0;
 		}
 		else if (currentRound == RIVER) {
 			currentRound++;
@@ -338,9 +339,9 @@ public class Game implements Serializable, Observer {
 
 		cleanTable();
 		resetPlayers();
-		nextDealer();
-		nextBigBlind();
-		nextSmallBlind();
+		nextDealerPlayer();
+		nextSmallBlindPlayer();
+		nextBigBlindPlayer();
 		updateRoundPotAndBets();
 
 		if (players.size() == 1) {
@@ -383,51 +384,53 @@ public class Game implements Serializable, Observer {
 	 * For each round, set the next dealer by increment the index, the right
 	 * position of the old dealer
 	 */
-	private void nextDealer() {
-		if (dealer == players.size() - 1)
-			dealer = 0;
+	private void nextDealerPlayer() {
+		if (dealerPlayerInt == players.size() - 1)
+			dealerPlayerInt = 0;
 		else
-			dealer = (dealer % players.size()) + 1;
+			dealerPlayerInt = (dealerPlayerInt % players.size()) + 1;
 
-		lastPlayerToPlay = dealer;
+		lastPlayerToPlay = dealerPlayerInt;
 
-		Player dealer = players.get(this.dealer);
-		dealer.setAsDealer();
+		Player dealerPlayer = players.get(this.dealerPlayerInt);
+		dealerPlayer.setAsDealer();
 
-		Event.addEvent("THE DEALER IS : " + dealer.getName());
+		Event.addEvent("THE DEALER IS : " + dealerPlayer.getName());
 	}
 
 	/**
 	 * For each round, set the next bigBlind by increment the index, the right
 	 * position of the old bigBlind
 	 */
-	private void nextBigBlind() {
+	private void nextBigBlindPlayer() {
 
-		if (bigBlind == players.size() - 1)
-			bigBlind = 0;
+		if (bigBlindPlayerInt == players.size() - 1)
+			bigBlindPlayerInt = 0;
 		else
-			bigBlind = (bigBlind % players.size()) + 1;
-		Player bigBlind = players.get(bigBlindPlayer);
-		bigBlind.setAsBigBlind();
+			bigBlindPlayerInt = (bigBlindPlayerInt % players.size()) + 1;
+		
+		Player bigBlindPlayer = players.get(bigBlindPlayerInt);
+		bigBlindPlayer.setAsBigBlind();
 
-		Event.addEvent("THE BIG BLIND IS : " + bigBlind.getName());
+		Event.addEvent("THE BIG BLIND IS : " + bigBlindPlayer.getName());
 	}
 
 	/**
 	 * For each round, set the next samllBlind by increment the index, the right
 	 * position of the old smallBlind
 	 */
-	private void nextSmallBlind() {
+	private void nextSmallBlindPlayer() {
 
-		if (smallBlind == players.size() - 1)
-			smallBlind = 0;
+		if (smallBlindPlayerInt == players.size() - 1)
+			smallBlindPlayerInt = 0;
 		else
-			smallBlind = (smallBlind % players.size()) + 1;
+			smallBlindPlayerInt = (smallBlindPlayerInt % players.size()) + 1;
 
-		Player smallBlind = players.get(smallBlindPlayer);
-		smallBlind.setAsSmallBlind();
+		Player smallBlindPlayer = players.get(smallBlindPlayerInt);
+		smallBlindPlayer.setAsSmallBlind();
+		currentPlayerInt = smallBlindPlayerInt;
 
-		Event.addEvent("THE SMALL BLIND IS : " + smallBlind.getName());
+		Event.addEvent("THE SMALL BLIND IS : " + smallBlindPlayer.getName());
 	}
 
 	/**
@@ -521,7 +524,7 @@ public class Game implements Serializable, Observer {
 	 */
 	public void verifyIsMyTurn(Player player) {
 
-		if (currentPlayer != players.indexOf(player))
+		if (currentPlayerInt != players.indexOf(player))
 			throw new GameException(NOT_YOUR_TURN + player.getName());
 	}
 
@@ -529,11 +532,9 @@ public class Game implements Serializable, Observer {
 	 * After each connection of player, add it to the only one non-ready game
 	 */
 	public void add(Player player) {
-		players.add(player);
-		/*int money = player.getMoney() - this.getGameType().getBuyIn();
-		player.setMoney(money);*/
-		player.setInGame();
+		players.add(player);	
 		player.setGame(this);
+		player.setInGame();
 	}
 
 	/**
@@ -549,30 +550,30 @@ public class Game implements Serializable, Observer {
 	 * current player
 	 */
 	public void nextPlayer() {
-		if ((currentPlayer == lastPlayerToPlay) && verifyBet()) {
-			currentPlayer = smallBlindPlayer;
+		if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
+			currentPlayerInt = smallBlindPlayerInt;
 			nextPlayerToStart();		
 			nextRound();
 		} else {
-			if (currentPlayer == players.size() - 1)
-				currentPlayer = 0;
+			if (currentPlayerInt == players.size() - 1)
+				currentPlayerInt = 0;
 			else
-				currentPlayer = (currentPlayer % players.size()) + 1;
-			if (players.get(currentPlayer).isfolded() || players.get(currentPlayer).getCurrentTokens() == 0 || players.get(currentPlayer).isMissing()) {
+				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
+			if (players.get(currentPlayerInt).isfolded() || players.get(currentPlayerInt).getCurrentTokens() == 0 || players.get(currentPlayerInt).isMissing()) {
 				nextPlayer();
 			}
 		}
 	}
 
 	private void nextPlayerToStart(){
-		if(players.get(currentPlayer).isfolded()){
-			if (currentPlayer == players.size() - 1){
-				currentPlayer = 0;
+		if(players.get(currentPlayerInt).isfolded()){
+			if (currentPlayerInt == players.size() - 1){
+				currentPlayerInt = 0;
 				lastPlayerToPlay = players.size() - 1;
 			}			
 			else{
-				lastPlayerToPlay = currentPlayer;
-				currentPlayer = (currentPlayer % players.size()) + 1;
+				lastPlayerToPlay = currentPlayerInt;
+				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
 			}
 			nextPlayerToStart();
 		}
@@ -730,10 +731,10 @@ public class Game implements Serializable, Observer {
 	}
 
 	public void updateLastPlayerToPlay() {
-		if (currentPlayer == 0)
+		if (currentPlayerInt == 0)
 			lastPlayerToPlay = players.size() - 1;
 		else
-			lastPlayerToPlay = (currentPlayer % players.size()) - 1;
+			lastPlayerToPlay = (currentPlayerInt % players.size()) - 1;
 	}
 
 	// Getters and Setters
@@ -769,24 +770,24 @@ public class Game implements Serializable, Observer {
 		return gameLevel;
 	}
 
-	public int getIntCurrentPlayer() {
-		return currentPlayer;
+	public int getCurrentPlayerInt() {
+		return currentPlayerInt;
 	}
 
 	public Player getCurrentPlayer() {
-		return players.get(currentPlayer);
+		return players.get(currentPlayerInt);
 	}
 
-	public int getDealer() {
-		return dealer;
+	public int getDealerInt() {
+		return dealerPlayerInt;
 	}
 
-	public int getBigBlindPlayer() {
-		return bigBlindPlayer;
+	public int getBigBlindPlayerInt() {
+		return bigBlindPlayerInt;
 	}
 
-	public int getSmallBlindPlayer() {
-		return smallBlindPlayer;
+	public int getSmallBlindPlayerInt() {
+		return smallBlindPlayerInt;
 	}
 
 	public int getTotalPot() {
@@ -805,16 +806,24 @@ public class Game implements Serializable, Observer {
 		return lastPlayerToPlay;
 	}
 
-	public Player getDealerP() {
-		return players.get(dealer);
+	public Player getDealerPlayer() {
+		return players.get(dealerPlayerInt);
 	}
 
-	public Player getSmallBlindP() {
-		return players.get(smallBlindPlayer);
+	public Player getSmallBlindPlayer() {
+		return players.get(smallBlindPlayerInt);
 	}
 
-	public Player getBigBlindP() {
-		return players.get(bigBlindPlayer);
+	public Player getBigBlindPlayer() {
+		return players.get(bigBlindPlayerInt);
+	}
+	
+	public Player getAfterPlayer(Player player) {
+		int playerInt = this.players.indexOf(player);
+		if (playerInt == players.size() - 1)
+			return players.get(0);
+		else
+			return players.get((playerInt % players.size()) + 1);
 	}
 
 	public String getName() {
@@ -846,7 +855,7 @@ public class Game implements Serializable, Observer {
 	}
 	
 	public void setCurrentPlayer(int cp) {
-		currentPlayer = cp;
+		currentPlayerInt = cp;
 	}
 
 	public void setCurrentRound(int i) {
@@ -858,11 +867,11 @@ public class Game implements Serializable, Observer {
 	}
 	
 	public void setSmallBlindPlayer(int i){
-		smallBlindPlayer = i;
+		smallBlindPlayerInt = i;
 	}
 	
 	public void setBigBlindPlayer(int i){
-		bigBlindPlayer = i;
+		bigBlindPlayerInt = i;
 	}
 
 	/**

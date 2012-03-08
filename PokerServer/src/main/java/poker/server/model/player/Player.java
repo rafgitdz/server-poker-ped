@@ -126,7 +126,6 @@ public class Player extends Observable implements Serializable {
 			game.updateCurrentPot(necessaryTokens);
 			currentTokens -= necessaryTokens;
 			currentBet += necessaryTokens;
-			//game.setLastPlayerToPlay(game.getCurrentPlayer());
 		}
 		setChanged();
 		game.update(this, "raise"); // inform the game that a player raises

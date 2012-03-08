@@ -54,16 +54,22 @@ public class TestGame {
 		flipedCards = new ArrayList<Card>();
 	}
 	
-	/*@Test
+	@Test
+	public void testNewGame() {
+		assertEquals(game.getCurrentBet(), 0);
+		assertEquals(game.getCurrentPot(), 0);
+		assertEquals(game.getTotalPot(), 0);
+	}
+	
+	@Test
 	public void testNewGameParameters() {
 		Game gameParameters;
 		Parameters params = new SitAndGo();
 		gameParameters = gameFactory.newGame(params);
 		
 		assertEquals(params, gameParameters.getGameType());
-	}*/
+	}
 
-	// EVENT
 	@Test
 	public void testEvent() {
 		game.dealCards();
@@ -91,7 +97,6 @@ public class TestGame {
 		assertEquals(0, game.players.size());
 	}
 
-	// DEAL CARD / ROUND
 	@Test
 	public void testSetPlayerRoles() {
 		game.add(player1);
@@ -212,11 +217,19 @@ public class TestGame {
 		game.add(player1);
 		game.add(player2);
 
+		int expectedFullDeckCard = 52;
+		assertEquals(expectedFullDeckCard, game.getDeck().getCards().size());
+			
 		game.dealCards();
+		
+		int expectedDeckAfterDealCard = expectedFullDeckCard - (game.getPlayers().size() * 2);
 
-		assertEquals(game.getDeck().getCards().size(), 48);
-		assertEquals(player1.getCurrentHand().getSize(), 2);
-		assertEquals(player2.getCurrentHand().getSize(), 2);
+		assertEquals(expectedDeckAfterDealCard, game.getDeck().getCards().size());
+		assertEquals(0, game.getFlipedCards().size());
+
+		for (Player p : game.getPlayers()) {
+			assertEquals(2, p.getCurrentHand().getCards().size());
+		}
 	}
 	
 	@Test
@@ -472,7 +485,7 @@ public class TestGame {
 		assertEquals(player3, game.getCurrentPlayer());	
 		
 		game.nextPlayer();
-		assertEquals(game.getSmallBlindP(), game.getCurrentPlayer());	
+		assertEquals(game.getSmallBlindPlayer(), game.getCurrentPlayer());	
 	}
 	
 	@Test
