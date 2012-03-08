@@ -54,14 +54,14 @@ public class TestGame {
 		flipedCards = new ArrayList<Card>();
 	}
 	
-	@Test
+	/*@Test
 	public void testNewGameParameters() {
 		Game gameParameters;
 		Parameters params = new SitAndGo();
 		gameParameters = gameFactory.newGame(params);
 		
 		assertEquals(params, gameParameters.getGameType());
-	}
+	}*/
 
 	// EVENT
 	@Test

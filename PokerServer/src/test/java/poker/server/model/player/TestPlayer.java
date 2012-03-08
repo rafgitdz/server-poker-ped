@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import poker.server.model.exception.GameException;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactory;
@@ -233,6 +234,16 @@ public class TestPlayer {
 		
 		expectedMoney = 50 - game.getGameType().getBuyIn();
 		assertEquals(expectedMoney, playerBuyIn.getMoney());
+	}
+	
+	@Test(expected = PlayerException.class)
+	public void testBuyInNotEnough() {
+		Player playerBuyIn = new Player("test", "test");
+		playerBuyIn.setMoney(5);
+		int expectedMoney = playerBuyIn.getMoney();
+		assertEquals(expectedMoney, playerBuyIn.getMoney());
+		
+		game.add(playerBuyIn);
 	}
 
 	// CONNECT/DISCONNECT (IN SERVICE ==> TO BE REMOVED IN THE MODEL)

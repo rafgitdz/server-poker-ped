@@ -342,9 +342,9 @@ public class Player extends Observable implements Serializable {
 
 	public void setGame(Game gamE) {
 
-		int buyIn = gamE.getGameType().getBuyIn();
+		game = gamE;
+		int buyIn = game.getGameType().getBuyIn();
 		if (money < buyIn) {
-			game = gamE;
 			throw new PlayerException(NOT_ENOUGH_MONEY);
 		}
 		money -= buyIn;

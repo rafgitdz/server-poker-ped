@@ -344,7 +344,6 @@ public class Game implements Serializable, Observer {
 		updateRoundPotAndBets();
 
 		if (players.size() == 1) {
-
 			playersRank.add(players.get(0));
 			setPrizeForPlayers();
 			status = ENDED;
@@ -531,8 +530,9 @@ public class Game implements Serializable, Observer {
 	 */
 	public void add(Player player) {
 		players.add(player);
-		int money = player.getMoney() - this.getGameType().getBuyIn();
-		player.setMoney(money);
+		/*int money = player.getMoney() - this.getGameType().getBuyIn();
+		player.setMoney(money);*/
+		player.setInGame();
 		player.setGame(this);
 	}
 
@@ -736,7 +736,7 @@ public class Game implements Serializable, Observer {
 			lastPlayerToPlay = (currentPlayer % players.size()) - 1;
 	}
 
-	// Getters and the Setters
+	// Getters and Setters
 	public Deck getDeck() {
 		return deck;
 	}
