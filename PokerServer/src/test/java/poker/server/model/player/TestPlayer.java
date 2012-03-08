@@ -221,6 +221,19 @@ public class TestPlayer {
 		saveTestValues();
 		player.check();
 	}
+	
+	// BUY IN
+	@Test
+	public void testBuyIn() {
+		Player playerBuyIn = new Player("test", "test");
+		int expectedMoney = 50;
+		assertEquals(expectedMoney, playerBuyIn.getMoney());
+		
+		game.add(playerBuyIn);
+		
+		expectedMoney = 50 - game.getGameType().getBuyIn();
+		assertEquals(expectedMoney, playerBuyIn.getMoney());
+	}
 
 	// CONNECT/DISCONNECT (IN SERVICE ==> TO BE REMOVED IN THE MODEL)
 	// @Test

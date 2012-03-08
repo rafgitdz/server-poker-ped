@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import poker.server.model.exception.GameException;
+import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;
@@ -24,10 +26,6 @@ public class TestRound {
 
 	@Before
 	public void beforeTest() {
-
-	}
-
-	private void initGame() {
 		game = gameFactory.newGame();
 		
 		player1 = playerFactory.newPlayer("rafik", "rafik");
@@ -57,13 +55,10 @@ public class TestRound {
 
 		player4.call();
 		player5.call();
-		player1.call();
 	}
 
 	@Test
 	public void testNewGame() {
-		initGame();
-
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
 		assertEquals(game.getTotalPot(), 0);
@@ -71,12 +66,10 @@ public class TestRound {
 
 	@Test
 	public void testNewPlayerRoles() {
-		initGame();
-
 		Player dealer = game.getDealerP();
 		Player smallBlindPlayer = game.getSmallBlindP();
 		Player bigBlindPlayer = game.getBigBlindP();
-		Player currentPlayer = game.currentPlayer();
+		Player currentPlayer = game.getCurrentPlayer();
 
 		assertEquals(currentPlayer.getName(), player4.getName());
 
@@ -94,8 +87,6 @@ public class TestRound {
 
 	@Test
 	public void testNewGameCards() {
-		initGame();
-
 		int fullDeckCardQt = 52;
 		int afterDealCardQt = fullDeckCardQt - (game.getPlayers().size() * 2);
 
@@ -106,11 +97,9 @@ public class TestRound {
 			assertEquals(p.getCurrentHand().getCards().size(), 2);
 		}
 	}
-
+	
 	@Test
 	public void preflop() {
-
-		initGame();
 		game.flop();
 		playersPlaying();
 	}

@@ -36,6 +36,8 @@ public class Player extends Observable implements Serializable {
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
+	
+	public final static int MONEY = 50;
 
 	@Id
 	private String name;
@@ -53,6 +55,7 @@ public class Player extends Observable implements Serializable {
 	int connectionStatus;
 	int role;
 	boolean folded;
+	boolean allIn;
 
 	/**
 	 * Default constructor
@@ -76,7 +79,7 @@ public class Player extends Observable implements Serializable {
 		currentHand = new Hand();
 		currentBet = 0;
 		currentTokens = 0;
-		money = 0;
+		money = MONEY;
 		connectionStatus = 1;
 		folded = false;
 	}
@@ -121,6 +124,7 @@ public class Player extends Observable implements Serializable {
 			game.updateCurrentPot(necessaryTokens);
 			currentTokens -= necessaryTokens;
 			currentBet += necessaryTokens;
+			//game.setLastPlayerToPlay(game.getCurrentPlayer());
 		}
 		setChanged();
 		game.update(this, "raise"); // inform the game that a player raises
@@ -142,6 +146,10 @@ public class Player extends Observable implements Serializable {
 			game.updateCurrentPot(minTokenToCall);
 			this.currentTokens -= minTokenToCall;
 			this.currentBet += minTokenToCall;
+			if(this.currentTokens == 0){
+				game.updateLastPlayerToPlay();
+				this.allIn = true;
+			}
 		}
 
 		game.nextPlayer();
@@ -160,8 +168,10 @@ public class Player extends Observable implements Serializable {
 
 		currentBet += currentTokens; //game.getCurrentBet();
 		currentTokens = 0;
-		game.nextPlayer();
+		this.allIn = true;
+		
 		game.update(this, "allIn"); // inform the game that a player all in
+		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
 	}
 
@@ -207,6 +217,30 @@ public class Player extends Observable implements Serializable {
 	public String getPwd() {
 		return pwd;
 	}
+	
+	public void getBestHand() {
+		System.out.println("getBestHand() : TODO");
+	}
+
+	public Hand getCurrentHand() {
+		return currentHand;
+	}
+
+	public int getCurrentBet() {
+		return currentBet;
+	}
+
+	public int getMoney() {
+		return money;
+	}
+
+	public int getCurrentTokens() {
+		return currentTokens;
+	}
+
+	public Game getGame() {
+		return game;
+	}
 
 	public void setAsPresent() {
 		connectionStatus = PRESENT;
@@ -223,7 +257,11 @@ public class Player extends Observable implements Serializable {
 	public void setWaiting() {
 		connectionStatus = WAITING;
 	}
-
+	
+	public void setAsFolded() {
+		folded = true;
+	}
+	
 	public boolean isPresent() {
 		return connectionStatus == PRESENT;
 	}
@@ -257,33 +295,12 @@ public class Player extends Observable implements Serializable {
 		return role == REGULAR;
 	}
 
+	
 	public boolean isfolded() {
 		return folded;
 	}
 
-	public void getBestHand() {
-		System.out.println("getBestHand() : TODO");
-	}
-
-	public Hand getCurrentHand() {
-		return currentHand;
-	}
-
-	public int getCurrentBet() {
-		return currentBet;
-	}
-
-	public int getMoney() {
-		return money;
-	}
-
-	public int getCurrentTokens() {
-		return currentTokens;
-	}
-
-	public Game getGame() {
-		return game;
-	}
+	
 
 	public void setCurrentBet(int currentB) {
 		currentBet = currentB;
@@ -304,17 +321,19 @@ public class Player extends Observable implements Serializable {
 	public void setAsBigBlind() {
 		role = BIG_BLIND;
 		currentBet = game.getBigBlind();
+		game.setBigBlindPlayer(game.getPlayers().indexOf(this));
 	}
 
 	public void setAsSmallBlind() {
 		role = SMALL_BLIND;
 		currentBet = game.getSmallBlind();
+		game.setSmallBlindPlayer(game.getPlayers().indexOf(this));
 	}
 
 	public void setAsRegular() {
 		role = REGULAR;
 	}
-
+	
 	public void setCurrentHand(Hand hand) {
 		currentHand = hand;
 	}
@@ -329,5 +348,9 @@ public class Player extends Observable implements Serializable {
 
 	public void removeCard(Card card) {
 		currentHand.removeCard(card);
+	}
+
+	public boolean isAllIn() {
+		return allIn;
 	}
 }
