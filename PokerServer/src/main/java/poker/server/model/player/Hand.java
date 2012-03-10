@@ -6,14 +6,29 @@ package poker.server.model.player;
  *         Model class : Hand
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.IndexColumn;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Value;
 
-public class Hand {
+@Entity
+public class Hand implements Serializable {
+
+	private static final long serialVersionUID = 4992236533941764498L;
 
 	private static final int ROYAL_FLUSH = 9;
 	private static final int STRAIGHT_FLUSH = 8;
@@ -27,7 +42,14 @@ public class Hand {
 	private static final int HIGH_CARD = 0;
 	private static final String NOT_FIVE_CARDS = "can't evaluate less or more than five cards";
 
-	private List<Card> cards;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int id;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "Hand_Id")
+	@IndexColumn(name = "CardHandIndex")
+	List<Card> cards;
 
 	Hand() {
 		cards = new ArrayList<Card>();

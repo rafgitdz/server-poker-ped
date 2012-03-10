@@ -87,7 +87,7 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
-		
+
 		int tokensRaised = quantity + (gameCurrentBet - playerBet);
 		assertEquals(gameCurrentPot + tokensRaised, player.getGame()
 				.getCurrentPot());
@@ -109,7 +109,7 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
-		
+
 		int tokensRaised = quantity + (gameCurrentBet - playerBet);
 		assertEquals(playerBet + tokensRaised, player.getCurrentBet());
 	}
@@ -120,7 +120,7 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.raise(quantity);
-		
+
 		int tokensRaised = quantity + (gameCurrentBet - playerBet);
 		assertEquals(playerTokens - tokensRaised, player.getCurrentTokens());
 	}
@@ -139,7 +139,7 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.call();
-		
+
 		int nbTokenToCall = (gameCurrentBet - playerBet);
 		assertEquals(gameCurrentPot + nbTokenToCall, player.getGame()
 				.getCurrentPot());
@@ -159,7 +159,7 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.call();
-		
+
 		int nbTokenToCall = (gameCurrentBet - playerBet);
 		assertEquals(playerBet + nbTokenToCall, player.getCurrentBet());
 	}
@@ -169,7 +169,7 @@ public class TestPlayer {
 		player.setCurrentTokens(50);
 		saveTestValues();
 		player.call();
-		
+
 		int nbTokenToCall = (gameCurrentBet - playerBet);
 		assertEquals(playerTokens - nbTokenToCall, player.getCurrentTokens());
 	}
@@ -221,30 +221,31 @@ public class TestPlayer {
 		saveTestValues();
 		player.check();
 	}
-	
+
 	// BUY IN
 	@Test
 	public void testBuyIn() {
+
 		Player playerBuyIn = new Player("test", "test");
 		int expectedMoney = 50;
 		assertEquals(expectedMoney, playerBuyIn.getMoney());
-		
-		game.add(playerBuyIn);
-		
+
+		playerBuyIn.updateMoney(game.getGameType().getBuyIn());
+
 		expectedMoney = 50 - game.getGameType().getBuyIn();
 		assertEquals(expectedMoney, playerBuyIn.getMoney());
 	}
-	
-	@Test(expected = PlayerException.class)
+
 	public void testBuyInNotEnough() {
+
 		Player playerBuyIn = new Player("test", "test");
 		playerBuyIn.setMoney(5);
 		int expectedMoney = playerBuyIn.getMoney();
 		assertEquals(expectedMoney, playerBuyIn.getMoney());
-
-		game.add(playerBuyIn);
+		assertEquals(
+				playerBuyIn.hasNecessaryMoney(game.getGameType().getBuyIn()),
+				false);
 	}
-
 	// CONNECT/DISCONNECT (IN SERVICE ==> TO BE REMOVED IN THE MODEL)
 	// @Test
 	// public void testConnect() {

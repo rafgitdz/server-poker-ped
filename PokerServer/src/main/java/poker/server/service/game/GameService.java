@@ -32,12 +32,14 @@ import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.ErrorMessage;
 
 @Stateless
-@Path("/gameService")
+@Path("/game")
 public class GameService {
 
-	private static final String ERROR = "error";
 	private static final String CODE = "code";
 	private static final String MESSAGE = "message";
+	private static final String STAT = "stat";
+	private static final String OK = "ok";
+	private static final String FAIL = "fail";
 
 	private static final String CROS = "Access-Control-Allow-Origin";
 	private static final String STAR = "*";
@@ -77,7 +79,7 @@ public class GameService {
 			@PathParam("pwd") String pwd) {
 
 		JSONObject json = new JSONObject();
-
+		Response resp = null;
 		Player player = repositoryPlayer.load(name);
 
 		if (player == null) {
@@ -87,40 +89,44 @@ public class GameService {
 
 		} else {
 
-			if (!player.getPwd().equals(pwd)) {
-				errorJSON(json, ErrorMessage.WRONG_PASSWORD);
-				return buildResponse(json);
-			}
+			if (!player.getPwd().equals(pwd))
+				resp = error(ErrorMessage.NOT_CORRECT_PASSWORD);
 
-			if (player.isInGame()) {
-				errorJSON(json, ErrorMessage.PLAYER_INGAME);
-				return buildResponse(json);
-			}
+			else if (player.isInGame())
+				resp = error(ErrorMessage.PLAYER_INGAME);
 		}
 
-		updateJSON(json, ERROR, false);
+		if (resp != null)
+			return resp;
+
+		updateJSON(json, STAT, OK);
 
 		Game currentGame = repositoryGame.currentGame();
 
 		if (currentGame != null) {
 
-			currentGame.add(player);
-			repositoryGame.update(currentGame);
+			if (!player.hasNecessaryMoney(currentGame.getGameType().getBuyIn()))
+				resp = error(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
+			else {
+				currentGame.add(player);
+				repositoryGame.update(currentGame);
 
-			if (currentGame.isReadyToStart())
-				currentGame.setAsReady();
+				if (currentGame.isReadyToStart())
+					currentGame.setAsReady();
+			}
 
 		} else {
+
 			currentGame = gameFactory.newGame();
-			currentGame.add(player);
-			repositoryGame.save(currentGame);
+			if (!player.hasNecessaryMoney(currentGame.getGameType().getBuyIn()))
+				resp = error(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
+			else {
+				currentGame.add(player);
+				repositoryGame.save(currentGame);
+			}
 		}
 
 		updateJSON(json, "nameTable", currentGame.getName());
-		updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
-		updateJSON(json, "size", currentGame.getPlayers().size());
-		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
-
 		return buildResponse(json);
 	}
 
@@ -134,6 +140,7 @@ public class GameService {
 	public Response startGame(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
+		Response resp = null;
 		Game currentGame = repositoryGame.load(tableName);
 
 		if (currentGame != null) {
@@ -141,7 +148,9 @@ public class GameService {
 			if (currentGame.isReady() && allPlayersReady(currentGame)) {
 
 				currentGame.start();
+				repositoryGame.update(currentGame);
 
+				updateJSON(json, STAT, OK);
 				updateJSON(json, "startGame", true);
 				updateJSON(json, "dealer", currentGame.getDealerPlayer()
 						.getName());
@@ -150,28 +159,40 @@ public class GameService {
 				updateJSON(json, "bigBlind", currentGame.getBigBlindPlayer()
 						.getName());
 
-			} else if (currentGame.isStarted()) {
+				updateJSON(json, "playerNames", getPlayerNames(currentGame));
+				updateJSON(json, "size", currentGame.getPlayers().size());
+				updateJSON(json, "playerBudget", currentGame.getGameType()
+						.getTokens());
+				updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
+				resp = buildResponse(json);
 
-				errorJSON(json, ErrorMessage.GAME_ALREADY_STARTED);
-				return buildResponse(json);
+			} else {
 
-			} else if (!currentGame.isReady()) {
-
-				errorJSON(json, ErrorMessage.GAME_NOT_READY_TO_START);
-				return buildResponse(json);
+				if (currentGame.isStarted())
+					resp = error(ErrorMessage.GAME_ALREADY_STARTED);
+				else if (!allPlayersReady(currentGame))
+					resp = error(ErrorMessage.NOT_ALL_PLAYERS_READY);
+				else if (!currentGame.isReady())
+					resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
 			}
-
-			repositoryGame.update(currentGame);
-
-			updateJSON(json, "playerNames", getPlayerNames(currentGame));
-			updateJSON(json, "size", currentGame.getPlayers().size());
-			updateJSON(json, "playerBudget", currentGame.getGameType()
-					.getTokens());
-
 		} else
-			errorJSON(json, ErrorMessage.GAME_NOT_EXIST);
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
 
-		return buildResponse(json);
+		return resp;
+	}
+
+	/**
+	 * Returns the status of the game "tableName"
+	 */
+	@GET
+	@Path("/getGameStatus/{tableName}")
+	public Response getGameStatus(@PathParam("tableName") String tableName) {
+
+		Game game = repositoryGame.load(tableName);
+		if (game == null)
+			return error(ErrorMessage.GAME_NOT_EXIST);
+
+		return getGameStatus(game);
 	}
 
 	/**
@@ -183,11 +204,14 @@ public class GameService {
 			@PathParam("namePlayer") String namePlayer) {
 
 		JSONObject json = new JSONObject();
+		Response resp = null;
 		Player player = repositoryPlayer.load(namePlayer);
 
-		if (player == null) {
-			errorJSON(json, ErrorMessage.PLAYER_NOT_EXIST);
-			return buildResponse(json);
+		if (player == null)
+			return error(ErrorMessage.PLAYER_NOT_EXIST);
+		else {
+			if (player.isReady())
+				return error(ErrorMessage.PLAYER_INGAME);
 		}
 
 		Game game = player.getGame();
@@ -195,16 +219,18 @@ public class GameService {
 		if (game != null) {
 
 			if (!game.isReady())
-				errorJSON(json, ErrorMessage.GAME_NOT_READY_TO_START);
+				resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
 			else {
 				player.setAsReady();
 				repositoryPlayer.update(player);
+				updateJSON(json, STAT, OK);
+				resp = buildResponse(json);
 			}
 
 		} else
-			errorJSON(json, ErrorMessage.GAME_NOT_EXIST);
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
 
-		return buildResponse(json);
+		return resp;
 	}
 
 	/**
@@ -215,43 +241,46 @@ public class GameService {
 	public Response getFlipedCards(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
+		Response resp = null;
 		Game game = repositoryGame.load(tableName);
 
-		if (game == null) {
-			errorJSON(json, ErrorMessage.GAME_NOT_EXIST);
-			return buildResponse(json);
+		if (game == null)
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
+
+		else if (!game.isStarted())
+			resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
+
+		else {
+			updateJSON(json, STAT, OK);
+			updateJSON(json, "flipedCards", getCards(game));
+			resp = buildResponse(json);
 		}
 
-		if (!game.isReady()) {
-			errorJSON(json, ErrorMessage.GAME_NOT_READY_TO_START);
-			return buildResponse(json);
-		}
-
-		updateJSON(json, "flipedCards", getCards(game));
-		return buildResponse(json);
+		return resp;
 	}
 
 	/**
-	 * Returns the list of, size and budget of players related to the {@code id}
-	 * game
+	 * Returns the flip cards related on the current round of the game
 	 */
 	@GET
-	@Path("/getPlayers/{tableName}")
-	public Response getPlayers(@PathParam("tableName") String tableName) {
+	@Path("/getPlayersCards/{tableName}")
+	public Response getPlayersCards(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
+		Response resp = null;
 		Game game = repositoryGame.load(tableName);
+		if (game == null)
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
 
-		if (game == null) {
-			errorJSON(json, ErrorMessage.GAME_NOT_EXIST);
-			return buildResponse(json);
+		else if (!game.isStarted())
+			resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
+
+		else {
+			updateJSON(json, STAT, OK);
+			updateJSON(json, "playersCards", getPlayersCards(game));
+			resp = buildResponse(json);
 		}
-
-		updateJSON(json, "playerNames", getPlayerNames(game));
-		updateJSON(json, "size", game.getPlayers().size());
-		updateJSON(json, "playerBudget", game.getGameType().getTokens());
-
-		return buildResponse(json);
+		return resp;
 	}
 
 	/**
@@ -262,26 +291,19 @@ public class GameService {
 	public Response showDown(@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
+		Response resp = null;
 		Game game = repositoryGame.load(tableName);
 
-		if (game == null) {
-			errorJSON(json, ErrorMessage.GAME_NOT_EXIST);
-			return buildResponse(json);
-		} else {
+		if (game == null)
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
 
-			if (!game.isStarted()) {
-				errorJSON(json, ErrorMessage.GAME_NOT_READY_TO_START);
-				return buildResponse(json);
-			}
+		else if (!game.isReady())
+			resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
 
-			if (!game.isEnded()) {
-				errorJSON(json, ErrorMessage.GAME_NOT_FINISH);
-				return buildResponse(json);
-			}
-		}
+		if (resp != null)
+			return resp;
 
 		Map<String, Integer> winners = game.showDown();
-
 		Map<String, List<Integer>> playersCards = new HashMap<String, List<Integer>>();
 
 		for (Player player : game.getPlayers()) {
@@ -293,6 +315,7 @@ public class GameService {
 			playersCards.put(player.getName(), cards);
 		}
 
+		updateJSON(json, STAT, OK);
 		updateJSON(json, "winners", winners);
 		updateJSON(json, "playerCards", playersCards);
 
@@ -352,15 +375,18 @@ public class GameService {
 	/**
 	 * Build and return a JSONObject error message
 	 */
-	private void errorJSON(JSONObject json, ErrorMessage errorMessage) {
+	private Response error(ErrorMessage errorMessage) {
+
+		JSONObject json = new JSONObject();
 
 		try {
-			json.put(ERROR, true);
+			json.put(STAT, FAIL);
 			json.put(CODE, errorMessage.getCode());
 			json.put(MESSAGE, errorMessage.getMessage());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		return buildResponse(json);
 	}
 
 	/**
@@ -374,5 +400,43 @@ public class GameService {
 				return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Returns the status of the game
+	 */
+	private Response getGameStatus(Game currentGame) {
+
+		JSONObject json = new JSONObject();
+		updateJSON(json, STAT, OK);
+		updateJSON(json, "playerNames", getPlayerNames(currentGame));
+		updateJSON(json, "nameTable", currentGame.getName());
+		updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
+		updateJSON(json, "size", currentGame.getPlayers().size());
+		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
+		// updateJSON(json, "playersCards", getPlayersCards(currentGame));
+		// updateJSON(json, "flipedCards", getCards(game));
+		return buildResponse(json);
+	}
+
+	/**
+	 * @return
+	 * 
+	 */
+	private Map<String, List<Integer>> getPlayersCards(Game game) {
+
+		List<Player> players = game.getPlayers();
+		Map<String, List<Integer>> playersCards = new HashMap<String, List<Integer>>();
+
+		for (Player player : players) {
+
+			List<Integer> cards = new ArrayList<Integer>();
+			for (Card card : player.getCurrentHand().getCards())
+				cards.add(card.getId());
+
+			playersCards.put(player.getName(), cards);
+		}
+
+		return playersCards;
 	}
 }

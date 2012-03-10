@@ -20,7 +20,7 @@ import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
 
 @Stateless
-@Path("/playerService")
+@Path("/player")
 public class PlayerService {
 
 	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player : ";

@@ -6,16 +6,39 @@ package poker.server.model.game.parameters;
  *         Model abstract class : Parameters
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Parameters {
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.IndexColumn;
+
+@Entity
+public abstract class Parameters implements Serializable {
+
+	private static final long serialVersionUID = 2604121179074138425L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int id;
 
 	public final static int CASH = 1;
 	public final static int TOKEN = 2;
 
 	protected int potType;
-	protected List<Integer> buyInSplit;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "Parameters_Id")
+	@IndexColumn(name = "PercentIndex")
+	protected List<Percent> buyInSplit;
 
 	protected int buyIn;
 	protected int buyInIncreasing;
@@ -39,17 +62,15 @@ public abstract class Parameters {
 		return potType == TOKEN;
 	}
 
-	// SET/GET
-	
-	protected void setPotSplit(List<Integer> percents) {
+	protected void setPotSplit(List<Percent> percents) {
 
-		List<Integer> finalSplit = new ArrayList<Integer>();
+		List<Percent> finalSplit = new ArrayList<Percent>();
 
 		int sum = 0;
 		int percent = 0;
 
-		for (Integer p : percents) {
-			sum = sum + p;
+		for (Percent p : percents) {
+			sum = sum + p.getRate();
 		}
 
 		if (sum <= 100) {
@@ -57,7 +78,7 @@ public abstract class Parameters {
 		} else {
 			percent = 100 / percents.size();
 			for (int i = 0; i < percents.size(); i++) {
-				finalSplit.add(percent);
+				finalSplit.add(new Percent(percent));
 			}
 		}
 
@@ -81,14 +102,14 @@ public abstract class Parameters {
 		playerNumber = playerNumb;
 	}
 
-	public List<Integer> getPotSplit() {
+	public List<Percent> getPotSplit() {
 		return buyInSplit;
 	}
 
 	public int getPlayerNumber() {
 		return playerNumber;
 	}
-	
+
 	public int getBuyIn() {
 		return buyIn;
 	}
@@ -116,7 +137,7 @@ public abstract class Parameters {
 	public int getTokens() {
 		return initPlayersTokens;
 	}
-	
+
 	public int getTimeChangeBlind() {
 		return timeChangeBlind;
 	}

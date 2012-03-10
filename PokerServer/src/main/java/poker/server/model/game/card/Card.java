@@ -1,11 +1,17 @@
 package poker.server.model.game.card;
 
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  * @author PokerServerGroup
  * 
  */
 
-public enum Card {
+@Entity
+public enum Card implements Serializable {
 
 	ACE_HEART(1, Value.ACE, Suit.HEART), 
 	KING_HEART(2, Value.KING, Suit.HEART),
@@ -63,6 +69,7 @@ public enum Card {
 	THREE_SPADE(51, Value.THREE, Suit.SPADE),
 	TWO_SPADE(52, Value.TWO, Suit.SPADE);
 
+	@Id
 	private final int id;
 	private final int value;
 	private final String suit;
@@ -77,7 +84,7 @@ public enum Card {
 	public int getId() {
 		return id;
 	}
-	
+
 	public int getValue() {
 		return value;
 	}

@@ -8,7 +8,12 @@ package poker.server.model.game.parameters;
 
 import java.util.ArrayList;
 
+import javax.persistence.Entity;
+
+@Entity
 public class SitAndGo extends Parameters {
+
+	private static final long serialVersionUID = 827113569152348882L;
 
 	public SitAndGo() {
 
@@ -25,10 +30,10 @@ public class SitAndGo extends Parameters {
 		setBlinds(10);
 		setPotAsToken();
 
-		buyInSplit = new ArrayList<Integer>(); // in percent
-		buyInSplit.add(50);
-		buyInSplit.add(35);
-		buyInSplit.add(15);
+		buyInSplit = new ArrayList<Percent>(); // in percent
+		buyInSplit.add(new Percent(50));
+		buyInSplit.add(new Percent(35));
+		buyInSplit.add(new Percent(15));
 
 		setPotSplit(buyInSplit);
 	}

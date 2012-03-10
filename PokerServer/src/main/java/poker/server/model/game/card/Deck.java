@@ -6,17 +6,39 @@ package poker.server.model.game.card;
  *         Model class : Deck
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.IndexColumn;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.game.Event;
 
-public class Deck {
+@Entity
+public class Deck implements Serializable {
+
+	private static final long serialVersionUID = 1777319055997725546L;
 
 	private static final int NUMBER_CARDS = 52;
 	private static final String NO_CARDS = "there isn't a cards on table !";
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int id;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "Deck_Id")
+	@IndexColumn(name = "CardIndex")
 	private List<Card> cards = null;
 
 	public Deck() {

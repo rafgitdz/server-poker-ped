@@ -138,7 +138,7 @@ public class TestRound {
 		
 		int expectedTotalTokens = game.getGameType().getTokens() * game.getGameType().getPlayerNumber();
 		int actual = 0;
-		for(Player player : game.players){
+		for(Player player : game.getPlayers()){
 			actual += player.getCurrentTokens();
 		}
 		
@@ -171,7 +171,7 @@ public class TestRound {
 		
 		int expectedTotalTokens = game.getGameType().getTokens() * game.getGameType().getPlayerNumber();
 		int actual = 0;
-		for(Player player : game.players){
+		for(Player player : game.getPlayers()){
 			actual += player.getCurrentTokens();
 		}
 		

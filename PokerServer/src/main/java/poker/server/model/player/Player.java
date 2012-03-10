@@ -11,11 +11,13 @@ package poker.server.model.player;
 import java.io.Serializable;
 import java.util.Observable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Event;
@@ -27,8 +29,6 @@ public class Player extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
 
-	private static final String NOT_ENOUGH_MONEY = "Not enough money for the player to play";
-
 	public final static int PRESENT = 1;
 	public final static int READY = 2;
 	public final static int MISSING = 3;
@@ -38,18 +38,22 @@ public class Player extends Observable implements Serializable {
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
-	
+
 	public final static int MONEY = 50;
 
 	@Id
 	private String name;
-	String pwd;
+
+	private String pwd;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "Game_Id")
 	Game game;
 
-	transient Hand currentHand;
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "deck")
+	Hand currentHand;
+
 	int currentBet;
 	int currentTokens;
 	int money;
@@ -147,7 +151,7 @@ public class Player extends Observable implements Serializable {
 			game.updateCurrentPot(minTokenToCall);
 			this.currentTokens -= minTokenToCall;
 			this.currentBet += minTokenToCall;
-			if(this.currentTokens == 0){
+			if (this.currentTokens == 0) {
 				game.updateLastPlayerToPlay();
 				this.allIn = true;
 			}
@@ -170,7 +174,7 @@ public class Player extends Observable implements Serializable {
 		currentBet += currentTokens; // game.getCurrentBet();
 		currentTokens = 0;
 		this.allIn = true;
-		
+
 		game.update(this, "allIn"); // inform the game that a player all in
 		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
@@ -210,6 +214,39 @@ public class Player extends Observable implements Serializable {
 		Event.addEvent(name + " CHECKS");
 	}
 
+	/**
+	 * Updates the current money after that the player is connected to a game
+	 */
+	public void updateMoney(int buyIn) {
+		money -= buyIn;
+	}
+
+	/**
+	 * Verifies if the player has enough money to play a game with a buyIn
+	 */
+	public boolean hasNecessaryMoney(int buyIn) {
+
+		if (money < buyIn)
+			return false;
+		return true;
+	}
+
+	/**
+	 * Evaluates the current hand after a showDown
+	 * 
+	 * @see showDown
+	 */
+	public int evaluateHand() {
+		return currentHand.evaluateHand();
+	}
+
+	/**
+	 * Removes the card from the current hand of the player
+	 */
+	public void removeCard(Card card) {
+		currentHand.removeCard(card);
+	}
+
 	// Getters and Setters
 	public String getName() {
 		return name;
@@ -218,7 +255,7 @@ public class Player extends Observable implements Serializable {
 	public String getPwd() {
 		return pwd;
 	}
-	
+
 	public void getBestHand() {
 		System.out.println("getBestHand() : TODO");
 	}
@@ -254,15 +291,15 @@ public class Player extends Observable implements Serializable {
 	public void setInGame() {
 		connectionStatus = IN_GAME;
 	}
-	
+
 	public void setAsReady() {
 		connectionStatus = READY;
 	}
-	
+
 	public void setAsFolded() {
 		folded = true;
 	}
-	
+
 	public boolean isPresent() {
 		return connectionStatus == PRESENT;
 	}
@@ -274,7 +311,7 @@ public class Player extends Observable implements Serializable {
 	public boolean isInGame() {
 		return connectionStatus == IN_GAME;
 	}
-	
+
 	public boolean isReady() {
 		return connectionStatus == READY;
 	}
@@ -334,26 +371,12 @@ public class Player extends Observable implements Serializable {
 	public void setAsRegular() {
 		role = REGULAR;
 	}
-	
+
 	public void setCurrentHand(Hand hand) {
 		currentHand = hand;
 	}
 
 	public void setGame(Game gamE) {
-
 		game = gamE;
-		int buyIn = game.getGameType().getBuyIn();
-		if (money < buyIn) {
-			throw new PlayerException(NOT_ENOUGH_MONEY);
-		}
-		money -= buyIn;
-	}
-
-	public int evaluateHand() {
-		return currentHand.evaluateHand();
-	}
-
-	public void removeCard(Card card) {
-		currentHand.removeCard(card);
 	}
 }

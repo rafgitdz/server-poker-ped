@@ -15,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.IndexColumn;
 
@@ -64,13 +65,25 @@ public class Game implements Serializable, Observer {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "Game_Id")
 	@IndexColumn(name = "PlayerIndex")
-	List<Player> players;
+	private List<Player> players;
 
-	private transient List<Player> playersRank;
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "deck")
+	private Deck deck;
 
-	private transient Parameters gameType;
-	private transient Deck deck;
-	private transient List<Card> flippedCards;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "Game_Id")
+	@IndexColumn(name = "PlayerRankIndex")
+	private List<Player> playersRank;
+
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "parameters")
+	private Parameters gameType;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "Game_Id")
+	@IndexColumn(name = "FlipCardIndex")
+	private List<Card> flippedCards;
 
 	private int currentPlayerInt;
 	private int dealerPlayerInt;
@@ -147,7 +160,7 @@ public class Game implements Serializable, Observer {
 	 * @see PlayerNumber in class Parameters
 	 */
 	public void start() {
-		
+
 		setPlayerRoles();
 		initPlayersTokens();
 		fixPrizePool();
@@ -162,7 +175,7 @@ public class Game implements Serializable, Observer {
 	 * At the begin of game, set each role for each player
 	 */
 	public void setPlayerRoles() {
-		
+
 		if (players.size() < gameType.getPlayerNumber()) {
 			throw new GameException(
 					"not enough player to start a poker game ! < "
@@ -210,7 +223,7 @@ public class Game implements Serializable, Observer {
 	private void setPlayerInGame() {
 		for (Player player : players)
 			player.setInGame();
-	}	
+	}
 
 	/**
 	 * Initialize the bet, the pot and update the current tokens for the players
@@ -230,13 +243,13 @@ public class Game implements Serializable, Observer {
 	protected void setPrizeForPlayers() {
 
 		playersRank.get(0).setMoney(
-				(prizePool * gameType.getPotSplit().get(0)) / 100);
+				(prizePool * gameType.getPotSplit().get(0).getRate()) / 100);
 		playersRank.get(1).setMoney(
-				(prizePool * gameType.getPotSplit().get(1)) / 100);
+				(prizePool * gameType.getPotSplit().get(1).getRate()) / 100);
 		playersRank.get(2).setMoney(
-				(prizePool * gameType.getPotSplit().get(2)) / 100);
+				(prizePool * gameType.getPotSplit().get(2).getRate()) / 100);
 	}
-	
+
 	/**
 	 * At the begin of game, give for each player two cards
 	 */
@@ -314,19 +327,16 @@ public class Game implements Serializable, Observer {
 			currentRound = SHOWDOWN;
 			nextRoundTasks();
 			currentRound = 0;
-		}
-		else if (currentRound == RIVER) {
+		} else if (currentRound == RIVER) {
 			currentRound++;
 			showDown();
 			nextRoundTasks();
 			currentRound = 0;
-		} 
-		else if (isPlayersAllIn()) {
+		} else if (isPlayersAllIn()) {
 			currentRound++;
 			flipRoundCard();
 			nextRound();
-		}
-		else {
+		} else {
 			currentRound++;
 			flipRoundCard();
 		}
@@ -408,7 +418,7 @@ public class Game implements Serializable, Observer {
 			bigBlindPlayerInt = 0;
 		else
 			bigBlindPlayerInt = (bigBlindPlayerInt % players.size()) + 1;
-		
+
 		Player bigBlindPlayer = players.get(bigBlindPlayerInt);
 		bigBlindPlayer.setAsBigBlind();
 
@@ -440,15 +450,15 @@ public class Game implements Serializable, Observer {
 
 		for (Player player : players)
 			player.setCurrentBet(0);
-		
+
 		if (currentRound != SHOWDOWN)
 			totalPot += currentPot;
 		else
 			totalPot = 0;
-		
+
 		currentBet = 0;
 		currentPot = 0;
-		
+
 		Event.addEvent("RESET PLAYERS BETS AND UPDATE POT OF THE GAME");
 	}
 
@@ -476,7 +486,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * Verify if all players are all in. Return true if it is, false if not.
 	 */
-	private boolean isPlayersAllIn(){
+	private boolean isPlayersAllIn() {
 		List<Player> currentPlayerInRound = currentPlayerInRound();
 
 		for (Player p : currentPlayerInRound) {
@@ -517,7 +527,6 @@ public class Game implements Serializable, Observer {
 		Event.addEvent("CURRENT BET = " + currentBet);
 	}
 
-
 	/**
 	 * Before a player action, it verify is it his turn </br> Launch a game
 	 * exception if not
@@ -532,7 +541,7 @@ public class Game implements Serializable, Observer {
 	 * After each connection of player, add it to the only one non-ready game
 	 */
 	public void add(Player player) {
-		players.add(player);	
+		players.add(player);
 		player.setGame(this);
 		player.setInGame();
 	}
@@ -552,26 +561,27 @@ public class Game implements Serializable, Observer {
 	public void nextPlayer() {
 		if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
 			currentPlayerInt = smallBlindPlayerInt;
-			nextPlayerToStart();		
+			nextPlayerToStart();
 			nextRound();
 		} else {
 			if (currentPlayerInt == players.size() - 1)
 				currentPlayerInt = 0;
 			else
 				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
-			if (players.get(currentPlayerInt).isfolded() || players.get(currentPlayerInt).getCurrentTokens() == 0 || players.get(currentPlayerInt).isMissing()) {
+			if (players.get(currentPlayerInt).isfolded()
+					|| players.get(currentPlayerInt).getCurrentTokens() == 0
+					|| players.get(currentPlayerInt).isMissing()) {
 				nextPlayer();
 			}
 		}
 	}
 
-	private void nextPlayerToStart(){
-		if(players.get(currentPlayerInt).isfolded()){
-			if (currentPlayerInt == players.size() - 1){
+	private void nextPlayerToStart() {
+		if (players.get(currentPlayerInt).isfolded()) {
+			if (currentPlayerInt == players.size() - 1) {
 				currentPlayerInt = 0;
 				lastPlayerToPlay = players.size() - 1;
-			}			
-			else{
+			} else {
 				lastPlayerToPlay = currentPlayerInt;
 				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
 			}
@@ -701,7 +711,7 @@ public class Game implements Serializable, Observer {
 
 		return result;
 	}
-	
+
 	/**
 	 * At the end of round river, reward the winners by divide the total pot
 	 * between all the best players
@@ -817,7 +827,7 @@ public class Game implements Serializable, Observer {
 	public Player getBigBlindPlayer() {
 		return players.get(bigBlindPlayerInt);
 	}
-	
+
 	public Player getAfterPlayer(Player player) {
 		int playerInt = this.players.indexOf(player);
 		if (playerInt == players.size() - 1)
@@ -833,7 +843,7 @@ public class Game implements Serializable, Observer {
 	public int getPrizePool() {
 		return prizePool;
 	}
-	
+
 	public List<Player> getPlayersRank() {
 		return playersRank;
 	}
@@ -853,7 +863,7 @@ public class Game implements Serializable, Observer {
 	public void setLastPlayerToPlay(int lrp) {
 		lastPlayerToPlay = lrp;
 	}
-	
+
 	public void setCurrentPlayer(int cp) {
 		currentPlayerInt = cp;
 	}
@@ -865,12 +875,12 @@ public class Game implements Serializable, Observer {
 	protected void setFlipedCards(List<Card> cards) {
 		flippedCards = cards;
 	}
-	
-	public void setSmallBlindPlayer(int i){
+
+	public void setSmallBlindPlayer(int i) {
 		smallBlindPlayerInt = i;
 	}
-	
-	public void setBigBlindPlayer(int i){
+
+	public void setBigBlindPlayer(int i) {
 		bigBlindPlayerInt = i;
 	}
 
@@ -880,7 +890,7 @@ public class Game implements Serializable, Observer {
 	public void setAsReady() {
 		status = READY_TO_START;
 	}
-	
+
 	/**
 	 * Verify if a game is ready to begin if it reaches the number of player
 	 * 
@@ -892,8 +902,8 @@ public class Game implements Serializable, Observer {
 			return true;
 
 		return false;
-	}	
-	
+	}
+
 	/**
 	 * Verify if a game is at flop
 	 */
