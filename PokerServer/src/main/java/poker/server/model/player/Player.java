@@ -47,11 +47,11 @@ public class Player extends Observable implements Serializable {
 	private String pwd;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "Game_Id")
+	@JoinColumn(name = "game_Id")
 	Game game;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "deck")
+	@JoinColumn(name = "hand")
 	Hand currentHand;
 
 	int currentBet;
@@ -75,8 +75,9 @@ public class Player extends Observable implements Serializable {
 	 * @param nameE
 	 *            name of the player
 	 * @param pwD
-	 *            password of the player
-	 * @goal build an instance of a player
+	 *            password of the player <br>
+	 * <br>
+	 *            Builds an instance of a player
 	 */
 	Player(String namE, String pwD) {
 

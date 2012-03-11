@@ -47,8 +47,8 @@ public class Hand implements Serializable {
 	int id;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "Hand_Id")
-	@IndexColumn(name = "CardHandIndex")
+	@JoinColumn(name = "hand_Id")
+	@IndexColumn(name = "cardHandIndex")
 	List<Card> cards;
 
 	Hand() {

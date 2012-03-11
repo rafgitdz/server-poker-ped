@@ -37,9 +37,9 @@ public class Deck implements Serializable {
 	int id;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "Deck_Id")
-	@IndexColumn(name = "CardIndex")
-	private List<Card> cards = null;
+	@JoinColumn(name = "deck_Id")
+	@IndexColumn(name = "deckCardIndex")
+	List<Card> cards;
 
 	public Deck() {
 		cards = new ArrayList<Card>(NUMBER_CARDS);
@@ -94,69 +94,60 @@ public class Deck implements Serializable {
 
 	private void prepareCards() {
 
-		cards.add(Card.ACE_HEART);
-		cards.add(Card.ACE_DIAMOND);
-		cards.add(Card.ACE_CLUB);
-		cards.add(Card.ACE_SPADE);
+		cards.add(new Card(1, Value.ACE, Suit.HEART));
+		cards.add(new Card(2, Value.KING, Suit.HEART));
+		cards.add(new Card(3, Value.QUEEN, Suit.HEART));
+		cards.add(new Card(4, Value.JACK, Suit.HEART));
+		cards.add(new Card(5, Value.TEN, Suit.HEART));
+		cards.add(new Card(6, Value.NINE, Suit.HEART));
+		cards.add(new Card(7, Value.EIGHT, Suit.HEART));
+		cards.add(new Card(8, Value.SEVEN, Suit.HEART));
+		cards.add(new Card(9, Value.SIX, Suit.HEART));
+		cards.add(new Card(10, Value.FIVE, Suit.HEART));
+		cards.add(new Card(11, Value.FOUR, Suit.HEART));
+		cards.add(new Card(12, Value.THREE, Suit.HEART));
+		cards.add(new Card(13, Value.TWO, Suit.HEART));
 
-		cards.add(Card.KING_CLUB);
-		cards.add(Card.KING_DIAMOND);
-		cards.add(Card.KING_HEART);
-		cards.add(Card.KING_SPADE);
+		cards.add(new Card(14, Value.ACE, Suit.DIAMOND));
+		cards.add(new Card(15, Value.KING, Suit.DIAMOND));
+		cards.add(new Card(16, Value.QUEEN, Suit.DIAMOND));
+		cards.add(new Card(17, Value.JACK, Suit.DIAMOND));
+		cards.add(new Card(18, Value.TEN, Suit.DIAMOND));
+		cards.add(new Card(19, Value.NINE, Suit.DIAMOND));
+		cards.add(new Card(20, Value.EIGHT, Suit.DIAMOND));
+		cards.add(new Card(21, Value.SEVEN, Suit.DIAMOND));
+		cards.add(new Card(22, Value.SIX, Suit.DIAMOND));
+		cards.add(new Card(23, Value.FIVE, Suit.DIAMOND));
+		cards.add(new Card(24, Value.FOUR, Suit.DIAMOND));
+		cards.add(new Card(25, Value.THREE, Suit.DIAMOND));
+		cards.add(new Card(26, Value.TWO, Suit.DIAMOND));
 
-		cards.add(Card.QUEEN_CLUB);
-		cards.add(Card.QUEEN_DIAMOND);
-		cards.add(Card.QUEEN_HEART);
-		cards.add(Card.QUEEN_SPADE);
+		cards.add(new Card(27, Value.ACE, Suit.CLUB));
+		cards.add(new Card(28, Value.KING, Suit.CLUB));
+		cards.add(new Card(29, Value.QUEEN, Suit.CLUB));
+		cards.add(new Card(30, Value.JACK, Suit.CLUB));
+		cards.add(new Card(31, Value.TEN, Suit.CLUB));
+		cards.add(new Card(32, Value.NINE, Suit.CLUB));
+		cards.add(new Card(33, Value.EIGHT, Suit.CLUB));
+		cards.add(new Card(34, Value.SEVEN, Suit.CLUB));
+		cards.add(new Card(35, Value.SIX, Suit.CLUB));
+		cards.add(new Card(36, Value.FIVE, Suit.CLUB));
+		cards.add(new Card(37, Value.FOUR, Suit.CLUB));
+		cards.add(new Card(38, Value.THREE, Suit.CLUB));
+		cards.add(new Card(39, Value.TWO, Suit.CLUB));
 
-		cards.add(Card.JACK_CLUB);
-		cards.add(Card.JACK_DIAMOND);
-		cards.add(Card.JACK_HEART);
-		cards.add(Card.JACK_SPADE);
-
-		cards.add(Card.TEN_CLUB);
-		cards.add(Card.TEN_DIAMOND);
-		cards.add(Card.TEN_HEART);
-		cards.add(Card.TEN_SPADE);
-
-		cards.add(Card.NINE_CLUB);
-		cards.add(Card.NINE_DIAMOND);
-		cards.add(Card.NINE_HEART);
-		cards.add(Card.NINE_SPADE);
-
-		cards.add(Card.EIGHT_CLUB);
-		cards.add(Card.EIGHT_DIAMOND);
-		cards.add(Card.EIGHT_HEART);
-		cards.add(Card.EIGHT_SPADE);
-
-		cards.add(Card.SEVEN_CLUB);
-		cards.add(Card.SEVEN_DIAMOND);
-		cards.add(Card.SEVEN_HEART);
-		cards.add(Card.SEVEN_SPADE);
-
-		cards.add(Card.SIX_CLUB);
-		cards.add(Card.SIX_DIAMOND);
-		cards.add(Card.SIX_HEART);
-		cards.add(Card.SIX_SPADE);
-
-		cards.add(Card.FIVE_CLUB);
-		cards.add(Card.FIVE_DIAMOND);
-		cards.add(Card.FIVE_HEART);
-		cards.add(Card.FIVE_SPADE);
-
-		cards.add(Card.FOUR_CLUB);
-		cards.add(Card.FOUR_DIAMOND);
-		cards.add(Card.FOUR_HEART);
-		cards.add(Card.FOUR_SPADE);
-
-		cards.add(Card.THREE_CLUB);
-		cards.add(Card.THREE_DIAMOND);
-		cards.add(Card.THREE_HEART);
-		cards.add(Card.THREE_SPADE);
-
-		cards.add(Card.TWO_CLUB);
-		cards.add(Card.TWO_DIAMOND);
-		cards.add(Card.TWO_HEART);
-		cards.add(Card.TWO_SPADE);
+		cards.add(new Card(40, Value.ACE, Suit.SPADE));
+		cards.add(new Card(41, Value.KING, Suit.SPADE));
+		cards.add(new Card(42, Value.QUEEN, Suit.SPADE));
+		cards.add(new Card(43, Value.JACK, Suit.SPADE));
+		cards.add(new Card(44, Value.TEN, Suit.SPADE));
+		cards.add(new Card(45, Value.NINE, Suit.SPADE));
+		cards.add(new Card(46, Value.EIGHT, Suit.SPADE));
+		cards.add(new Card(47, Value.SEVEN, Suit.SPADE));
+		cards.add(new Card(48, Value.SIX, Suit.SPADE));
+		cards.add(new Card(49, Value.FIVE, Suit.SPADE));
+		cards.add(new Card(50, Value.FOUR, Suit.SPADE));
+		cards.add(new Card(51, Value.THREE, Suit.SPADE));
+		cards.add(new Card(52, Value.TWO, Suit.SPADE));
 	}
 }

@@ -1,4 +1,4 @@
-package poker.server.model.parameters;
+package poker.server.model.game.parameters;
 
 import static org.junit.Assert.assertEquals;
 

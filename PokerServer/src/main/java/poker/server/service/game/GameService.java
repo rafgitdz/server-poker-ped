@@ -115,18 +115,22 @@ public class GameService {
 					currentGame.setAsReady();
 			}
 
+			updateJSON(json, "nameTable", currentGame.getName());
+
 		} else {
 
-			currentGame = gameFactory.newGame();
-			if (!player.hasNecessaryMoney(currentGame.getGameType().getBuyIn()))
+			Game game = gameFactory.newGame();
+			if (!player.hasNecessaryMoney(game.getGameType().getBuyIn()))
 				resp = error(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
 			else {
-				currentGame.add(player);
-				repositoryGame.save(currentGame);
+				player.updateMoney(game.getGameType().getBuyIn());
+				repositoryPlayer.update(player);
+				game.add(player);
+				repositoryGame.save(game);
 			}
+			updateJSON(json, "nameTable", game.getName());
 		}
 
-		updateJSON(json, "nameTable", currentGame.getName());
 		return buildResponse(json);
 	}
 

@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -23,6 +24,7 @@ import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.ParametersI;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 
@@ -47,10 +49,10 @@ public class Game implements Serializable, Observer {
 	private static final String NOT_ENOUGH_FLIPED_CARDS = "There isn't enough cards to do showDown";
 	private static final String NO_PLAYER_IN_GAME = "There is no players in game";
 
-	private static final int FLOP = 1;
-	private static final int TOURNANT = 2;
-	private static final int RIVER = 3;
-	private static final int SHOWDOWN = 4;
+	public static final int FLOP = 1;
+	public static final int TOURNANT = 2;
+	public static final int RIVER = 3;
+	public static final int SHOWDOWN = 4;
 
 	public final static int STARTED = 1;
 	public final static int READY_TO_START = 2;
@@ -60,30 +62,30 @@ public class Game implements Serializable, Observer {
 	private static final String GENERATED_NAME = "LabriTexasHoldem_";
 
 	@Id
-	private String name; // public at this time for testing service...
+	String name; // public at this time for testing service...
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "Game_Id")
-	@IndexColumn(name = "PlayerIndex")
-	private List<Player> players;
+	@JoinColumn(name = "game_Id")
+	@IndexColumn(name = "playerIndex")
+	List<Player> players;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "deck")
-	private Deck deck;
+	Deck deck;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "Game_Id")
-	@IndexColumn(name = "PlayerRankIndex")
-	private List<Player> playersRank;
+	@JoinColumn(name = "game_Id")
+	@IndexColumn(name = "playerRankIndex")
+	List<Player> playersRank;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Parameters.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parameters")
-	private Parameters gameType;
+	ParametersI gameType;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "Game_Id")
-	@IndexColumn(name = "FlipCardIndex")
-	private List<Card> flippedCards;
+	@JoinColumn(name = "game_Id")
+	@IndexColumn(name = "flipCardIndex")
+	List<Card> flippedCards;
 
 	private int currentPlayerInt;
 	private int dealerPlayerInt;
@@ -112,7 +114,7 @@ public class Game implements Serializable, Observer {
 	/**
 	 * Default constructor of Game, takes a SitAndGo parameters
 	 */
-	protected Game() {
+	public Game() {
 		gameType = new SitAndGo();
 		buildGame();
 	}
@@ -123,7 +125,7 @@ public class Game implements Serializable, Observer {
 	 * @see class Parameters
 	 * 
 	 */
-	protected Game(Parameters gameT) {
+	Game(ParametersI gameT) {
 		gameType = gameT;
 		buildGame();
 	}
@@ -169,6 +171,7 @@ public class Game implements Serializable, Observer {
 		++gameLevel;
 		status = STARTED;
 		Event.addEvent("START GAME");
+		dealCards();
 	}
 
 	/**
@@ -395,6 +398,7 @@ public class Game implements Serializable, Observer {
 	 * position of the old dealer
 	 */
 	private void nextDealerPlayer() {
+
 		if (dealerPlayerInt == players.size() - 1)
 			dealerPlayerInt = 0;
 		else
@@ -487,8 +491,8 @@ public class Game implements Serializable, Observer {
 	 * Verify if all players are all in. Return true if it is, false if not.
 	 */
 	private boolean isPlayersAllIn() {
+		
 		List<Player> currentPlayerInRound = currentPlayerInRound();
-
 		for (Player p : currentPlayerInRound) {
 			if (!p.isAllIn())
 				return false;
@@ -542,6 +546,7 @@ public class Game implements Serializable, Observer {
 	 */
 	public void add(Player player) {
 		players.add(player);
+		playersRank.add(player);
 		player.setGame(this);
 		player.setInGame();
 	}
@@ -559,6 +564,7 @@ public class Game implements Serializable, Observer {
 	 * current player
 	 */
 	public void nextPlayer() {
+
 		if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
 			currentPlayerInt = smallBlindPlayerInt;
 			nextPlayerToStart();
@@ -577,10 +583,13 @@ public class Game implements Serializable, Observer {
 	}
 
 	private void nextPlayerToStart() {
+
 		if (players.get(currentPlayerInt).isfolded()) {
+
 			if (currentPlayerInt == players.size() - 1) {
 				currentPlayerInt = 0;
 				lastPlayerToPlay = players.size() - 1;
+
 			} else {
 				lastPlayerToPlay = currentPlayerInt;
 				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
@@ -760,7 +769,7 @@ public class Game implements Serializable, Observer {
 		return bigBlind;
 	}
 
-	public Parameters getGameType() {
+	public ParametersI getGameType() {
 		return gameType;
 	}
 

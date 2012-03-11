@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 @Entity
 public class SitAndGo extends Parameters {
 
-	private static final long serialVersionUID = 827113569152348882L;
+	private static final long serialVersionUID = 6407941111548541169L;
 
 	public SitAndGo() {
 

@@ -1,5 +1,12 @@
 package poker.server.model.game.timer;
 
+/**
+ * @author PokerServerGroup
+ * 
+ *         Model class : StopWatch
+ *         Implements the timer that will be used in the service
+ */
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
