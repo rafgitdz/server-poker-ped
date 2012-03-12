@@ -49,11 +49,11 @@ public class TestCompleteGame {
 
 		player4.call();
 		player5.call();
-		player1.fold();
-		player2.call();
+		player1.call();
+		player2.fold();
 		player3.call();
 		assertEquals(game.getCurrentRound(), Game.FLOP);
-		player2.check();
+		//player2.check();
 		player3.check();
 		System.out.println("currentPlayer = " + game.getCurrentPlayerInt());
 		System.out.println("lasPlayerToPlay = " + game.getLastPlayerToPlay());
