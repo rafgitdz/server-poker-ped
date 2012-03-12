@@ -11,17 +11,19 @@ import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.PlayerException;
 import poker.server.model.player.Player;
+import poker.server.service.AbstractPokerService;
+import poker.server.service.ErrorMessage;
 
 @Stateless
 @Path("/player")
-public class PlayerService {
+public class PlayerService extends AbstractPokerService {
 
 	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player : ";
 
@@ -33,18 +35,18 @@ public class PlayerService {
 	 */
 	@GET
 	@Path("/raise/{name}/{tokens}")
-	public JSONObject raise(@PathParam("name") String name,
+	public Response raise(@PathParam("name") String name,
 			@PathParam("tokens") int tokens) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
-		if (!isPlayerInGame(json, player))
-			return json;
+		if ((!player.isInGame()))
+			return error(ErrorMessage.PLAYER_INGAME);
 
 		player.raise(tokens);
 		updateJSONPlayerAction(json, player);
 		repositoryPlayer.update(player);
-		return json;
+		return buildResponse(json);
 	}
 
 	/**
@@ -52,17 +54,17 @@ public class PlayerService {
 	 */
 	@GET
 	@Path("/call/{name}")
-	public JSONObject call(@PathParam("name") String name) {
+	public Response call(@PathParam("name") String name) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
-		if (!isPlayerInGame(json, player))
-			return json;
+		if ((!player.isInGame()))
+			return error(ErrorMessage.PLAYER_INGAME);
 
 		player.call();
 		updateJSONPlayerAction(json, player);
 		repositoryPlayer.update(player);
-		return json;
+		return buildResponse(json);
 	}
 
 	/**
@@ -70,17 +72,17 @@ public class PlayerService {
 	 */
 	@GET
 	@Path("/check/{name}")
-	public JSONObject check(@PathParam("name") String name) {
+	public Response check(@PathParam("name") String name) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
-		if (!isPlayerInGame(json, player))
-			return json;
+		if ((!player.isInGame()))
+			return error(ErrorMessage.PLAYER_INGAME);
 
 		player.check();
 		updateJSONPlayerAction(json, player);
 		repositoryPlayer.update(player);
-		return json;
+		return buildResponse(json);
 	}
 
 	/**
@@ -88,17 +90,17 @@ public class PlayerService {
 	 */
 	@GET
 	@Path("/fold/{name}")
-	public JSONObject fold(@PathParam("name") String name) {
+	public Response fold(@PathParam("name") String name) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
-		if (!isPlayerInGame(json, player))
-			return json;
+		if ((!player.isInGame()))
+			return error(ErrorMessage.PLAYER_INGAME);
 
 		player.check();
 		updateJSONPlayerAction(json, player);
 		repositoryPlayer.update(player);
-		return json;
+		return buildResponse(json);
 	}
 
 	/**
@@ -106,31 +108,34 @@ public class PlayerService {
 	 */
 	@GET
 	@Path("/allIn/{name}")
-	public JSONObject allIn(@PathParam("name") String name) {
+	public Response allIn(@PathParam("name") String name) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
-		if (!isPlayerInGame(json, player))
-			return json;
+		if ((!player.isInGame()))
+			return error(ErrorMessage.PLAYER_INGAME);
 
 		player.allIn();
 		updateJSONPlayerAction(json, player);
 		repositoryPlayer.update(player);
-		return json;
+		return buildResponse(json);
 	}
 
 	/**
 	 * Executes the allIn action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/missing/{name}")
-	public JSONObject missing(@PathParam("name") String name) {
+	@Path("/miss/{name}")
+	public Response miss(@PathParam("name") String name) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
+		if ((!player.isInGame()))
+			return error(ErrorMessage.PLAYER_INGAME);
+
 		player.setAsMissing();
 		repositoryPlayer.update(player);
-		return json;
+		return buildResponse(json);
 	}
 
 	/**
@@ -138,26 +143,16 @@ public class PlayerService {
 	 */
 	@GET
 	@Path("/reconnect/{name}")
-	public JSONObject reconnect(@PathParam("name") String name) {
+	public Response reconnect(@PathParam("name") String name) {
 
 		JSONObject json = new JSONObject();
 		Player player = getPlayer(name);
+		if (!player.isMissing())
+			return error(ErrorMessage.PLAYER_NOT_MISSING);
+
 		player.setInGame();
 		repositoryPlayer.update(player);
-		return json;
-	}
-
-	/**
-	 * Returns the player if he exists, launch an exception otherwise
-	 */
-	private boolean isPlayerInGame(JSONObject json, Player player) {
-
-		if (!player.isInGame()) {
-			updateJSON(json, "error", true);
-			updateJSON(json, "message", "The player isn't connected to a game");
-			return false;
-		}
-		return true;
+		return buildResponse(json);
 	}
 
 	/**
@@ -169,18 +164,6 @@ public class PlayerService {
 		if (player == null)
 			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
 		return player;
-	}
-
-	/**
-	 * Updates informations that will put in the JSON Object
-	 */
-	private void updateJSON(JSONObject json, String key, Object value) {
-
-		try {
-			json.put(key, value);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

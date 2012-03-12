@@ -32,9 +32,8 @@ public class RepositoryGenericJPA<T, TId> implements RepositoryGeneric<T, TId> {
 		return entity;
 	}
 
-	public T save(T entity, TId id) {
-
-		System.out.println("Persist : " + persistentClass.getName());
+	@Override
+	public T saveOrUpdate(T entity, TId id) {
 
 		if (em.find(persistentClass, id) != null)
 			em.merge(entity);

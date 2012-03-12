@@ -17,32 +17,23 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryPlayer;
+import poker.server.model.exception.GameException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
 import poker.server.model.game.card.Card;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
+import poker.server.service.AbstractPokerService;
 import poker.server.service.ErrorMessage;
 
 @Stateless
 @Path("/game")
-public class GameService {
-
-	private static final String CODE = "code";
-	private static final String MESSAGE = "message";
-	private static final String STAT = "stat";
-	private static final String OK = "ok";
-	private static final String FAIL = "fail";
-
-	private static final String CROS = "Access-Control-Allow-Origin";
-	private static final String STAR = "*";
+public class GameService extends AbstractPokerService {
 
 	@EJB
 	private RepositoryGame repositoryGame;
@@ -99,38 +90,23 @@ public class GameService {
 		if (resp != null)
 			return resp;
 
-		updateJSON(json, STAT, OK);
-
 		Game currentGame = repositoryGame.currentGame();
 
-		if (currentGame != null) {
+		if (currentGame == null)
+			currentGame = gameFactory.newGame();
 
-			if (!player.hasNecessaryMoney(currentGame.getGameType().getBuyIn()))
-				resp = error(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
-			else {
-				currentGame.add(player);
-				repositoryGame.update(currentGame);
+		try {
+			currentGame.add(player);
+			if (currentGame.isReadyToStart())
+				currentGame.setAsReady();
+			repositoryGame.update(currentGame);
 
-				if (currentGame.isReadyToStart())
-					currentGame.setAsReady();
-			}
-
-			updateJSON(json, "nameTable", currentGame.getName());
-
-		} else {
-
-			Game game = gameFactory.newGame();
-			if (!player.hasNecessaryMoney(game.getGameType().getBuyIn()))
-				resp = error(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
-			else {
-				player.updateMoney(game.getGameType().getBuyIn());
-				repositoryPlayer.update(player);
-				game.add(player);
-				repositoryGame.save(game);
-			}
-			updateJSON(json, "nameTable", game.getName());
+		} catch (GameException e) {
+			return error(e.getError());
 		}
 
+		updateJSON(json, STAT, OK);
+		updateJSON(json, "nameTable", currentGame.getName());
 		return buildResponse(json);
 	}
 
@@ -327,16 +303,6 @@ public class GameService {
 	}
 
 	/**
-	 * Returns the Response built on JSONObject instance
-	 */
-	private Response buildResponse(JSONObject json) {
-
-		ResponseBuilder builder = Response.ok(json);
-		builder.header(CROS, STAR);
-		return builder.build();
-	}
-
-	/**
 	 * Returns the list of players of the game {@code game}
 	 */
 	private List<String> getPlayerNames(Game game) {
@@ -362,35 +328,6 @@ public class GameService {
 			flipedCards.add(card.getId());
 
 		return flipedCards;
-	}
-
-	/**
-	 * Updates informations that will be put in the JSON Object
-	 */
-	private void updateJSON(JSONObject json, String key, Object value) {
-
-		try {
-			json.put(key, value);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Build and return a JSONObject error message
-	 */
-	private Response error(ErrorMessage errorMessage) {
-
-		JSONObject json = new JSONObject();
-
-		try {
-			json.put(STAT, FAIL);
-			json.put(CODE, errorMessage.getCode());
-			json.put(MESSAGE, errorMessage.getMessage());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return buildResponse(json);
 	}
 
 	/**

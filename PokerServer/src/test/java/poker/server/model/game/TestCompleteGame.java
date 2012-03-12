@@ -55,6 +55,8 @@ public class TestCompleteGame {
 		assertEquals(game.getCurrentRound(), Game.FLOP);
 		player2.call();
 		player3.call();
+		System.out.println("currentPlayer = " + game.getCurrentPlayerInt());
+		System.out.println("lasPlayerToPlay = " + game.getLastPlayerToPlay());
 		player4.call();
 		player5.call();
 		player1.call();
@@ -71,6 +73,8 @@ public class TestCompleteGame {
 		player5.call();
 		player1.call();
 		assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
+		assertEquals(game.getTotalPot(), Game.SHOWDOWN);
+		
 
 	}
 

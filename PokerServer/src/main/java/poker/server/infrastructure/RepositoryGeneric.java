@@ -14,7 +14,7 @@ public interface RepositoryGeneric<T, TId> {
 
 	public T save(T entity);
 
-	public T save(T entity, TId id);
+	public T saveOrUpdate(T entity, TId id);
 
 	public void delete(TId id);
 

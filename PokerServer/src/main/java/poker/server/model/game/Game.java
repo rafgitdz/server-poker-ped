@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -27,6 +25,7 @@ import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.ParametersI;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
+import poker.server.service.ErrorMessage;
 
 /**
  * @author PokerServerGroup <br/>
@@ -39,7 +38,7 @@ import poker.server.model.player.Player;
  */
 
 @Entity
-public class Game implements Serializable, Observer {
+public class Game implements Serializable {
 
 	static final long serialVersionUID = 2687924657560495636L;
 
@@ -319,22 +318,22 @@ public class Game implements Serializable, Observer {
 	}
 
 	/**
-	 * Between each round, reset all the concepts of the poker </br> Update the
-	 * new dealer, new smallBlind,...etc
+	 * Between each round, do the habitual tasks to go to the next round...
 	 */
 	protected void nextRound() {
+
 		List<Player> currentPlayers = currentPlayerInRound();
 
 		if (currentPlayers.size() == 1) {
 			currentPlayers.get(0).reward(currentPot + totalPot);
 			currentRound = SHOWDOWN;
 			nextRoundTasks();
-			currentRound = 0;
+			// currentRound = 0;
 		} else if (currentRound == RIVER) {
 			currentRound++;
 			showDown();
 			nextRoundTasks();
-			currentRound = 0;
+			// currentRound = 0;
 		} else if (isPlayersAllIn()) {
 			currentRound++;
 			flipRoundCard();
@@ -350,17 +349,20 @@ public class Game implements Serializable, Observer {
 	 */
 	private void nextRoundTasks() {
 
-		cleanTable();
-		resetPlayers();
-		nextDealerPlayer();
-		nextSmallBlindPlayer();
-		nextBigBlindPlayer();
-		updateRoundPotAndBets();
-
 		if (players.size() == 1) {
 			playersRank.add(players.get(0));
 			setPrizeForPlayers();
 			status = ENDED;
+		} else {
+			cleanTable();
+			resetPlayers();
+			nextDealerPlayer();
+			nextSmallBlindPlayer();
+			nextBigBlindPlayer();
+			updateRoundPotAndBets();
+			// add the re-init of the deck
+			// add dealCards
+			// ...
 		}
 	}
 
@@ -491,13 +493,12 @@ public class Game implements Serializable, Observer {
 	 * Verify if all players are all in. Return true if it is, false if not.
 	 */
 	private boolean isPlayersAllIn() {
-		
+
 		List<Player> currentPlayerInRound = currentPlayerInRound();
 		for (Player p : currentPlayerInRound) {
 			if (!p.isAllIn())
 				return false;
 		}
-
 		return true;
 	}
 
@@ -545,6 +546,10 @@ public class Game implements Serializable, Observer {
 	 * After each connection of player, add it to the only one non-ready game
 	 */
 	public void add(Player player) {
+
+		if (!player.hasNecessaryMoney(getGameType().getBuyIn()))
+			throw new GameException(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
+
 		players.add(player);
 		playersRank.add(player);
 		player.setGame(this);
@@ -565,23 +570,44 @@ public class Game implements Serializable, Observer {
 	 */
 	public void nextPlayer() {
 
-		if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
+		// if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
+		// currentPlayerInt = smallBlindPlayerInt;
+		// nextPlayerToStart();
+		// nextRound();
+		// } else {
+		//
+		// if (currentPlayerInt == players.size() - 1)
+		// currentPlayerInt = 0;
+		// else
+		// currentPlayerInt = (currentPlayerInt % players.size()) + 1;
+		//
+		// if (players.get(currentPlayerInt).isfolded()
+		// || players.get(currentPlayerInt).getCurrentTokens() == 0
+		// || players.get(currentPlayerInt).isMissing()) {
+		// nextPlayer();
+		// }
+		// }
+
+		if (currentPlayerInt == lastPlayerToPlay && verifyBet()) {
+
 			currentPlayerInt = smallBlindPlayerInt;
-			nextPlayerToStart();
+			lastPlayerToPlay = dealerPlayerInt;
 			nextRound();
+
 		} else {
-			if (currentPlayerInt == players.size() - 1)
-				currentPlayerInt = 0;
-			else
-				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
-			if (players.get(currentPlayerInt).isfolded()
+			do {
+				if (currentPlayerInt == players.size() - 1)
+					currentPlayerInt = 0;
+				else
+					currentPlayerInt = (currentPlayerInt % players.size()) + 1;
+
+			} while (players.get(currentPlayerInt).isfolded()
 					|| players.get(currentPlayerInt).getCurrentTokens() == 0
-					|| players.get(currentPlayerInt).isMissing()) {
-				nextPlayer();
-			}
+					|| players.get(currentPlayerInt).isMissing());
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void nextPlayerToStart() {
 
 		if (players.get(currentPlayerInt).isfolded()) {
@@ -732,21 +758,6 @@ public class Game implements Serializable, Observer {
 
 		for (Player player : playerToReward)
 			player.reward(potWinner);
-	}
-
-	/**
-	 * Class Game is an observer, and informed when an event occurred in the
-	 * other instances
-	 */
-	@Override
-	public void update(Observable o, Object arg) {
-
-		if (arg.equals("updateBlind")) {
-			updateBlind();
-		} else {
-			if (arg.equals("raise") || arg.equals("allIn"))
-				updateLastPlayerToPlay();
-		}
 	}
 
 	public void updateLastPlayerToPlay() {

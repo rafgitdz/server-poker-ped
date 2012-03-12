@@ -12,7 +12,8 @@ public enum ErrorMessage {
 	PLAYER_NOT_EXIST(7,"The player doesn't exist"),
 	NOT_ALL_PLAYERS_READY(8, "All players are not ready"),
 	UNKNOWN_ERROR(999,"Unknown error"), 
-	PLAYER_NOT_NECESSARY_MONEY(9, "The player hasn't the necessary monyer to play");
+	PLAYER_NOT_NECESSARY_MONEY(9, "The player hasn't the necessary monyer to play"),
+	PLAYER_NOT_MISSING(10, "The player isn't missing !");
 	
 	private int code;
 	private String message;

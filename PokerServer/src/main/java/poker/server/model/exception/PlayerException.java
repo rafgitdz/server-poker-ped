@@ -1,5 +1,7 @@
 package poker.server.model.exception;
 
+import poker.server.service.ErrorMessage;
+
 /**
  * @author PokerServerGroup
  * 
@@ -11,8 +13,18 @@ package poker.server.model.exception;
 public class PlayerException extends RuntimeException {
 
 	private static final long serialVersionUID = 5190319176072577558L;
+	private ErrorMessage errorMessage;
 
 	public PlayerException(String message) {
 		super(message);
+	}
+
+	public PlayerException(ErrorMessage errorMessage) {
+		super();
+		this.errorMessage = errorMessage;
+	}
+
+	public ErrorMessage getError() {
+		return errorMessage;
 	}
 }

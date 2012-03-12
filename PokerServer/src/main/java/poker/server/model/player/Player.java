@@ -9,7 +9,6 @@ package poker.server.model.player;
  */
 
 import java.io.Serializable;
-import java.util.Observable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -25,7 +24,7 @@ import poker.server.model.game.Game;
 import poker.server.model.game.card.Card;
 
 @Entity
-public class Player extends Observable implements Serializable {
+public class Player implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
 
@@ -132,8 +131,6 @@ public class Player extends Observable implements Serializable {
 			currentTokens -= necessaryTokens;
 			currentBet += necessaryTokens;
 		}
-		setChanged();
-		game.update(this, "raise"); // inform the game that a player raises
 		game.nextPlayer();
 		Event.addEvent(name + " RAISES " + quantity);
 	}
@@ -159,7 +156,6 @@ public class Player extends Observable implements Serializable {
 		}
 
 		game.nextPlayer();
-		game.update(this, "call"); // inform the game that a player call
 		Event.addEvent(name + " CALLS");
 	}
 
@@ -176,7 +172,6 @@ public class Player extends Observable implements Serializable {
 		currentTokens = 0;
 		this.allIn = true;
 
-		game.update(this, "allIn"); // inform the game that a player all in
 		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
 	}
@@ -189,7 +184,6 @@ public class Player extends Observable implements Serializable {
 		game.verifyIsMyTurn(this);
 		folded = true;
 		game.nextPlayer();
-		game.update(this, "fold"); // inform the game that a player fold
 		Event.addEvent(name + " FOLDS");
 	}
 
@@ -211,7 +205,6 @@ public class Player extends Observable implements Serializable {
 			throw new PlayerException("not enough tokens to check");
 
 		game.nextPlayer();
-		game.update(this, "check"); // inform the game that a player check
 		Event.addEvent(name + " CHECKS");
 	}
 
