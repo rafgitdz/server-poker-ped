@@ -2,6 +2,8 @@ package poker.server.model.game;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,32 +51,29 @@ public class TestCompleteGame {
 
 		player4.call();
 		player5.call();
-		player1.fold();
+		player1.call();
 		player2.call();
 		player3.call();
 		assertEquals(game.getCurrentRound(), Game.FLOP);
 		player2.check();
 		player3.check();
-		System.out.println("currentPlayer = " + game.getCurrentPlayerInt());
-		System.out.println("lasPlayerToPlay = " + game.getLastPlayerToPlay());
 		player4.check();
 		player5.check();
 		player1.check();
 		assertEquals(game.getCurrentRound(), Game.TOURNANT);
-		player2.call();
-		player3.call();
-		player4.call();
-		player5.call();
-		player1.call();
+		player2.check();
+		player3.check();
+		player4.check();
+		player5.check();
+		player1.check();
 		assertEquals(game.getCurrentRound(), Game.RIVER);
-		player2.call();
-		player3.call();
-		player4.call();
-		player5.call();
-		player1.call();
+		player2.check();
+		player3.check();
+		player4.check();
+		player5.check();
+		player1.check();
 		assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
-		
-
+		assertEquals(game.getFlipedCards().size(), 5);
 	}
 
 }

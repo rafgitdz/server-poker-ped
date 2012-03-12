@@ -320,25 +320,26 @@ public class Game implements Serializable {
 	/**
 	 * Between each round, do the habitual tasks to go to the next round...
 	 */
-	protected void nextRound() {
+	private void nextRound() {
 
 		List<Player> currentPlayers = currentPlayerInRound();
 
 		if (currentPlayers.size() == 1) {
+
 			currentPlayers.get(0).reward(currentPot + totalPot);
 			currentRound = SHOWDOWN;
-			nextRoundTasks();
-			// currentRound = 0;
-		} else if (currentRound == RIVER) {
+
+		} else if (currentRound == RIVER)
 			currentRound++;
-			showDown();
-			nextRoundTasks();
-			// currentRound = 0;
-		} else if (isPlayersAllIn()) {
+
+		else if (isPlayersAllIn()) {
+
 			currentRound++;
 			flipRoundCard();
 			nextRound();
+
 		} else {
+
 			currentRound++;
 			flipRoundCard();
 		}
@@ -349,21 +350,28 @@ public class Game implements Serializable {
 	 */
 	private void nextRoundTasks() {
 
+		cleanTable();
 		if (players.size() == 1) {
 			playersRank.add(players.get(0));
 			setPrizeForPlayers();
 			status = ENDED;
-		} else {
-			cleanTable();
-			resetPlayers();
-			nextDealerPlayer();
-			nextSmallBlindPlayer();
-			nextBigBlindPlayer();
-			updateRoundPotAndBets();
-			// add the re-init of the deck
-			// add dealCards
-			// ...
 		}
+
+		resetPlayers();
+		nextDealerPlayer();
+		nextSmallBlindPlayer();
+		nextBigBlindPlayer();
+		updateRoundPotAndBets();
+		totalPot = 0;
+		deck = new Deck();
+		initPlayersHands();
+		dealCards();
+	}
+
+	private void initPlayersHands() {
+
+		for (Player player : players)
+			player.initHand();
 	}
 
 	/**
@@ -457,11 +465,7 @@ public class Game implements Serializable {
 		for (Player player : players)
 			player.setCurrentBet(0);
 
-		if (currentRound != SHOWDOWN)
-			totalPot += currentPot;
-		else
-			totalPot = 0;
-
+		totalPot += currentPot;
 		currentBet = 0;
 		currentPot = 0;
 
@@ -550,10 +554,11 @@ public class Game implements Serializable {
 		if (!player.hasNecessaryMoney(getGameType().getBuyIn()))
 			throw new GameException(ErrorMessage.PLAYER_NOT_NECESSARY_MONEY);
 
+		player.updateMoney(getGameType().getBuyIn());
 		players.add(player);
-		playersRank.add(player);
+		playersRank.add(player); // to...
 		player.setGame(this);
-		player.setInGame();
+		player.setAsPresent();
 	}
 
 	/**
@@ -586,8 +591,7 @@ public class Game implements Serializable {
 			}
 
 		} while (players.get(currentPlayerInt).isfolded()
-				|| players.get(currentPlayerInt).getCurrentTokens() == 0
-				|| players.get(currentPlayerInt).isMissing());
+				|| players.get(currentPlayerInt).isAllIn());
 
 	}
 
@@ -666,6 +670,7 @@ public class Game implements Serializable {
 				playerToReward);
 		rewardTheWinners(playerToReward);
 
+		nextRoundTasks();
 		return bestPlayers;
 	}
 
