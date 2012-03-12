@@ -570,58 +570,25 @@ public class Game implements Serializable {
 	 */
 	public void nextPlayer() {
 
-		// if ((currentPlayerInt == lastPlayerToPlay) && verifyBet()) {
-		// currentPlayerInt = smallBlindPlayerInt;
-		// nextPlayerToStart();
-		// nextRound();
-		// } else {
-		//
-		// if (currentPlayerInt == players.size() - 1)
-		// currentPlayerInt = 0;
-		// else
-		// currentPlayerInt = (currentPlayerInt % players.size()) + 1;
-		//
-		// if (players.get(currentPlayerInt).isfolded()
-		// || players.get(currentPlayerInt).getCurrentTokens() == 0
-		// || players.get(currentPlayerInt).isMissing()) {
-		// nextPlayer();
-		// }
-		// }
+		do {
+			if (currentPlayerInt == lastPlayerToPlay && verifyBet()) {
 
-		if (currentPlayerInt == lastPlayerToPlay && verifyBet()) {
+				currentPlayerInt = smallBlindPlayerInt;
+				lastPlayerToPlay = dealerPlayerInt;
+				nextRound();
 
-			currentPlayerInt = smallBlindPlayerInt;
-			lastPlayerToPlay = dealerPlayerInt;
-			nextRound();
-
-		} else {
-			do {
+			} else {
 				if (currentPlayerInt == players.size() - 1)
 					currentPlayerInt = 0;
 				else
 					currentPlayerInt = (currentPlayerInt % players.size()) + 1;
 
-			} while (players.get(currentPlayerInt).isfolded()
-					|| players.get(currentPlayerInt).getCurrentTokens() == 0
-					|| players.get(currentPlayerInt).isMissing());
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private void nextPlayerToStart() {
-
-		if (players.get(currentPlayerInt).isfolded()) {
-
-			if (currentPlayerInt == players.size() - 1) {
-				currentPlayerInt = 0;
-				lastPlayerToPlay = players.size() - 1;
-
-			} else {
-				lastPlayerToPlay = currentPlayerInt;
-				currentPlayerInt = (currentPlayerInt % players.size()) + 1;
 			}
-			nextPlayerToStart();
-		}
+
+		} while (players.get(currentPlayerInt).isfolded()
+				|| players.get(currentPlayerInt).getCurrentTokens() == 0
+				|| players.get(currentPlayerInt).isMissing());
+
 	}
 
 	private boolean verifyBet() {

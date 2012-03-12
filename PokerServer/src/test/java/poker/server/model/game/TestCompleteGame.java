@@ -49,17 +49,17 @@ public class TestCompleteGame {
 
 		player4.call();
 		player5.call();
-		player1.call();
+		player1.fold();
 		player2.call();
 		player3.call();
 		assertEquals(game.getCurrentRound(), Game.FLOP);
-		player2.call();
-		player3.call();
+		player2.check();
+		player3.check();
 		System.out.println("currentPlayer = " + game.getCurrentPlayerInt());
 		System.out.println("lasPlayerToPlay = " + game.getLastPlayerToPlay());
-		player4.call();
-		player5.call();
-		player1.call();
+		player4.check();
+		player5.check();
+		player1.check();
 		assertEquals(game.getCurrentRound(), Game.TOURNANT);
 		player2.call();
 		player3.call();
@@ -73,7 +73,6 @@ public class TestCompleteGame {
 		player5.call();
 		player1.call();
 		assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
-		assertEquals(game.getTotalPot(), Game.SHOWDOWN);
 		
 
 	}
