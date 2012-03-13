@@ -48,7 +48,7 @@ public class TestCompleteGame {
 		player2.call();
 		player3.call();
 		assertEquals(game.getCurrentRound(), Game.FLOP);
-		player2.check();
+		//player2.check();
 		player3.check();
 		player4.check();
 		player5.check();

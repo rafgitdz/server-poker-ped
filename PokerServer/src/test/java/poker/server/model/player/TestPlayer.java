@@ -2,6 +2,8 @@ package poker.server.model.player;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -246,36 +248,48 @@ public class TestPlayer {
 				playerBuyIn.hasNecessaryMoney(game.getGameType().getBuyIn()),
 				false);
 	}
-	// CONNECT/DISCONNECT (IN SERVICE ==> TO BE REMOVED IN THE MODEL)
-	// @Test
-	// public void testConnect() {
-	//
-	// player.connect(game);
-	// int expected = 1;
-	// assertEquals(expected, game.getPlayers().size());
-	// }
-	//
-	// @Test(expected = PlayerException.class)
-	// public void testFailConnect() {
-	// player.setInGame();
-	// player.connect(game);
-	// }
-	//
-	// @Test
-	// public void testDisconnect() {
-	//
-	// player.connect(game);
-	// int expected = 1;
-	// assertEquals(expected, game.getPlayers().size());
-	//
-	// player.disconnect();
-	//
-	// expected = 0;
-	// assertEquals(expected, game.getPlayers().size());
-	// }
-	//
-	// @Test(expected = PlayerException.class)
-	// public void testFailDisconnect() {
-	// player.disconnect();
-	// }
+	
+	// POSSIBLE ACTIONS
+	@Test
+	public void testPossibleActionsAllIn(){
+		game.setCurrentBet(2000);
+		Map<String, Integer> possibleActions = player.getPossibleActions();
+		
+		assertEquals(true, possibleActions.containsKey("allIn"));
+		assertEquals(false, possibleActions.containsKey("call"));
+		assertEquals(false, possibleActions.containsKey("check"));
+		assertEquals(false, possibleActions.containsKey("raise"));
+		
+		assertEquals(player.getCurrentTokens(), (int)possibleActions.get("allIn"));
+	}
+	
+	@Test
+	public void testPossibleActionsCallRaise(){
+		game.setCurrentBet(100);
+		Map<String, Integer> possibleActions = player.getPossibleActions();
+		
+		assertEquals(true, possibleActions.containsKey("allIn"));
+		assertEquals(true, possibleActions.containsKey("call"));
+		assertEquals(false, possibleActions.containsKey("check"));
+		assertEquals(true, possibleActions.containsKey("raise"));
+		
+		int expectedTokensToCall = game.getCurrentBet() - player.getCurrentBet();
+		
+		assertEquals(expectedTokensToCall, (int)possibleActions.get("call"));
+		assertEquals(game.getCurrentBet(), (int)possibleActions.get("raise"));
+	}
+	
+	@Test
+	public void testPossibleActionsCheck(){
+		game.setCurrentBet(player.getCurrentBet());
+		Map<String, Integer> possibleActions = player.getPossibleActions();
+		
+		assertEquals(true, possibleActions.containsKey("allIn"));
+		assertEquals(false, possibleActions.containsKey("call"));
+		assertEquals(true, possibleActions.containsKey("check"));
+		assertEquals(true, possibleActions.containsKey("raise"));
+		
+		assertEquals(player.getCurrentTokens(), (int)possibleActions.get("allIn"));
+		assertEquals(game.getCurrentBet(), (int)possibleActions.get("raise"));
+	}
 }

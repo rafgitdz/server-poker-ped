@@ -6,6 +6,8 @@ package poker.server.service.player;
  *         Service class : PlayerService
  */
 
+import java.util.Map;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -138,6 +140,23 @@ public class PlayerService extends AbstractPokerService {
 		}
 
 		repositoryPlayer.update(player);
+		return buildResponse(json);
+	}
+	
+	/**
+	 * Returns the possible actions for player with the name given as parameter
+	 */
+	@GET
+	@Path("/getPossibleActions/{name}")
+	public Response getPossibleActions(@PathParam("name") String name) {
+
+		JSONObject json = new JSONObject();
+		Player player = getPlayer(name);
+		if (player.isMissing())
+			return error(ErrorMessage.PLAYER_NOT_CONNECTED);
+
+		Map<String, Integer> possibleActions = player.getPossibleActions();
+		updateJSON(json, "possibleActions", possibleActions);
 		return buildResponse(json);
 	}
 
