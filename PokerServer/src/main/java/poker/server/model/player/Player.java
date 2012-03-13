@@ -28,15 +28,20 @@ public class Player implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
 
-	public final static int PRESENT = 1;
-	public final static int READY = 2;
-	public final static int MISSING = 3;
-	public final static int IN_GAME = 4;
+	public final static int OUTGAME = 1;
+	public final static int MISSING = 2;
+	public final static int IN_GAME = 3;
 
 	public final static int DEALER = 1;
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
+
+	public final static int CHECK = 1;
+	public final static int RAISE = 2;
+	public final static int FOLD = 3;
+	public final static int ALLIN = 4;
+	public final static int CALL = 5;
 
 	public final static int MONEY = 50;
 
@@ -62,6 +67,9 @@ public class Player implements Serializable {
 	boolean folded;
 	boolean allIn;
 
+	int lastAction;
+	int lastRaisedValue;
+
 	/**
 	 * Default constructor
 	 */
@@ -86,7 +94,7 @@ public class Player implements Serializable {
 		currentBet = 0;
 		currentTokens = 0;
 		money = MONEY;
-		connectionStatus = PRESENT;
+		connectionStatus = OUTGAME;
 		folded = false;
 	}
 
@@ -133,6 +141,8 @@ public class Player implements Serializable {
 		}
 		game.updateLastPlayerToPlay();
 		game.nextPlayer();
+		lastAction = RAISE;
+		lastRaisedValue = quantity;
 		Event.addEvent(name + " RAISES " + quantity);
 	}
 
@@ -157,6 +167,7 @@ public class Player implements Serializable {
 		}
 
 		game.nextPlayer();
+		lastAction = CALL;
 		Event.addEvent(name + " CALLS");
 	}
 
@@ -175,6 +186,7 @@ public class Player implements Serializable {
 
 		game.updateLastPlayerToPlay();
 		game.nextPlayer();
+		lastAction = ALLIN;
 		Event.addEvent(name + " ALLIN");
 	}
 
@@ -186,6 +198,7 @@ public class Player implements Serializable {
 		game.verifyIsMyTurn(this);
 		folded = true;
 		game.nextPlayer();
+		lastAction = FOLD;
 		Event.addEvent(name + " FOLDS");
 	}
 
@@ -207,6 +220,7 @@ public class Player implements Serializable {
 			throw new PlayerException("not enough tokens to check");
 
 		game.nextPlayer();
+		lastAction = CHECK;
 		Event.addEvent(name + " CHECKS");
 	}
 
@@ -276,8 +290,8 @@ public class Player implements Serializable {
 		return game;
 	}
 
-	public void setAsPresent() {
-		connectionStatus = PRESENT;
+	public void setOutGame() {
+		connectionStatus = OUTGAME;
 	}
 
 	public void setAsMissing() {
@@ -289,16 +303,12 @@ public class Player implements Serializable {
 		connectionStatus = IN_GAME;
 	}
 
-	public void setAsReady() {
-		connectionStatus = READY;
-	}
-
 	public void setAsFolded() {
 		folded = true;
 	}
 
-	public boolean isPresent() {
-		return connectionStatus == PRESENT;
+	public boolean isOutGame() {
+		return connectionStatus == OUTGAME;
 	}
 
 	public boolean isMissing() {
@@ -307,10 +317,6 @@ public class Player implements Serializable {
 
 	public boolean isInGame() {
 		return connectionStatus == IN_GAME;
-	}
-
-	public boolean isReady() {
-		return connectionStatus == READY;
 	}
 
 	public boolean isDealer() {
@@ -375,9 +381,18 @@ public class Player implements Serializable {
 
 	public void setGame(Game gamE) {
 		game = gamE;
+		setInGame();
 	}
 
 	public void initHand() {
 		currentHand = new Hand();
+	}
+
+	public int getLastAction() {
+		return lastAction;
+	}
+
+	public int getLastRaisedValue() {
+		return lastRaisedValue;
 	}
 }

@@ -44,19 +44,16 @@ public class Game implements Serializable {
 
 	private static final String UNKNOWN_ROUND = "unknown round !";
 	private static final String NOT_YOUR_TURN = "It's not your turn ";
-	private static final String NOT_END_ROUND_POKER = "It's not the end of the poker round";
-	private static final String NOT_ENOUGH_FLIPED_CARDS = "There isn't enough cards to do showDown";
-	private static final String NO_PLAYER_IN_GAME = "There is no players in game";
 
 	public static final int FLOP = 1;
 	public static final int TOURNANT = 2;
 	public static final int RIVER = 3;
 	public static final int SHOWDOWN = 4;
 
-	public final static int STARTED = 1;
+	public final static int WAITING = 1;
 	public final static int READY_TO_START = 2;
-	public final static int ENDED = 3;
-	public final static int WAITING = 4;
+	public final static int STARTED = 3;
+	public final static int ENDED = 4;
 
 	private static final String GENERATED_NAME = "LabriTexasHoldem_";
 
@@ -355,6 +352,7 @@ public class Game implements Serializable {
 			playersRank.add(players.get(0));
 			setPrizeForPlayers();
 			status = ENDED;
+			return;
 		}
 
 		resetPlayers();
@@ -387,6 +385,7 @@ public class Game implements Serializable {
 			if (player.getCurrentTokens() == 0) {
 				playersRank.add(0, player);
 				players.remove(player);
+				player.setOutGame();
 				--i;
 			}
 		}
@@ -558,7 +557,9 @@ public class Game implements Serializable {
 		players.add(player);
 		playersRank.add(player); // to...
 		player.setGame(this);
-		player.setAsPresent();
+
+		if (players.size() == gameType.getPlayerNumber())
+			status = READY_TO_START;
 	}
 
 	/**
@@ -576,7 +577,7 @@ public class Game implements Serializable {
 	public void nextPlayer() {
 
 		do {
-			if (currentPlayerInt == lastPlayerToPlay && verifyBet()) {
+			if (currentPlayerInt == lastPlayerToPlay) {
 
 				currentPlayerInt = smallBlindPlayerInt;
 				lastPlayerToPlay = dealerPlayerInt;
@@ -595,6 +596,7 @@ public class Game implements Serializable {
 
 	}
 
+	@SuppressWarnings("unused")
 	private boolean verifyBet() {
 		for (Player player : players) {
 			if (player.getCurrentBet() != getCurrentBet() && !player.isfolded())
@@ -626,11 +628,11 @@ public class Game implements Serializable {
 	public Map<String, Integer> showDown() {
 
 		if (currentRound != SHOWDOWN)
-			throw new GameException(NOT_END_ROUND_POKER);
+			throw new GameException(ErrorMessage.NOT_END_ROUND_POKER);
 		if (flippedCards.size() < 5)
-			throw new GameException(NOT_ENOUGH_FLIPED_CARDS);
-		if (players.isEmpty())
-			throw new GameException(NO_PLAYER_IN_GAME);
+			throw new GameException(ErrorMessage.NOT_ENOUGH_FLIPED_CARDS);
+		if (players.isEmpty() || players.size() == 1)
+			throw new GameException(ErrorMessage.NO_PLAYER_IN_GAME);
 
 		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
 		List<Player> playerToReward = new ArrayList<Player>();

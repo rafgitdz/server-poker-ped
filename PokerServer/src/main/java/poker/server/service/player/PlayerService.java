@@ -25,7 +25,13 @@ import poker.server.service.ErrorMessage;
 @Path("/player")
 public class PlayerService extends AbstractPokerService {
 
-	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player : ";
+	private static final int NO_VALUE = 0;
+	private static final int FOLD = 1;
+	private static final int CALL = 2;
+	private static final int CHECK = 3;
+	private static final int ALLIN = 4;
+	private static final int RAISE = 5;
+	private static final int MISSING = 6;
 
 	@EJB
 	private RepositoryPlayer repositoryPlayer;
@@ -34,19 +40,10 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the raise action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/raise/{name}/{tokens}")
+	@Path("/raise/{name}/{quantity}")
 	public Response raise(@PathParam("name") String name,
-			@PathParam("tokens") int tokens) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.raise(tokens);
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+			@PathParam("quantity") int quantity) {
+		return handlePlayerAction(name, RAISE, quantity);
 	}
 
 	/**
@@ -55,16 +52,7 @@ public class PlayerService extends AbstractPokerService {
 	@GET
 	@Path("/call/{name}")
 	public Response call(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.call();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, CALL, NO_VALUE);
 	}
 
 	/**
@@ -73,16 +61,7 @@ public class PlayerService extends AbstractPokerService {
 	@GET
 	@Path("/check/{name}")
 	public Response check(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.check();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, CHECK, NO_VALUE);
 	}
 
 	/**
@@ -91,16 +70,7 @@ public class PlayerService extends AbstractPokerService {
 	@GET
 	@Path("/fold/{name}")
 	public Response fold(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.check();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, FOLD, NO_VALUE);
 	}
 
 	/**
@@ -109,48 +79,64 @@ public class PlayerService extends AbstractPokerService {
 	@GET
 	@Path("/allIn/{name}")
 	public Response allIn(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.allIn();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, ALLIN, NO_VALUE);
 	}
 
 	/**
 	 * Executes the allIn action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/miss/{name}")
+	@Path("/misses/{name}")
 	public Response miss(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.setAsMissing();
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, MISSING, NO_VALUE);
 	}
 
+	/***********************
+	 * END OF THE SERVICES *
+	 ***********************/
+
 	/**
-	 * Executes the allIn action for player with the name given as parameter
+	 * Handle the action of the player
 	 */
-	@GET
-	@Path("/reconnect/{name}")
-	public Response reconnect(@PathParam("name") String name) {
+	private Response handlePlayerAction(String playerName, int action,
+			int raiseValue) {
 
 		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if (!player.isMissing())
-			return error(ErrorMessage.PLAYER_NOT_MISSING);
+		Player player = getPlayer(playerName);
 
-		player.setInGame();
+		if (player.isMissing())
+			return error(ErrorMessage.PLAYER_NOT_CONNECTED);
+
+		switch (action) {
+
+		case FOLD:
+			player.fold();
+			break;
+
+		case CALL:
+			player.call();
+			break;
+
+		case CHECK:
+			player.check();
+			break;
+
+		case ALLIN:
+			player.allIn();
+			break;
+
+		case RAISE:
+			player.raise(raiseValue);
+			break;
+
+		case MISSING:
+			player.setAsMissing();
+			break;
+
+		default:
+			break;
+		}
+
 		repositoryPlayer.update(player);
 		return buildResponse(json);
 	}
@@ -162,26 +148,7 @@ public class PlayerService extends AbstractPokerService {
 
 		Player player = repositoryPlayer.load(name);
 		if (player == null)
-			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
+			throw new PlayerException(ErrorMessage.ERROR_UNKNOWN_PLAYER);
 		return player;
-	}
-
-	/**
-	 * Returns the informations about a player after he plays
-	 */
-	private void updateJSONPlayerAction(JSONObject json, Player player) {
-
-		updateJSON(json, "playerName", player.getName());
-		updateJSON(json, "playerBet", player.getCurrentBet());
-		updateJSON(json, "tokens", player.getCurrentTokens());
-
-		updateJSON(json, "gameBet", player.getGame().getCurrentBet());
-		updateJSON(json, "currentPot", player.getGame().getCurrentPot());
-		updateJSON(json, "totalPot", player.getGame().getTotalPot());
-
-		updateJSON(json, "flop", player.getGame().isFlop());
-		updateJSON(json, "tournant", player.getGame().isRiver());
-		updateJSON(json, "river", player.getGame().isRiver());
-		updateJSON(json, "showdown", player.getGame().isShowDown());
 	}
 }

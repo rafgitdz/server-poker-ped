@@ -20,7 +20,6 @@ public class GameFactory implements GameFactoryLocal {
 
 	@Override
 	public Game newGame(Parameters gameType) {
-		// TODO Auto-generated method stub
 		return new Game(gameType);
 	}
 }
