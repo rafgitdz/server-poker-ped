@@ -131,6 +131,7 @@ public class Player implements Serializable {
 			currentTokens -= necessaryTokens;
 			currentBet += necessaryTokens;
 		}
+		game.updateLastPlayerToPlay();
 		game.nextPlayer();
 		Event.addEvent(name + " RAISES " + quantity);
 	}
@@ -172,6 +173,7 @@ public class Player implements Serializable {
 		currentTokens = 0;
 		this.allIn = true;
 
+		game.updateLastPlayerToPlay();
 		game.nextPlayer();
 		Event.addEvent(name + " ALLIN");
 	}
@@ -280,6 +282,7 @@ public class Player implements Serializable {
 
 	public void setAsMissing() {
 		connectionStatus = MISSING;
+		fold();
 	}
 
 	public void setInGame() {
@@ -372,5 +375,9 @@ public class Player implements Serializable {
 
 	public void setGame(Game gamE) {
 		game = gamE;
+	}
+
+	public void initHand() {
+		currentHand = new Hand();
 	}
 }
