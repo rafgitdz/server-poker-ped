@@ -9,6 +9,8 @@ package poker.server.model.player;
  */
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -274,6 +276,26 @@ public class Player implements Serializable {
 
 	public Game getGame() {
 		return game;
+	}
+
+	public Map<String, Integer> getPossibleActions() {
+
+		Map<String, Integer> possibleActions = new HashMap<String, Integer>();
+
+		if(game.getCurrentBet() >= this.currentTokens) {
+			possibleActions.put("allIn", currentTokens);
+		}
+		else{
+			if(game.getCurrentBet() == this.currentBet)
+				possibleActions.put("check", 0);
+			else
+				possibleActions.put("call", game.getCurrentBet() - currentBet);
+
+			possibleActions.put("allIn", currentTokens);
+			possibleActions.put("raise", game.getCurrentBet());
+		}
+
+		return possibleActions;
 	}
 
 	public void setAsPresent() {
