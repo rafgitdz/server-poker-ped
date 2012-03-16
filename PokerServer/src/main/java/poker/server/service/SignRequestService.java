@@ -51,14 +51,16 @@ public class SignRequestService extends AbstractPokerService {
 
 	private String createSignature(String request) {
 
-		//byte[] signature = aesCrypto.encrypt(request);
-		return "";
+		byte[] bytesSign = aesCrypto.encrypt(request);
+		String stringSign = AesCrypto.bytesToString(bytesSign);
+		return stringSign;
 	}
 
 	private String decryptSignature(String Signature) {
 		
-		//String decrypted = aesCrypto.decrypt(Signature);
-		return "";
+		byte[] bytesSign = AesCrypto.stringToBytes(Signature);
+		String decrytedSign = aesCrypto.decrypt(bytesSign);
+		return decrytedSign;
 	}
 
 	private boolean checkSignature(String key, String token, String name) {
