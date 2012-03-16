@@ -2,6 +2,10 @@ package poker.server.model.game;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +16,8 @@ public class TestAesCrypto {
 	private String original;
 
 	private byte[] encrypted;
-	private String encryptedAsHex;
+	private String encryptedAsString;
+	private byte[] encryptedAsByte;
 	
 	private String decrypted;
 	
@@ -20,36 +25,47 @@ public class TestAesCrypto {
 	public void beforTest() {
 		aesCrypto = new AesCrypto();
 		original = "originalInput";
-		
-//		System.out.println("=======================");
-//		System.out.println("input : " + original);
 	}
 	
 	@Test
-	public void encryptAES() {
+	public void TestEncryptAES() {
 		encrypted = aesCrypto.encrypt(original);
-		assertFalse(original == encryptedAsHex);
-		
-		System.out.println("encrypted : " + encrypted.toString());
+		assertFalse(original == encryptedAsString);
 	}
 	
 	@Test
-	public void decryptAES() {
+	public void TestDecryptAES() {
 		encrypted = aesCrypto.encrypt(original);
 		decrypted = aesCrypto.decrypt(encrypted);
 		assertEquals(original, decrypted);
-		
-//		System.out.println("decrypted : " + decrypted);
 	}
 	
 	@Test
-	public void asHexAES() {
+	public void TestBytesToStringAES() {
 		encrypted = aesCrypto.encrypt(original);
-		encryptedAsHex = aesCrypto.asHex(encrypted);
+		encryptedAsString = AesCrypto.bytesToString(encrypted).toString();
 		
-		assertFalse(original == encryptedAsHex);
-		assertTrue((original.getClass()).equals(encryptedAsHex.getClass()));
-		
-//		System.out.println("encrypted to Hex : " + encryptedAsHex);
+		assertFalse(original == encryptedAsString);
+		assertTrue((original.getClass()).equals(encryptedAsString.getClass()));
 	}
+	
+	@Test
+	public void TestStringToBytesAES() {
+		encrypted = aesCrypto.encrypt(original);
+		encryptedAsString =  AesCrypto.bytesToString(encrypted);
+		encryptedAsByte = AesCrypto.stringToBytes(encryptedAsString);
+		
+		assertTrue(Arrays.equals(encrypted,encryptedAsByte));
+	}
+	
+	@Test
+	public void TestAllAES() {
+		encrypted = aesCrypto.encrypt(original);
+		encryptedAsString =  AesCrypto.bytesToString(encrypted);
+		encryptedAsByte = AesCrypto.stringToBytes(encryptedAsString);
+		decrypted = aesCrypto.decrypt(encryptedAsByte);
+		
+		assertTrue(original.compareTo(decrypted) == 0);
+	}
+	
 }
