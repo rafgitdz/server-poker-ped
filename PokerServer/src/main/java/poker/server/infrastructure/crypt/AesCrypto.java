@@ -11,111 +11,114 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+
 public class AesCrypto {
+        
+        private Cipher cipher;
+        private KeyGenerator kgen;
+        private SecretKeySpec skeySpec;
+        
+        public AesCrypto() {
 
-	private Cipher cipher;
-	private KeyGenerator kgen;
-	private SecretKeySpec skeySpec;
+                try {
 
-	public AesCrypto() {
+                        kgen = KeyGenerator.getInstance("AES");
+                        kgen.init(128); // 192 and 256 bits may not be available
 
-		try {
+                        SecretKey skey = kgen.generateKey();
+                        byte[] raw = skey.getEncoded();
 
-			kgen = KeyGenerator.getInstance("AES");
-			kgen.init(128); // 192 and 256 bits may not be available
-			SecretKey skey = kgen.generateKey();
-			byte[] raw = skey.getEncoded();
+                        skeySpec = new SecretKeySpec(raw, "AES");
 
-			skeySpec = new SecretKeySpec(raw, "AES");
+                        cipher = Cipher.getInstance("AES");
 
-			cipher = Cipher.getInstance("AES");
+                } catch (NoSuchAlgorithmException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (NoSuchPaddingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
 
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
+        }
 
-	}
+        public Cipher getCipher() {
+                return cipher;
+        }
 
-	public Cipher getCipher() {
-		return cipher;
-	}
+        public KeyGenerator getKgen() {
+                return kgen;
+        }
 
-	public KeyGenerator getKgen() {
-		return kgen;
-	}
+        public SecretKeySpec getSkeySpec() {
+                return skeySpec;
+        }
 
-	public SecretKeySpec getSkeySpec() {
-		return skeySpec;
-	}
+        public byte[] encrypt(String input) {
 
-	/**
-	 * Turns array of bytes into string
-	 * 
-	 * @param buf
-	 *            Array of bytes to convert to hex string
-	 * @return Generated hex string
-	 * 
-	 */
-	public String asHex(byte buf[]) {
+                byte[] encrypted = null;
 
-		StringBuffer strbuf = new StringBuffer(buf.length * 2);
-		int i;
+                try {
 
-		for (i = 0; i < buf.length; i++) {
-			if (((int) buf[i] & 0xff) < 0x10)
-				strbuf.append("0");
+                        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+                        encrypted = cipher.doFinal(input.getBytes());
 
-			strbuf.append(Long.toString((int) buf[i] & 0xff, 16));
-		}
+                } catch (InvalidKeyException e) {
+                        // TODO Auto-generated catch block
+                } catch (IllegalBlockSizeException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (BadPaddingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
 
-		return strbuf.toString();
-	}
+                return encrypted;
+        }
 
-	public byte[] encrypt(String input) {
+        public String decrypt(byte[] input) {
 
-		byte[] encrypted = null;
+                String decrypted = null;
 
-		try {
+                try {
 
-			cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-			encrypted = cipher.doFinal(input.getBytes());
+                        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+                        byte[] original = cipher.doFinal(input);
+                        decrypted = new String(original);
 
-		} catch (InvalidKeyException e) {
+                } catch (InvalidKeyException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (IllegalBlockSizeException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (BadPaddingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
 
-		} catch (IllegalBlockSizeException e) {
+                return decrypted;
+        }
 
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-
-			e.printStackTrace();
-		}
-
-		return encrypted;
-	}
-
-	public String decrypt(byte[] input) {
-
-		String decrypted = null;
-
-		try {
-
-			cipher.init(Cipher.DECRYPT_MODE, skeySpec);
-			byte[] original = cipher.doFinal(input);
-			decrypted = new String(original);
-
-		} catch (InvalidKeyException e) {
-
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-
-			e.printStackTrace();
-		}
-
-		return decrypted;
-	}
+        public static String bytesToString(byte[] input) {
+                String output = Hex.encodeHexString(input);
+                return output;
+        }
+        
+        public static byte[] stringToBytes(String input) {
+                
+                char[] inputChar = input.toCharArray();
+                byte[] output = null;
+                
+                try {
+                        output = Hex.decodeHex(inputChar);
+                } catch (DecoderException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                
+                return output;
+        }
 }
