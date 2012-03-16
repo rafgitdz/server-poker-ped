@@ -416,4 +416,8 @@ public class Player implements Serializable {
 	public int getLastRaisedValue() {
 		return lastRaisedValue;
 	}
+
+	public String getConsumerKey() {
+		return "EROPFKLDFKLDDFDSSDKJ";
+	}
 }

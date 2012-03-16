@@ -42,9 +42,16 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the raise action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/raise/{name}/{quantity}")
-	public Response raise(@PathParam("name") String name,
-			@PathParam("quantity") int quantity) {
+	@Path("/raise/{consumerKey}/{signature}/{token}/{name}/{quantity}")
+	public Response raise(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name, @PathParam("quantity") int quantity) {
+
+		// decrypt the signature
+		// exist(token) , exist(consumerKey)
+		// verifier si le token est conforme au consumerKey dans le DB
+		// si le token est valide
 		return handlePlayerAction(name, RAISE, quantity);
 	}
 
@@ -142,7 +149,7 @@ public class PlayerService extends AbstractPokerService {
 		repositoryPlayer.update(player);
 		return buildResponse(json);
 	}
-	
+
 	/**
 	 * Returns the possible actions for player with the name given as parameter
 	 */
