@@ -18,14 +18,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryGame;
+import poker.server.infrastructure.RepositoryParameters;
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
 import poker.server.model.game.card.Card;
+import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
@@ -40,6 +44,9 @@ public class GameService extends AbstractPokerService {
 
 	@EJB
 	private RepositoryPlayer repositoryPlayer;
+
+	@EJB
+	private RepositoryParameters repositoryParameters;
 
 	@EJB
 	private GameFactoryLocal gameFactory;
@@ -65,12 +72,13 @@ public class GameService extends AbstractPokerService {
 	 * 
 	 */
 	@GET
-	@Path("/authenticate/{name}/{pwd}")
-	public Response authenticate(@PathParam("name") String name,
-			@PathParam("pwd") String pwd) {
+	@Path("/authenticate/{consumerKey}/{token}/{signature}/{name}/{pwd}")
+	public Response authenticate(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name, @PathParam("pwd") String pwd) {
 
 		JSONObject json = new JSONObject();
-		Response resp = null;
 		Player player = repositoryPlayer.load(name);
 
 		if (player == null) {
@@ -79,37 +87,93 @@ public class GameService extends AbstractPokerService {
 			repositoryPlayer.save(player);
 
 		} else {
+
 			if (!player.getPwd().equals(pwd))
-				resp = error(ErrorMessage.NOT_CORRECT_PASSWORD);
-		}
-
-		if (resp != null)
-			return resp;
-
-		Game currentGame = repositoryGame.currentGame();
-
-		if (player.isInGame())
-			updateJSON(json, "alreadyConnected", true);
-
-		else {
-
-			updateJSON(json, "alreadyConnected", false);
-
-			if (currentGame == null)
-				currentGame = gameFactory.newGame();
-
-			try {
-				currentGame.add(player);
-				repositoryGame.update(currentGame);
-
-			} catch (GameException e) {
-				return error(e.getError());
-			}
-
-			updateJSON(json, "nameTable", currentGame.getName());
+				return error(ErrorMessage.NOT_CORRECT_PASSWORD);
+			else if (player.isInGame())
+				updateJSON(json, "alreadyConnected", true);
+			else
+				updateJSON(json, "alreadyConnected", false);
 		}
 
 		updateJSON(json, STAT, OK);
+		return buildResponse(json);
+	}
+
+	/**
+	 * Returns the status of the game that is not ready to start
+	 * 
+	 * @return
+	 */
+	@GET
+	@Path("/connectGame/{consumerKey}/{token}/{signature}/{tableName}/{playerName}")
+	public Response connectGame(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("tableName") String tableName,
+			@PathParam("playerName") String playerName) {
+
+		Game game = repositoryGame.load(tableName);
+
+		if (game == null)
+			return error(ErrorMessage.GAME_NOT_EXIST);
+		else if (game.isStarted())
+			return error(ErrorMessage.GAME_ALREADY_STARTED);
+
+		Player player = repositoryPlayer.load(playerName);
+
+		if (player == null)
+			return error(ErrorMessage.PLAYER_NOT_EXIST);
+		else if (player.isInGame())
+			return error(ErrorMessage.PLAYER_INGAME);
+
+		game.add(player);
+		repositoryGame.update(game);
+
+		JSONObject json = new JSONObject();
+		updateJSON(json, STAT, OK);
+		updateJSON(json, "tableName", game.getName());
+		return buildResponse(json);
+	}
+
+	/**
+	 * Returns the status of all games (types) that is not ready to start
+	 * 
+	 * @return
+	 */
+	@GET
+	@Path("/getGamesStatus")
+	public Response getGamesStatus() {
+
+		List<Game> currentGames = new ArrayList<Game>();
+		List<Parameters> parameters = new ArrayList<Parameters>();
+
+		currentGames = repositoryGame.getNotReadyGames();
+		parameters = repositoryParameters.loadAll();
+
+		if (currentGames.size() < parameters.size()) {
+
+			for (Parameters param : parameters) {
+
+				if (!repositoryGame.exist(param)) {
+					Game newGame = gameFactory.newGame(param);
+					newGame = repositoryGame.save(newGame);
+					currentGames.add(newGame);
+				}
+			}
+		}
+
+		currentGames = repositoryGame.getReadyOrNotGames();
+		JSONArray gamesStatus = new JSONArray();
+
+		for (Game game : currentGames)
+			gamesStatus.put(getGameStatus(game));
+
+		JSONObject json = new JSONObject();
+		updateJSON(json, STAT, OK);
+
+		updateJSON(json, "gamesStatus", gamesStatus);
+
 		return buildResponse(json);
 	}
 
@@ -128,7 +192,7 @@ public class GameService extends AbstractPokerService {
 		if (currentGame == null)
 			resp = error(ErrorMessage.GAME_NOT_EXIST);
 		else if (currentGame != null)
-			resp = getGameStatus(currentGame);
+			resp = buildResponse(getGameStatus(currentGame));
 
 		return resp;
 	}
@@ -174,9 +238,6 @@ public class GameService extends AbstractPokerService {
 		if (game == null)
 			resp = error(ErrorMessage.GAME_NOT_EXIST);
 
-		else if (!game.isReady())
-			resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
-
 		if (resp != null)
 			return resp;
 
@@ -184,6 +245,8 @@ public class GameService extends AbstractPokerService {
 
 		try {
 			winners = game.showDown();
+			repositoryGame.update(game);
+			
 		} catch (GameException e) {
 			return error(e.getError());
 		}
@@ -197,6 +260,34 @@ public class GameService extends AbstractPokerService {
 		return buildResponse(json);
 	}
 
+	/**
+	 * Returns the winners and the list of hand's players, after a showDown
+	 */
+	@GET
+	@Path("/addGameType/{nameParameters}")
+	public Response addGameType(
+			@PathParam("nameParameters") String nameParameters) {
+
+		Parameters param = new SitAndGo(nameParameters);
+		repositoryParameters.save(param);
+		JSONObject json = new JSONObject();
+		updateJSON(json, STAT, OK);
+		return buildResponse(json);
+	}
+
+	/**
+	 * Returns the winners and the list of hand's players, after a showDown
+	 */
+	@GET
+	@Path("/defaultGameType/")
+	public Response defaultGameType() {
+
+		repositoryParameters.save(new SitAndGo());
+		JSONObject json = new JSONObject();
+		updateJSON(json, STAT, OK);
+		return buildResponse(json);
+	}
+
 	/***********************
 	 * END OF THE SERVICES *
 	 ***********************/
@@ -204,7 +295,7 @@ public class GameService extends AbstractPokerService {
 	/**
 	 * Returns the status of the game
 	 */
-	private Response getGameStatus(Game currentGame) {
+	private JSONObject getGameStatus(Game currentGame) {
 
 		JSONObject json = new JSONObject();
 
@@ -229,7 +320,7 @@ public class GameService extends AbstractPokerService {
 		updateJSON(json, "prizePool", currentGame.getPrizePool());
 		updateJSON(json, STAT, OK);
 
-		return buildResponse(json);
+		return json;
 	}
 
 	/**

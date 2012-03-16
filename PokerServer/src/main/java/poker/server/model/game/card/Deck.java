@@ -9,6 +9,7 @@ package poker.server.model.game.card;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -76,15 +77,20 @@ public class Deck implements Serializable {
 			throw new GameException(NO_CARDS);
 
 		Card temp = null;
-		int limit = cards.size() / 2;
-		int sizeCards = cards.size() - 1;
 
-		for (int i = 0; i < limit; ++i, --sizeCards) {
-			temp = cards.get(i);
-			cards.set(i, cards.get(sizeCards));
-			cards.set(sizeCards, temp);
+		Random r = new Random();
+		int random = r.nextInt() % 20;
+
+		while (random > 0) {
+			int limit = cards.size() / 2;
+			int sizeCards = cards.size() - 1;
+			for (int i = 0; i < limit; ++i, --sizeCards) {
+				temp = cards.get(i);
+				cards.set(i, cards.get(sizeCards));
+				cards.set(sizeCards, temp);
+			}
+			--random;
 		}
-
 		Event.addEvent("THE DECK IS SHUFFLED");
 	}
 

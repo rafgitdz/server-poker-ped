@@ -60,6 +60,8 @@ public class Player implements Serializable {
 	@JoinColumn(name = "hand")
 	Hand currentHand;
 
+	transient Hand cleanHand = new Hand();
+
 	int currentBet;
 	int currentTokens;
 	int money;
@@ -294,6 +296,7 @@ public class Player implements Serializable {
 
 	public void setOutGame() {
 		connectionStatus = OUTGAME;
+		game.removePlayer(name);
 	}
 
 	public Map<String, Integer> getPossibleActions() {
@@ -406,7 +409,7 @@ public class Player implements Serializable {
 	}
 
 	public void initHand() {
-		currentHand = new Hand();
+		currentHand = cleanHand;
 	}
 
 	public int getLastAction() {
@@ -415,9 +418,5 @@ public class Player implements Serializable {
 
 	public int getLastRaisedValue() {
 		return lastRaisedValue;
-	}
-
-	public String getConsumerKey() {
-		return "EROPFKLDFKLDDFDSSDKJ";
 	}
 }

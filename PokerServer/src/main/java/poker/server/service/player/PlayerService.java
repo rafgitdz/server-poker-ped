@@ -34,6 +34,7 @@ public class PlayerService extends AbstractPokerService {
 	private static final int ALLIN = 4;
 	private static final int RAISE = 5;
 	private static final int MISSING = 6;
+	private static final int DISCONNECT = 7;
 
 	@EJB
 	private RepositoryPlayer repositoryPlayer;
@@ -92,12 +93,22 @@ public class PlayerService extends AbstractPokerService {
 	}
 
 	/**
-	 * Executes the allIn action for player with the name given as parameter
+	 * Executes the miss action for player with the name given as parameter
 	 */
 	@GET
 	@Path("/misses/{name}")
 	public Response miss(@PathParam("name") String name) {
 		return handlePlayerAction(name, MISSING, NO_VALUE);
+	}
+
+	/**
+	 * Executes the disconnect action for player with the name given as
+	 * parameter
+	 */
+	@GET
+	@Path("/disconnect/{name}")
+	public Response disconnect(@PathParam("name") String name) {
+		return handlePlayerAction(name, DISCONNECT, NO_VALUE);
 	}
 
 	/***********************
@@ -140,6 +151,10 @@ public class PlayerService extends AbstractPokerService {
 
 		case MISSING:
 			player.setAsMissing();
+			break;
+
+		case DISCONNECT:
+			player.setOutGame();
 			break;
 
 		default:

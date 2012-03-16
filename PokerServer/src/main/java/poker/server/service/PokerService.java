@@ -8,7 +8,7 @@ public interface PokerService {
 
 	Response buildResponse(JSONObject json);
 
-	Response error(ErrorMessage errorMessage);
-
 	void updateJSON(JSONObject json, String key, Object value);
+
+	Response error(ErrorMessage errorMessage);
 }

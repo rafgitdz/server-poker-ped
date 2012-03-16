@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.AbstractParameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
@@ -64,7 +64,7 @@ public class TestGame {
 	@Test
 	public void testNewGameParameters() {
 		Game gameParameters;
-		Parameters params = new SitAndGo();
+		AbstractParameters params = new SitAndGo();
 		gameParameters = gameFactory.newGame(params);
 
 		assertEquals(params, gameParameters.getGameType());

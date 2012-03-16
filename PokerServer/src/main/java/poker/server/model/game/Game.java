@@ -21,8 +21,8 @@ import org.hibernate.annotations.IndexColumn;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
+import poker.server.model.game.parameters.AbstractParameters;
 import poker.server.model.game.parameters.Parameters;
-import poker.server.model.game.parameters.ParametersI;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.service.ErrorMessage;
@@ -69,14 +69,16 @@ public class Game implements Serializable {
 	@JoinColumn(name = "deck")
 	Deck deck;
 
+	transient Deck originalDeck = new Deck();
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
 	@IndexColumn(name = "playerRankIndex")
 	List<Player> playersRank;
 
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Parameters.class, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = AbstractParameters.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parameters")
-	ParametersI gameType;
+	Parameters gameType;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
@@ -121,8 +123,9 @@ public class Game implements Serializable {
 	 * @see class Parameters
 	 * 
 	 */
-	Game(ParametersI gameT) {
+	Game(Parameters gameT) {
 		gameType = gameT;
+		gameType.increment();
 		buildGame();
 	}
 
@@ -141,7 +144,7 @@ public class Game implements Serializable {
 		currentBet = 0;
 		currentRound = 0;
 		gameLevel = 0;
-		deck = new Deck();
+		deck = originalDeck;
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
 		playersRank = new ArrayList<Player>();
@@ -166,6 +169,7 @@ public class Game implements Serializable {
 		setInitBetGame();
 		++gameLevel;
 		status = STARTED;
+		gameType.decrement();
 		Event.addEvent("START GAME");
 		dealCards();
 	}
@@ -361,7 +365,9 @@ public class Game implements Serializable {
 		nextBigBlindPlayer();
 		updateRoundPotAndBets();
 		totalPot = 0;
-		deck = new Deck();
+		deck = originalDeck;
+		flippedCards = null;
+		flippedCards = new ArrayList<Card>();
 		initPlayersHands();
 		dealCards();
 	}
@@ -754,8 +760,12 @@ public class Game implements Serializable {
 		return bigBlind;
 	}
 
-	public ParametersI getGameType() {
+	public Parameters getGameType() {
 		return gameType;
+	}
+
+	public void setGameType(Parameters gameType) {
+		this.gameType = gameType;
 	}
 
 	public List<Player> getPlayers() {
@@ -967,5 +977,9 @@ public class Game implements Serializable {
 	 */
 	public boolean isGameEnded() {
 		return status == ENDED;
+	}
+
+	public void removePlayer(String playerName) {
+		players.remove(playerName);
 	}
 }
