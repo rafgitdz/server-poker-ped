@@ -6,8 +6,6 @@ package poker.server.service.player;
  *         Service class : PlayerService
  */
 
-import java.util.Map;
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -18,10 +16,9 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryPlayer;
-import poker.server.model.exception.PlayerException;
+import poker.server.model.exception.ErrorMessage;
 import poker.server.model.player.Player;
 import poker.server.service.AbstractPokerService;
-import poker.server.service.ErrorMessage;
 
 @Stateless
 @Path("/player")
@@ -49,10 +46,11 @@ public class PlayerService extends AbstractPokerService {
 			@PathParam("signature") String signature,
 			@PathParam("name") String name, @PathParam("quantity") int quantity) {
 
-		// decrypt the signature
-		// exist(token) , exist(consumerKey)
-		// verifier si le token est conforme au consumerKey dans le DB
-		// si le token est valide
+		/*
+		 * decrypt the signature exist(token) , exist(consumerKey) verifier si
+		 * le token est conforme au consumerKey dans le DB si le token est
+		 * valide
+		 */
 		return handlePlayerAction(name, RAISE, quantity);
 	}
 
@@ -60,8 +58,12 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the call action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/call/{name}")
-	public Response call(@PathParam("name") String name) {
+	@Path("/call/{consumerKey}/{signature}/{token}/{name}")
+	public Response call(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
+
 		return handlePlayerAction(name, CALL, NO_VALUE);
 	}
 
@@ -69,8 +71,12 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the check action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/check/{name}")
-	public Response check(@PathParam("name") String name) {
+	@Path("/check/{consumerKey}/{signature}/{token}/{name}")
+	public Response check(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
+
 		return handlePlayerAction(name, CHECK, NO_VALUE);
 	}
 
@@ -78,8 +84,12 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the fold action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/fold/{name}")
-	public Response fold(@PathParam("name") String name) {
+	@Path("/fold/{consumerKey}/{signature}/{token}/{name}")
+	public Response fold(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
+
 		return handlePlayerAction(name, FOLD, NO_VALUE);
 	}
 
@@ -87,8 +97,12 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the allIn action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/allIn/{name}")
-	public Response allIn(@PathParam("name") String name) {
+	@Path("/allIn/{consumerKey}/{signature}/{token}/{name}")
+	public Response allIn(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
+
 		return handlePlayerAction(name, ALLIN, NO_VALUE);
 	}
 
@@ -96,8 +110,12 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the miss action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/misses/{name}")
-	public Response miss(@PathParam("name") String name) {
+	@Path("/misses/{consumerKey}/{signature}/{token}/{name}")
+	public Response miss(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
+
 		return handlePlayerAction(name, MISSING, NO_VALUE);
 	}
 
@@ -106,8 +124,12 @@ public class PlayerService extends AbstractPokerService {
 	 * parameter
 	 */
 	@GET
-	@Path("/disconnect/{name}")
-	public Response disconnect(@PathParam("name") String name) {
+	@Path("/disconnect/{consumerKey}/{signature}/{token}/{name}")
+	public Response disconnect(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
+
 		return handlePlayerAction(name, DISCONNECT, NO_VALUE);
 	}
 
@@ -122,10 +144,17 @@ public class PlayerService extends AbstractPokerService {
 			int raiseValue) {
 
 		JSONObject json = new JSONObject();
-		Player player = getPlayer(playerName);
+		Player player = repositoryPlayer.load(playerName);
 
-		if (player.isMissing())
-			return error(ErrorMessage.PLAYER_NOT_CONNECTED);
+		if (player == null)
+			return error(ErrorMessage.ERROR_UNKNOWN_PLAYER);
+
+		else {
+			if (player.isOutGame() || player.isMissing())
+				return error(ErrorMessage.PLAYER_NOT_CONNECTED);
+			else if (player.getGame() != null && !player.getGame().isStarted())
+				return error(ErrorMessage.GAME_NOT_READY_TO_START);
+		}
 
 		switch (action) {
 
@@ -163,33 +192,5 @@ public class PlayerService extends AbstractPokerService {
 
 		repositoryPlayer.update(player);
 		return buildResponse(json);
-	}
-
-	/**
-	 * Returns the possible actions for player with the name given as parameter
-	 */
-	@GET
-	@Path("/getPossibleActions/{name}")
-	public Response getPossibleActions(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if (player.isMissing())
-			return error(ErrorMessage.PLAYER_NOT_CONNECTED);
-
-		Map<String, Integer> possibleActions = player.getPossibleActions();
-		updateJSON(json, "possibleActions", possibleActions);
-		return buildResponse(json);
-	}
-
-	/**
-	 * Returns the player if he exists, launch an exception otherwise
-	 */
-	private Player getPlayer(String name) {
-
-		Player player = repositoryPlayer.load(name);
-		if (player == null)
-			throw new PlayerException(ErrorMessage.ERROR_UNKNOWN_PLAYER);
-		return player;
 	}
 }

@@ -24,8 +24,6 @@ public interface Parameters extends Serializable {
 
 	void setBlinds(int smallB);
 
-	void setPlayerNumber(int playerNumb);
-
 	List<Percent> getPotSplit();
 
 	int getPlayerNumber();

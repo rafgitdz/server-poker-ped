@@ -18,6 +18,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.IndexColumn;
 
+import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
@@ -25,7 +26,6 @@ import poker.server.model.game.parameters.AbstractParameters;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
-import poker.server.service.ErrorMessage;
 
 /**
  * @author PokerServerGroup <br/>

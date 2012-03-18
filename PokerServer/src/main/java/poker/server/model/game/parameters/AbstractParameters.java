@@ -27,7 +27,7 @@ public abstract class AbstractParameters implements Parameters {
 
 	@Id
 	String name;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parameters_Id")
 	@IndexColumn(name = "percentIndex")
@@ -69,11 +69,6 @@ public abstract class AbstractParameters implements Parameters {
 	public void setBlinds(int smallB) {
 		smallBlind = smallB;
 		bigBlind = smallBlind * multFactor;
-	}
-
-	@Override
-	public void setPlayerNumber(int playerNumb) {
-		playerNumber = playerNumb;
 	}
 
 	@Override
@@ -130,14 +125,18 @@ public abstract class AbstractParameters implements Parameters {
 	public String getName() {
 		return name;
 	}
-	
+
 	@Override
 	public void increment() {
 		numberOfCurrentGames++;
 	}
-	
+
 	@Override
 	public void decrement() {
 		numberOfCurrentGames--;
+	}
+
+	public void setPlayerNumber(int i) {
+		playerNumber = i;
 	}
 }

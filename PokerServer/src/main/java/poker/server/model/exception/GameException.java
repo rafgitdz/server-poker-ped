@@ -1,6 +1,5 @@
 package poker.server.model.exception;
 
-import poker.server.service.ErrorMessage;
 
 /**
  * @author PokerServerGroup

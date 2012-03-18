@@ -1,6 +1,5 @@
-package poker.server.service;
+package poker.server.service.sign;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,12 +9,13 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.crypt.AesCrypto;
+import poker.server.service.AbstractPokerService;
 
 @Stateless
 @Path("/sign")
 public class SignRequestService extends AbstractPokerService {
 
-	@EJB
+	// @EJB
 	private AesCrypto aesCrypto;
 
 	@GET
@@ -56,7 +56,7 @@ public class SignRequestService extends AbstractPokerService {
 	}
 
 	private String decryptSignature(String Signature) {
-		
+
 		byte[] bytesSign = AesCrypto.stringToBytes(Signature);
 		String decrytedSign = aesCrypto.decrypt(bytesSign);
 		return decrytedSign;

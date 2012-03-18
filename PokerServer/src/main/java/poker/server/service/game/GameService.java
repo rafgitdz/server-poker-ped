@@ -24,16 +24,17 @@ import org.json.JSONObject;
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryParameters;
 import poker.server.infrastructure.RepositoryPlayer;
+import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
 import poker.server.model.game.card.Card;
+import poker.server.model.game.parameters.OtherGameType;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
-import poker.server.service.ErrorMessage;
 
 @Stateless
 @Path("/game")
@@ -58,7 +59,7 @@ public class GameService extends AbstractPokerService {
 	 * Insure the connection of a player in a game, the result is a
 	 * {@code JSONObject} that will contains the informations about the
 	 * connection's state, if the connection of the player is correct then
-	 * {@code signed = true} else {@code signed = false} and with
+	 * {@code stat = true} else {@code stat = false} and with
 	 * {@code message String}
 	 * 
 	 * @param name
@@ -90,9 +91,10 @@ public class GameService extends AbstractPokerService {
 
 			if (!player.getPwd().equals(pwd))
 				return error(ErrorMessage.NOT_CORRECT_PASSWORD);
-			else if (player.isInGame())
+			else if (player.isInGame()) {
 				updateJSON(json, "alreadyConnected", true);
-			else
+				updateJSON(json, "tableName", player.getGame().getName());
+			} else
 				updateJSON(json, "alreadyConnected", false);
 		}
 
@@ -101,7 +103,8 @@ public class GameService extends AbstractPokerService {
 	}
 
 	/**
-	 * Returns the status of the game that is not ready to start
+	 * Connects a player's name given as parameter a the game given also as
+	 * parameter
 	 * 
 	 * @return
 	 */
@@ -142,8 +145,8 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 */
 	@GET
-	@Path("/getGamesStatus")
-	public Response getGamesStatus() {
+	@Path("/getGamesStatus/{consumerKey}")
+	public Response getGamesStatus(@PathParam("consumerKey") String consumerKey) {
 
 		List<Game> currentGames = new ArrayList<Game>();
 		List<Parameters> parameters = new ArrayList<Parameters>();
@@ -151,7 +154,14 @@ public class GameService extends AbstractPokerService {
 		currentGames = repositoryGame.getNotReadyGames();
 		parameters = repositoryParameters.loadAll();
 
-		if (currentGames.size() < parameters.size()) {
+		if (parameters.size() == 0) {
+			// by default if there is not a default parameter, create manually a
+			// game with this default parameter
+			Game newGame = gameFactory.newGame();
+			newGame = repositoryGame.save(newGame);
+			currentGames.add(newGame);
+
+		} else if (currentGames.size() < parameters.size()) {
 
 			for (Parameters param : parameters) {
 
@@ -178,33 +188,14 @@ public class GameService extends AbstractPokerService {
 	}
 
 	/**
-	 * Returns the status of the game that is not ready to start
-	 * 
-	 * @return
-	 */
-	@GET
-	@Path("/getGameStatus/{tableName}")
-	public Response getGameStatus(@PathParam("tableName") String tableName) {
-
-		Response resp = null;
-		Game currentGame = repositoryGame.load(tableName);
-
-		if (currentGame == null)
-			resp = error(ErrorMessage.GAME_NOT_EXIST);
-		else if (currentGame != null)
-			resp = buildResponse(getGameStatus(currentGame));
-
-		return resp;
-	}
-
-	/**
 	 * Returns all the informations about the current game {@code tableName}
 	 * 
 	 * @return
 	 */
 	@GET
-	@Path("/getGameData/{tableName}/{playerName}")
-	public Response getGameData(@PathParam("tableName") String tableName,
+	@Path("/getGameData/{consumerKey}/{tableName}/{playerName}")
+	public Response getGameData(@PathParam("consumerKey") String consumerKey,
+			@PathParam("tableName") String tableName,
 			@PathParam("playerName") String playerName) {
 
 		Response resp = null;
@@ -228,25 +219,24 @@ public class GameService extends AbstractPokerService {
 	 * Returns the winners and the list of hand's players, after a showDown
 	 */
 	@GET
-	@Path("/showDown/{tableName}")
-	public Response showDown(@PathParam("tableName") String tableName) {
+	@Path("/showDown/{consumerKey}/{token}/{signature}/{tableName}")
+	public Response showDown(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("tableName") String tableName) {
 
 		JSONObject json = new JSONObject();
-		Response resp = null;
 		Game game = repositoryGame.load(tableName);
 
 		if (game == null)
-			resp = error(ErrorMessage.GAME_NOT_EXIST);
-
-		if (resp != null)
-			return resp;
+			return error(ErrorMessage.GAME_NOT_EXIST);
 
 		Map<String, Integer> winners = null;
 
 		try {
 			winners = game.showDown();
 			repositoryGame.update(game);
-			
+
 		} catch (GameException e) {
 			return error(e.getError());
 		}
@@ -261,30 +251,58 @@ public class GameService extends AbstractPokerService {
 	}
 
 	/**
-	 * Returns the winners and the list of hand's players, after a showDown
+	 * Adds a new game type
 	 */
 	@GET
-	@Path("/addGameType/{nameParameters}")
-	public Response addGameType(
-			@PathParam("nameParameters") String nameParameters) {
+	@Path("/addGameType/{consumerKey}/{name}/{potType}/{buyIn}/{buyInIncreasing}/{multFactor}/{bigBlind}"
+			+ "/{smallBlind}/{initPlayersTokens}/{playerNumber}/{speakTime}/{timeChangeBlind}/{numberOfWinners}"
+			+ "/{percent1}/{percent2}/{percent3}/")
+	public Response addGameType(@PathParam("consumerKey") String consumerKey,
+			@PathParam("name") String name, @PathParam("potType") int potType,
+			@PathParam("buyIn") int buyIn,
+			@PathParam("buyInIncreasing") int buyInIncreasing,
+			@PathParam("multFactor") int multFactor,
+			@PathParam("bigBlind") int bigBlind,
+			@PathParam("smallBlind") int smallBlind,
+			@PathParam("initPlayersTokens") int initPlayersTokens,
+			@PathParam("playerNumber") int playerNumber,
+			@PathParam("speakTime") int speakTime,
+			@PathParam("timeChangeBlind") int timeChangeBlind,
+			@PathParam("numberOfWinners") int numberOfWinners,
+			@PathParam("percent1") int percentReward1,
+			@PathParam("percent2") int percentReward2,
+			@PathParam("percent3") int percentReward3) {
 
-		Parameters param = new SitAndGo(nameParameters);
-		repositoryParameters.save(param);
+		Parameters param = new OtherGameType(name, potType, buyIn,
+				buyInIncreasing, multFactor, bigBlind, smallBlind,
+				initPlayersTokens, playerNumber, speakTime, timeChangeBlind,
+				numberOfWinners, percentReward1, percentReward2, percentReward3);
+		try {
+			repositoryParameters.save(param);
+		} catch (Exception e) {
+			return error(e.getMessage());
+		}
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
 		return buildResponse(json);
 	}
 
 	/**
-	 * Returns the winners and the list of hand's players, after a showDown
+	 * create the only default game type
 	 */
 	@GET
-	@Path("/defaultGameType/")
-	public Response defaultGameType() {
+	@Path("/defaultGameType/{consumerKey}")
+	public Response defaultGameType(@PathParam("consumerKey") String consumerKey) {
 
-		repositoryParameters.save(new SitAndGo());
 		JSONObject json = new JSONObject();
-		updateJSON(json, STAT, OK);
+
+		if (!repositoryParameters.existSitAndGo()) {
+
+			repositoryParameters.save(new SitAndGo());
+			updateJSON(json, STAT, OK);
+		} else
+			return error(ErrorMessage.SITANDGO_ALREADY_EXISTS);
+
 		return buildResponse(json);
 	}
 

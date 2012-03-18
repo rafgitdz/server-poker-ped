@@ -15,10 +15,6 @@ public class SitAndGo extends AbstractParameters {
 
 	private static final long serialVersionUID = 6407941111548541169L;
 
-	public SitAndGo(String name) {
-		this.name = name;
-	}
-
 	public SitAndGo() {
 
 		name = "Labri_Texas_Holdem_SitAndGo";
@@ -36,7 +32,7 @@ public class SitAndGo extends AbstractParameters {
 
 		setBlinds(10);
 		setPotAsToken();
-		
+
 		numberOfCurrentGames = 0;
 	}
 }

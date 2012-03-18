@@ -1,24 +1,23 @@
 package poker.server.model.exception;
 
-
 /**
  * @author PokerServerGroup
  * 
- * @exception PlayerException
+ * @exception ParametersException
  * 
  *                Exception launched after an error detected in the treatment
  */
 
-public class PlayerException extends RuntimeException {
+public class ParametersException extends RuntimeException {
 
-	private static final long serialVersionUID = 5190319176072577558L;
+	private static final long serialVersionUID = 4202663862670216896L;
 	private ErrorMessage errorMessage;
 
-	public PlayerException(String message) {
+	public ParametersException(String message) {
 		super(message);
 	}
 
-	public PlayerException(ErrorMessage errorMessage) {
+	public ParametersException(ErrorMessage errorMessage) {
 		super();
 		this.errorMessage = errorMessage;
 	}

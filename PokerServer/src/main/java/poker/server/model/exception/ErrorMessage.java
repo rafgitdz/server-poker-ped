@@ -1,4 +1,4 @@
-package poker.server.service;
+package poker.server.model.exception;
 
 public enum ErrorMessage {
 	
@@ -19,7 +19,14 @@ public enum ErrorMessage {
 	NOT_ENOUGH_FLIPED_CARDS(12, "There isn't enough cards to do showDown"),
 	NO_PLAYER_IN_GAME (13,"There is no players in game"), 
 	ERROR_UNKNOWN_PLAYER(14, "Unknown player !"), 
-	PLAYER_NOT_CONNECTED(15, "The player is not connected to a game");
+	PLAYER_NOT_CONNECTED(15, "The player is not connected to a game"), 
+	CONSUMEY_KEY_ERROR (16, "Can not generate a consumerKey"),
+	UNKNOWN_CONSUMER_KEY (17, "Unknown consumer key"), 
+	UNKNOWN_REQUEST_TOKEN (18, "Unknown request token"), 
+	INCOMPATIBLE_RQTOKEN_CONSUMER (19, "Incompatible request token and consumer key"),
+	REQ_TOKEN_NOT_VALID (20, "The request token is not valid"), 
+	SITANDGO_ALREADY_EXISTS (21, "The game type SitAndGo is already exsits"),
+	NOT_EQUITABLE_REWARD(22, "The number of winners is not equals to the percent reward's array size");
 	
 	private int code;
 	private String message;

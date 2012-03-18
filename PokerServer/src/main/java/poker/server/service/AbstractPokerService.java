@@ -6,6 +6,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import poker.server.model.exception.ErrorMessage;
+
 public abstract class AbstractPokerService implements PokerService {
 
 	private static final String CODE = "code";
@@ -39,6 +41,22 @@ public abstract class AbstractPokerService implements PokerService {
 			json.put(STAT, FAIL);
 			json.put(CODE, errorMessage.getCode());
 			json.put(MESSAGE, errorMessage.getMessage());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return buildResponse(json);
+	}
+
+	/**
+	 * Build and return a JSONObject error message
+	 */
+	@Override
+	public Response error(String message) {
+		JSONObject json = new JSONObject();
+
+		try {
+			json.put(STAT, FAIL);
+			json.put(CODE, message);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

@@ -20,7 +20,10 @@ import org.jboss.resteasy.auth.oauth.OAuthException;
 import org.jboss.resteasy.auth.oauth.OAuthPermissions;
 import org.jboss.resteasy.auth.oauth.OAuthRequestToken;
 import org.jboss.resteasy.auth.oauth.OAuthToken;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import flexjson.JSONSerializer;
 
 import poker.server.infrastructure.RepositoryAccessToken;
 import poker.server.infrastructure.RepositoryConsumer;
@@ -28,7 +31,7 @@ import poker.server.infrastructure.RepositoryRequestToken;
 import poker.server.infrastructure.auth.AccessToken;
 import poker.server.infrastructure.auth.Consumer;
 import poker.server.infrastructure.auth.RequestToken;
-import poker.server.service.ErrorMessage;
+import poker.server.model.exception.ErrorMessage;
 
 @Stateless
 @Path("auth/")
@@ -47,23 +50,22 @@ public class AuthProviderService extends AuthProvider {
 	 * Service that deliver a consumer key to an application
 	 */
 	@GET
-	@Path("/getConsumerKey/")
-	public Response getConsumerKey() throws OAuthException {
+	@Path("/getConsumerKey/{displayName}")
+	public Response getConsumerKey(@PathParam("displayName") String displayName)
+			throws OAuthException {
 
 		OAuthConsumer oauthConsumer;
 		String consumerKey = makeRandomString();
-		String displayName = null;
 		String URi = null;
 
 		try {
 			oauthConsumer = registerConsumer(consumerKey, displayName, URi);
 		} catch (OAuthException e) {
-			return error(ErrorMessage.UNKNOWN_ERROR);
+			return error(ErrorMessage.CONSUMEY_KEY_ERROR);
 		}
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
-		// updateJSON(json, "consumer", oauthConsumer);
 		updateJSON(json, "consumerKey", oauthConsumer.getKey());
 		return buildResponse(json);
 	}
@@ -76,24 +78,21 @@ public class AuthProviderService extends AuthProvider {
 	public Response requestToken(@PathParam("consumerKey") String consumerKey,
 			@PathParam("callback") String callback) throws OAuthException {
 
-		if (repositoryConsumer.load(consumerKey) == null)
-			return error(ErrorMessage.UNKNOWN_ERROR);
+		ErrorMessage errorMessage;
+		if ((errorMessage = exist(consumerKey)) != null)
+			return error(errorMessage);
 
 		String[] scopes = null;
 		String[] permissions = null;
+
 		OAuthToken oauthToken = makeRequestToken(consumerKey, callback, scopes,
 				permissions);
-
-		if (consumerKey != null
-				&& !oauthToken.getConsumer().getKey().equals(consumerKey))
-			return error(ErrorMessage.UNKNOWN_ERROR);
 
 		OAuthRequestToken oauthRequestToken = getRequestToken(consumerKey,
 				oauthToken.getToken());
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
-		// updateJSON(json, "requestToken", oauthRequestToken);
 		updateJSON(json, "oauth_token", oauthRequestToken.getToken());
 		updateJSON(json, "oauth_token_secret", oauthRequestToken.getSecret());
 		return buildResponse(json);
@@ -109,16 +108,11 @@ public class AuthProviderService extends AuthProvider {
 			@PathParam("requestToken") String requestToken)
 			throws OAuthException {
 
-		RequestToken requestTokenObj = repositoryRequestToken
-				.load(requestToken);
-
-		if (requestTokenObj == null)
-			return error(ErrorMessage.UNKNOWN_ERROR);
-
-		if (consumerKey != null
-				&& !requestTokenObj.getConsumer().getConsumerKey()
-						.equals(consumerKey))
-			return error(ErrorMessage.UNKNOWN_ERROR);
+		ErrorMessage errorMessage;
+		if ((errorMessage = exist(consumerKey)) != null
+				|| (errorMessage = existReqTokenOrIncompatible(consumerKey,
+						requestToken)) != null)
+			return error(errorMessage);
 
 		String verifier = authoriseRequestToken(consumerKey, requestToken);
 
@@ -137,19 +131,18 @@ public class AuthProviderService extends AuthProvider {
 			@PathParam("requestToken") String requestToken)
 			throws OAuthException {
 
+		ErrorMessage errorMessage;
+		if ((errorMessage = exist(consumerKey)) != null
+				|| (errorMessage = existReqTokenOrIncompatible(consumerKey,
+						requestToken)) != null)
+			return error(errorMessage);
+
 		RequestToken requestTokenObj = repositoryRequestToken
 				.load(requestToken);
 
-		if (requestTokenObj == null)
-			return error(ErrorMessage.UNKNOWN_ERROR);
-
-		if ((consumerKey != null && !requestTokenObj.getConsumer()
-				.getConsumerKey().equals(consumerKey)))
-			return error(ErrorMessage.UNKNOWN_ERROR);
-
 		// Not validate the request token
 		if (requestTokenObj.getVerifier() == null)
-			return error(ErrorMessage.UNKNOWN_ERROR);
+			return error(ErrorMessage.REQ_TOKEN_NOT_VALID);
 
 		OAuthToken newOAuthToken = makeAccessToken(consumerKey, requestToken,
 				requestTokenObj.getVerifier());
@@ -157,15 +150,15 @@ public class AuthProviderService extends AuthProvider {
 		newOAuthToken = getAccessToken(consumerKey, newOAuthToken.getToken());
 
 		JSONObject json = new JSONObject();
-		// updateJSON(json, "accessToken", newOAuthToken);
+		updateJSON(json, STAT, OK);
 		updateJSON(json, "oauth_token", newOAuthToken.getToken());
-		updateJSON(json, "oauth_token_secret", newOAuthToken.getSecret());
+		updateJSON(json, "oauth_secret_token", newOAuthToken.getSecret());
 		return buildResponse(json);
 	}
 
-	/****************************************************
-	 * END OF THE SERVICES - BEGIN OF PROVIDER SERVICES *
-	 ****************************************************/
+	/***************************************************
+	 * END OF THE SERVICES - BEGIN OF PROVIDER METHODS *
+	 ***************************************************/
 	/**
 	 * Registers consumer
 	 */
@@ -298,54 +291,83 @@ public class AuthProviderService extends AuthProvider {
 				consumer.getURI());
 	}
 
-	// @Override
-	// public void registerConsumerPermissions(String arg0, String[] arg1)
-	// throws OAuthException {
-	// // TODO Auto-generated method stub
-	//
-	// }
-
 	@Override
 	public void registerConsumerScopes(String arg0, String[] arg1)
 			throws OAuthException {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void checkTimestamp(OAuthToken arg0, long arg1)
 			throws OAuthException {
-		// TODO Auto-generated method stub
 
 	}
-
-	// @Override
-	// public Set<String> convertPermissionsToRoles(String[] arg0) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
 
 	@Override
 	public String getRealm() {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
-
-	private static String makeRandomString() {
-		return UUID.randomUUID().toString();
-	}
-
-	// @Override
-	// public OAuthToken makeRequestToken(String arg0, String arg1)
-	// throws OAuthException {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
 
 	@Override
 	public void registerConsumerPermissions(String arg0, OAuthPermissions arg1)
 			throws OAuthException {
-		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * Builds a jsonObject from an object
+	 */
+	@SuppressWarnings("unused")
+	private JSONObject buildJsonObject(Object obj) {
+
+		JSONSerializer serializer = new JSONSerializer();
+		JSONObject json = null;
+
+		try {
+			json = new JSONObject(serializer.serialize(obj));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		updateJSON(json, STAT, OK);
+		return json;
+	}
+
+	/**
+	 * Gets a random number based
+	 * 
+	 * @see UUID
+	 */
+	private static String makeRandomString() {
+		return UUID.randomUUID().toString();
+	}
+
+	/**
+	 * Verifies if the consumerKey given as parameter is exists
+	 */
+	private ErrorMessage exist(String consumerKey) {
+		if (repositoryConsumer.load(consumerKey) == null)
+			return ErrorMessage.UNKNOWN_CONSUMER_KEY;
+		return null;
+	}
+
+	/**
+	 * Verifies if the request token is compatible with the consumerKey
+	 */
+	private ErrorMessage existReqTokenOrIncompatible(String consumerKey,
+			String requestToken) {
+
+		RequestToken requestTokenObj = repositoryRequestToken
+				.load(requestToken);
+
+		if (requestTokenObj == null)
+			return ErrorMessage.UNKNOWN_REQUEST_TOKEN;
+
+		if (consumerKey != null
+				&& !requestTokenObj.getConsumer().getConsumerKey()
+						.equals(consumerKey))
+			return ErrorMessage.INCOMPATIBLE_RQTOKEN_CONSUMER;
+
+		return null;
 	}
 }

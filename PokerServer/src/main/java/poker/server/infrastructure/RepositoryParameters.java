@@ -13,4 +13,6 @@ import poker.server.model.game.parameters.Parameters;
 @Local
 public interface RepositoryParameters extends RepositoryGeneric<Parameters, String> {
 
+	boolean existSitAndGo();
+
 }
