@@ -2,9 +2,15 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -26,6 +32,9 @@ import poker.server.model.game.parameters.ParametersI;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.service.ErrorMessage;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * @author PokerServerGroup <br/>
@@ -86,6 +95,10 @@ public class Game implements Serializable {
 	@IndexColumn(name = "flipCardIndex")
 	List<Card> flippedCards;
 
+	BiMap<Integer, List<Player>> splitPot;
+	Map<Player, Integer> playersAllIn;
+	Map<Player, Integer>  sortedPlayersAllIn;
+
 	private int currentPlayerInt;
 	private int dealerPlayerInt;
 	private int smallBlindPlayerInt;
@@ -143,6 +156,9 @@ public class Game implements Serializable {
 		currentPot = 0;
 		currentBet = 0;
 		currentRound = 0;
+		splitPot = HashBiMap.create();
+		playersAllIn = new HashMap<Player, Integer>();
+		sortedPlayersAllIn = new HashMap<Player, Integer>();
 		gameLevel = 0;
 		deck = new Deck();
 		flippedCards = new ArrayList<Card>();
@@ -324,26 +340,109 @@ public class Game implements Serializable {
 
 		List<Player> currentPlayers = currentPlayerInRound();
 
+		if(playerAllInInRound(currentPlayers))
+			sortPlayerTotalBet(currentPlayers);
+
 		if (currentPlayers.size() == 1) {
 
 			currentPlayers.get(0).reward(currentPot + totalPot);
 			currentRound = SHOWDOWN;
+		} else if (currentRound == RIVER){
 
-		} else if (currentRound == RIVER)
-			currentRound++;
-
-		else if (isPlayersAllIn()) {
+			sortPlayerTotalBet(currentPlayers);
+			currentRound++;	
+		} else if (isPlayersAllIn(currentPlayers)) {
 
 			currentRound++;
 			flipRoundCard();
 			nextRound();
-
 		} else {
 
 			currentRound++;
 			flipRoundCard();
 		}
 	}
+
+	private boolean playerAllInInRound(List<Player> currentPlayers) {
+		for(Player p : currentPlayers){
+			if(p.isAllIn() && (p.getRoundAllIn() == currentRound))
+				return true;		
+		}
+		return false;
+	}
+
+	/**
+	 * Sort the player by the total of their bet
+	 * @param currentPlayers
+	 */
+	public void sortPlayerTotalBet(List<Player> currentPlayers) {
+
+		if(currentRound == RIVER) {
+
+			for(Player player : currentPlayers) {
+				if(!player.isAllIn() && !player.isfolded()) {
+					playersAllIn.put(player, player.getTotalBet());
+				}
+			}
+		}
+		else {
+			for(Player player : currentPlayers) {
+				if(player.isAllIn() && (player.getRoundAllIn() == currentRound)) {
+					playersAllIn.put(player, player.getTotalBet());
+				}
+			}
+		}
+
+		sortedPlayersAllIn = sortByValue(playersAllIn);
+	}
+
+	/*
+	 * Split the pot between the player, if someone bet more than a player can
+	 */
+	public void splitPot(Map<Player, Integer> sortedPlayer){
+		int size = sortedPlayer.size();
+		for(int i = 0; i < size; i++){
+			Iterator<Player> itr = sortedPlayer.keySet().iterator();
+			List<Player> listPlayer = new ArrayList<Player>();
+			
+			Player firstP = itr.next();
+			listPlayer.add(firstP);
+			itr.remove();
+			
+			while(itr.hasNext()){
+				Player nextPlayer = itr.next();
+				listPlayer.add(nextPlayer);
+				
+				if(nextPlayer.getTotalBet() == listPlayer.get(0).getTotalBet()){
+					itr.remove();
+					i++;
+				}
+			}
+
+			int expectedPot = firstP.getTotalBet()*listPlayer.size();
+			splitPot.put(expectedPot, listPlayer);
+		}
+	}
+
+	/*
+	 * Sort a map by the value
+	 */
+	static Map<Player, Integer> sortByValue(Map map) {
+		List list = new ArrayList<Player>(map.entrySet());
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue())
+						.compareTo(((Map.Entry) (o2)).getValue());
+			}
+		});
+
+		Map result = new LinkedHashMap();
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry entry = (Map.Entry)it.next();
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	} 
 
 	/**
 	 * Method go to the next round and verify if is the end of the game
@@ -400,6 +499,7 @@ public class Game implements Serializable {
 		for (Player p : players) {
 			p.setAsRegular();
 			p.unFold();
+			p.setTotalBet(0);
 		}
 	}
 
@@ -495,10 +595,10 @@ public class Game implements Serializable {
 
 	/**
 	 * Verify if all players are all in. Return true if it is, false if not.
+	 * @param currentPlayers 
 	 */
-	private boolean isPlayersAllIn() {
+	private boolean isPlayersAllIn(List<Player> currentPlayerInRound) {
 
-		List<Player> currentPlayerInRound = currentPlayerInRound();
 		for (Player p : currentPlayerInRound) {
 			if (!p.isAllIn())
 				return false;
@@ -581,6 +681,7 @@ public class Game implements Serializable {
 				currentPlayerInt = smallBlindPlayerInt;
 				lastPlayerToPlay = dealerPlayerInt;
 				nextRound();
+				break;
 
 			} else {
 				if (currentPlayerInt == players.size() - 1)
@@ -597,7 +698,7 @@ public class Game implements Serializable {
 
 	private boolean verifyBet() {
 		for (Player player : players) {
-			if (player.getCurrentBet() != getCurrentBet() && !player.isfolded())
+			if (player.getCurrentBet() != getCurrentBet() && !player.isfolded() && !player.isAllIn())
 				return false;
 		}
 		return true;
@@ -840,6 +941,14 @@ public class Game implements Serializable {
 		return playersRank;
 	}
 
+	public BiMap<Integer, List<Player>> getSplitPot() {
+		return splitPot;
+	}
+	
+	public Map<Player, Integer> getSortedPlayer() {
+		return sortedPlayersAllIn;
+	}
+
 	public void setCurrentBet(int currentB) {
 		currentBet = currentB;
 	}
@@ -966,4 +1075,5 @@ public class Game implements Serializable {
 	public boolean isGameEnded() {
 		return status == ENDED;
 	}
+
 }

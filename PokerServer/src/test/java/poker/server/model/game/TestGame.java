@@ -4,11 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.BiMap;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
@@ -54,7 +57,7 @@ public class TestGame {
 		flipedCards = new ArrayList<Card>();
 	}
 
-	@Test
+	/*@Test
 	public void testNewGame() {
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
@@ -650,5 +653,57 @@ public class TestGame {
 		flipedCards.add(card3); // flop
 		flipedCards.add(card4); // tournant
 		flipedCards.add(card5); // river
+	}*/
+	
+	//POT ALL IN
+	@Test
+	public void testSplitPot() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
+
+		game.start();
+		
+		player1.setCurrentTokens(1000);
+		player2.setCurrentTokens(1400);
+		player3.setCurrentTokens(1500);
+		player4.setCurrentTokens(500);
+		player5.setCurrentTokens(600);
+		
+		player4.allIn();
+		player5.allIn();
+		player1.call();
+		player2.call();
+		player3.call();
+		
+		player2.check();
+		player3.check();
+		player1.allIn();
+		player2.call();
+		player3.call();
+
+		player2.raise(20);
+		player3.call();
+		
+		player2.raise(40);
+		player3.call();
+		
+		Map<Player, Integer> map = game.getSortedPlayer();
+		
+		game.splitPot(map);
+		Map<Integer, List<Player>> splitPot = game.getSplitPot();
+		
+		/*Iterator<Player> itr = map.keySet().iterator();
+		while(itr.hasNext()){
+			Player p = itr.next();
+			System.out.println(p.getName() + " " + map.get(p));		
+		}
+		
+		Iterator<Integer> itrSP = splitPot.keySet().iterator();
+		while(itrSP.hasNext()){
+			System.out.println(itrSP.next().intValue());
+		}*/
 	}
 }

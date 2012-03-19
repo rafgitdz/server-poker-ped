@@ -1,0 +1,41 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x73e6a7af, pid=4472, tid=4632
+#
+# JRE version: 7.0_03-b05
+# Java VM: Java HotSpot(TM) Client VM (22.1-b02 mixed mode windows-x86 )
+# Problematic frame:
+# C  [jdwp.dll+0x1a7af]
+#
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.sun.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x188d9c00):  JavaThread "JDWP Command Reader" daemon [_thread_in_native, id=4632, stack(0x18eb0000,0x18f00000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x00000000
+
+Registers:
+EAX=0x00000028, EBX=0x73e43444, ECX=0x00000000, EDX=0xf0a6ff6b
+ESP=0x18eff40c, EBP=0x18eff410, ESI=0x0000000c, EDI=0x73e4315c
+EIP=0x73e6a7af, EFLAGS=0x00010206
+
+Top of Stack: (sp=0x18eff40c)
+0x18eff40c:   0000000c 18eff534 73e4107e 00000028
+0x18eff41c:   18eff430 73e4315c 73e43444 18eff574
+0x18eff42c:   000000ca 65746e49 70757272 20646574
+0x18eff43c:   636e7566 6e6f6974 6c616320 71a8006c
+0x18eff44c:   71a8461c 0872b534 18eff574 00e64ce8
+0x18eff45c:   00000000 18eff4ec 00000001 00000000
+0x18eff46c:   00000020 00000000 00000000 c0000120
+0x18eff47c:   00000000 00000000 00000288 0042e7a8 
+
+Instructions: (pc=0x73e6a7af)
+0x73e6a78f:   5f 33 cd 5e
