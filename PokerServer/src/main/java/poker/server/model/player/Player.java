@@ -65,11 +65,13 @@ public class Player implements Serializable {
 	int currentBet;
 	int currentTokens;
 	int money;
+	int totalBet;
 
 	int connectionStatus;
 	int role;
 	boolean folded;
 	boolean allIn;
+	int roundAllIn;
 
 	int lastAction;
 	int lastRaisedValue;
@@ -97,6 +99,7 @@ public class Player implements Serializable {
 		currentHand = new Hand();
 		currentBet = 0;
 		currentTokens = 0;
+		totalBet = 0;
 		money = MONEY;
 		connectionStatus = OUTGAME;
 		folded = false;
@@ -142,6 +145,7 @@ public class Player implements Serializable {
 			game.updateCurrentPot(necessaryTokens);
 			currentTokens -= necessaryTokens;
 			currentBet += necessaryTokens;
+			totalBet += necessaryTokens;
 		}
 		game.updateLastPlayerToPlay();
 		game.nextPlayer();
@@ -162,11 +166,13 @@ public class Player implements Serializable {
 			throw new PlayerException("not enough tokens to call");
 		} else {
 			game.updateCurrentPot(minTokenToCall);
-			this.currentTokens -= minTokenToCall;
-			this.currentBet += minTokenToCall;
-			if (this.currentTokens == 0) {
+			currentTokens -= minTokenToCall;
+			currentBet += minTokenToCall;
+			totalBet += minTokenToCall;
+
+			if (currentTokens == 0) {
 				game.updateLastPlayerToPlay();
-				this.allIn = true;
+				allIn = true;
 			}
 		}
 
@@ -184,9 +190,11 @@ public class Player implements Serializable {
 		game.updateCurrentPot(currentTokens);
 		game.updateCurrentBet(currentTokens + currentBet - game.getCurrentBet());
 
-		currentBet += currentTokens; // game.getCurrentBet();
+		currentBet += currentTokens;
+		totalBet += currentTokens;
 		currentTokens = 0;
 		this.allIn = true;
+		this.roundAllIn = game.getCurrentRound();
 
 		game.updateLastPlayerToPlay();
 		game.nextPlayer();
@@ -290,8 +298,16 @@ public class Player implements Serializable {
 		return currentTokens;
 	}
 
+	public int getTotalBet() {
+		return totalBet;
+	}
+
 	public Game getGame() {
 		return game;
+	}
+
+	public int getRoundAllIn() {
+		return roundAllIn;
 	}
 
 	public void setOutGame() {
@@ -380,6 +396,10 @@ public class Player implements Serializable {
 		money = moneY;
 	}
 
+	public void setTotalBet(int i) {
+		totalBet = 0;
+	}
+
 	public void setAsDealer() {
 		role = DEALER;
 	}
@@ -387,12 +407,14 @@ public class Player implements Serializable {
 	public void setAsBigBlind() {
 		role = BIG_BLIND;
 		currentBet = game.getBigBlind();
+		totalBet += game.getBigBlind();
 		game.setBigBlindPlayer(game.getPlayers().indexOf(this));
 	}
 
 	public void setAsSmallBlind() {
 		role = SMALL_BLIND;
 		currentBet = game.getSmallBlind();
+		totalBet += game.getSmallBlind();
 		game.setSmallBlindPlayer(game.getPlayers().indexOf(this));
 	}
 
@@ -419,5 +441,9 @@ public class Player implements Serializable {
 
 	public int getLastRaisedValue() {
 		return lastRaisedValue;
+	}
+
+	public void updateBestHand(Card c1, Card c2, Card c3) {
+		// update bestHand
 	}
 }
