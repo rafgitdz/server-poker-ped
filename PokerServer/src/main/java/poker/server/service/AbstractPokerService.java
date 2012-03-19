@@ -6,7 +6,9 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class AbstractPokerService {
+import poker.server.model.exception.ErrorMessage;
+
+public abstract class AbstractPokerService implements PokerService {
 
 	private static final String CODE = "code";
 	private static final String MESSAGE = "message";
@@ -19,7 +21,8 @@ public abstract class AbstractPokerService {
 	/**
 	 * Returns the Response built on JSONObject instance
 	 */
-	protected Response buildResponse(JSONObject json) {
+	@Override
+	public Response buildResponse(JSONObject json) {
 
 		ResponseBuilder builder = Response.ok(json);
 		builder.header(CROS, STAR);
@@ -29,7 +32,8 @@ public abstract class AbstractPokerService {
 	/**
 	 * Build and return a JSONObject error message
 	 */
-	protected Response error(ErrorMessage errorMessage) {
+	@Override
+	public Response error(ErrorMessage errorMessage) {
 
 		JSONObject json = new JSONObject();
 
@@ -44,9 +48,26 @@ public abstract class AbstractPokerService {
 	}
 
 	/**
+	 * Build and return a JSONObject error message
+	 */
+	@Override
+	public Response error(String message) {
+		JSONObject json = new JSONObject();
+
+		try {
+			json.put(STAT, FAIL);
+			json.put(CODE, message);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return buildResponse(json);
+	}
+
+	/**
 	 * Updates informations that will put in the JSON Object
 	 */
-	protected void updateJSON(JSONObject json, String key, Object value) {
+	@Override
+	public void updateJSON(JSONObject json, String key, Object value) {
 
 		try {
 			json.put(key, value);

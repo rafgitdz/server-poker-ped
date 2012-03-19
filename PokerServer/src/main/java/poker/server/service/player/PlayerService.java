@@ -6,8 +6,6 @@ package poker.server.service.player;
  *         Service class : PlayerService
  */
 
-import java.util.Map;
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -18,16 +16,22 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import poker.server.infrastructure.RepositoryPlayer;
-import poker.server.model.exception.PlayerException;
+import poker.server.model.exception.ErrorMessage;
 import poker.server.model.player.Player;
 import poker.server.service.AbstractPokerService;
-import poker.server.service.ErrorMessage;
 
 @Stateless
 @Path("/player")
 public class PlayerService extends AbstractPokerService {
 
-	public static final String ERROR_UNKNOWN_PLAYER = "Unknown player : ";
+	private static final int NO_VALUE = 0;
+	private static final int FOLD = 1;
+	private static final int CALL = 2;
+	private static final int CHECK = 3;
+	private static final int ALLIN = 4;
+	private static final int RAISE = 5;
+	private static final int MISSING = 6;
+	private static final int DISCONNECT = 7;
 
 	@EJB
 	private RepositoryPlayer repositoryPlayer;
@@ -36,171 +40,157 @@ public class PlayerService extends AbstractPokerService {
 	 * Executes the raise action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/raise/{name}/{tokens}")
-	public Response raise(@PathParam("name") String name,
-			@PathParam("tokens") int tokens) {
+	@Path("/raise/{consumerKey}/{signature}/{token}/{name}/{quantity}")
+	public Response raise(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name, @PathParam("quantity") int quantity) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.raise(tokens);
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		/*
+		 * decrypt the signature exist(token) , exist(consumerKey) verifier si
+		 * le token est conforme au consumerKey dans le DB si le token est
+		 * valide
+		 */
+		return handlePlayerAction(name, RAISE, quantity);
 	}
 
 	/**
 	 * Executes the call action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/call/{name}")
-	public Response call(@PathParam("name") String name) {
+	@Path("/call/{consumerKey}/{signature}/{token}/{name}")
+	public Response call(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.call();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, CALL, NO_VALUE);
 	}
 
 	/**
 	 * Executes the check action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/check/{name}")
-	public Response check(@PathParam("name") String name) {
+	@Path("/check/{consumerKey}/{signature}/{token}/{name}")
+	public Response check(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.check();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, CHECK, NO_VALUE);
 	}
 
 	/**
 	 * Executes the fold action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/fold/{name}")
-	public Response fold(@PathParam("name") String name) {
+	@Path("/fold/{consumerKey}/{signature}/{token}/{name}")
+	public Response fold(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.check();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, FOLD, NO_VALUE);
 	}
 
 	/**
 	 * Executes the allIn action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/allIn/{name}")
-	public Response allIn(@PathParam("name") String name) {
+	@Path("/allIn/{consumerKey}/{signature}/{token}/{name}")
+	public Response allIn(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.allIn();
-		updateJSONPlayerAction(json, player);
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, ALLIN, NO_VALUE);
 	}
 
 	/**
-	 * Executes the allIn action for player with the name given as parameter
+	 * Executes the miss action for player with the name given as parameter
 	 */
 	@GET
-	@Path("/miss/{name}")
-	public Response miss(@PathParam("name") String name) {
+	@Path("/misses/{consumerKey}/{signature}/{token}/{name}")
+	public Response miss(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if ((!player.isInGame()))
-			return error(ErrorMessage.PLAYER_INGAME);
-
-		player.setAsMissing();
-		repositoryPlayer.update(player);
-		return buildResponse(json);
+		return handlePlayerAction(name, MISSING, NO_VALUE);
 	}
 
 	/**
-	 * Executes the allIn action for player with the name given as parameter
+	 * Executes the disconnect action for player with the name given as
+	 * parameter
 	 */
 	@GET
-	@Path("/reconnect/{name}")
-	public Response reconnect(@PathParam("name") String name) {
+	@Path("/disconnect/{consumerKey}/{signature}/{token}/{name}")
+	public Response disconnect(@PathParam("consumerKey") String consumerKey,
+			@PathParam("token") String token,
+			@PathParam("signature") String signature,
+			@PathParam("name") String name) {
 
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if (!player.isMissing())
-			return error(ErrorMessage.PLAYER_NOT_MISSING);
-
-		player.setInGame();
-		repositoryPlayer.update(player);
-		return buildResponse(json);
-	}
-	
-	/**
-	 * Executes the possible actions for player with the name given as parameter
-	 */
-	@GET
-	@Path("/actions/{name}")
-	public Response possibleActions(@PathParam("name") String name) {
-
-		JSONObject json = new JSONObject();
-		Player player = getPlayer(name);
-		if (!player.isMissing())
-			return error(ErrorMessage.PLAYER_NOT_MISSING);
-
-		Map<String, Integer> possibleActions = player.getPossibleActions();
-		updateJSON(json, "possibleActions", possibleActions);
-		return buildResponse(json);
+		return handlePlayerAction(name, DISCONNECT, NO_VALUE);
 	}
 
-	/**
-	 * Returns the player if he exists, launch an exception otherwise
-	 */
-	private Player getPlayer(String name) {
+	/***********************
+	 * END OF THE SERVICES *
+	 ***********************/
 
-		Player player = repositoryPlayer.load(name);
+	/**
+	 * Handle the action of the player
+	 */
+	private Response handlePlayerAction(String playerName, int action,
+			int raiseValue) {
+
+		JSONObject json = new JSONObject();
+		Player player = repositoryPlayer.load(playerName);
+
 		if (player == null)
-			throw new PlayerException(ERROR_UNKNOWN_PLAYER + name);
-		return player;
-	}
+			return error(ErrorMessage.ERROR_UNKNOWN_PLAYER);
 
-	/**
-	 * Returns the informations about a player after he plays
-	 */
-	private void updateJSONPlayerAction(JSONObject json, Player player) {
+		else {
+			if (player.isOutGame() || player.isMissing())
+				return error(ErrorMessage.PLAYER_NOT_CONNECTED);
+			else if (player.getGame() != null && !player.getGame().isStarted())
+				return error(ErrorMessage.GAME_NOT_READY_TO_START);
+		}
 
-		updateJSON(json, "playerName", player.getName());
-		updateJSON(json, "playerBet", player.getCurrentBet());
-		updateJSON(json, "tokens", player.getCurrentTokens());
+		switch (action) {
 
-		updateJSON(json, "gameBet", player.getGame().getCurrentBet());
-		updateJSON(json, "currentPot", player.getGame().getCurrentPot());
-		updateJSON(json, "totalPot", player.getGame().getTotalPot());
+		case FOLD:
+			player.fold();
+			break;
 
-		updateJSON(json, "flop", player.getGame().isFlop());
-		updateJSON(json, "tournant", player.getGame().isRiver());
-		updateJSON(json, "river", player.getGame().isRiver());
-		updateJSON(json, "showdown", player.getGame().isShowDown());
+		case CALL:
+			player.call();
+			break;
+
+		case CHECK:
+			player.check();
+			break;
+
+		case ALLIN:
+			player.allIn();
+			break;
+
+		case RAISE:
+			player.raise(raiseValue);
+			break;
+
+		case MISSING:
+			player.setAsMissing();
+			break;
+
+		case DISCONNECT:
+			player.setOutGame();
+			break;
+
+		default:
+			break;
+		}
+
+		repositoryPlayer.update(player);
+		return buildResponse(json);
 	}
 }

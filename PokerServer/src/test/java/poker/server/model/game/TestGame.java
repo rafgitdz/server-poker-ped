@@ -67,7 +67,7 @@ public class TestGame {
 	@Test
 	public void testNewGameParameters() {
 		Game gameParameters;
-		Parameters params = new SitAndGo();
+		AbstractParameters params = new SitAndGo();
 		gameParameters = gameFactory.newGame(params);
 
 		assertEquals(params, gameParameters.getGameType());

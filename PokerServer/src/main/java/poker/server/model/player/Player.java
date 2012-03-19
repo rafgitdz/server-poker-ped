@@ -30,15 +30,20 @@ public class Player implements Serializable {
 
 	private static final long serialVersionUID = 594540699238459099L;
 
-	public final static int PRESENT = 1;
-	public final static int READY = 2;
-	public final static int MISSING = 3;
-	public final static int IN_GAME = 4;
+	public final static int OUTGAME = 1;
+	public final static int MISSING = 2;
+	public final static int IN_GAME = 3;
 
 	public final static int DEALER = 1;
 	public final static int BIG_BLIND = 2;
 	public final static int SMALL_BLIND = 3;
 	public final static int REGULAR = 4;
+
+	public final static int CHECK = 1;
+	public final static int RAISE = 2;
+	public final static int FOLD = 3;
+	public final static int ALLIN = 4;
+	public final static int CALL = 5;
 
 	public final static int MONEY = 50;
 
@@ -55,6 +60,8 @@ public class Player implements Serializable {
 	@JoinColumn(name = "hand")
 	Hand currentHand;
 
+	transient Hand cleanHand = new Hand();
+
 	int currentBet;
 	int currentTokens;
 	int money;
@@ -64,8 +71,15 @@ public class Player implements Serializable {
 	int role;
 	boolean folded;
 	boolean allIn;
+<<<<<<< HEAD
 	int roundAllIn;
 	
+=======
+
+	int lastAction;
+	int lastRaisedValue;
+
+>>>>>>> 76397b2eecc2bb1beab462e60397c9fecfadec3f
 	/**
 	 * Default constructor
 	 */
@@ -91,7 +105,7 @@ public class Player implements Serializable {
 		currentTokens = 0;
 		totalBet = 0;
 		money = MONEY;
-		connectionStatus = PRESENT;
+		connectionStatus = OUTGAME;
 		folded = false;
 	}
 
@@ -139,6 +153,8 @@ public class Player implements Serializable {
 		}
 		game.updateLastPlayerToPlay();
 		game.nextPlayer();
+		lastAction = RAISE;
+		lastRaisedValue = quantity;
 		Event.addEvent(name + " RAISES " + quantity);
 	}
 
@@ -165,6 +181,7 @@ public class Player implements Serializable {
 		}
 
 		game.nextPlayer();
+		lastAction = CALL;
 		Event.addEvent(name + " CALLS");
 	}
 
@@ -185,6 +202,7 @@ public class Player implements Serializable {
 
 		game.updateLastPlayerToPlay();
 		game.nextPlayer();
+		lastAction = ALLIN;
 		Event.addEvent(name + " ALLIN");
 	}
 
@@ -196,6 +214,7 @@ public class Player implements Serializable {
 		game.verifyIsMyTurn(this);
 		folded = true;
 		game.nextPlayer();
+		lastAction = FOLD;
 		Event.addEvent(name + " FOLDS");
 	}
 
@@ -217,6 +236,7 @@ public class Player implements Serializable {
 			throw new PlayerException("not enough tokens to check");
 
 		game.nextPlayer();
+		lastAction = CHECK;
 		Event.addEvent(name + " CHECKS");
 	}
 
@@ -294,15 +314,19 @@ public class Player implements Serializable {
 		return roundAllIn;
 	}
 
+	public void setOutGame() {
+		connectionStatus = OUTGAME;
+		game.removePlayer(name);
+	}
+
 	public Map<String, Integer> getPossibleActions() {
 
 		Map<String, Integer> possibleActions = new HashMap<String, Integer>();
 
-		if(game.getCurrentBet() >= this.currentTokens) {
+		if (game.getCurrentBet() >= this.currentTokens) {
 			possibleActions.put("allIn", currentTokens);
-		}
-		else{
-			if(game.getCurrentBet() == this.currentBet)
+		} else {
+			if (game.getCurrentBet() == this.currentBet)
 				possibleActions.put("check", 0);
 			else
 				possibleActions.put("call", game.getCurrentBet() - currentBet);
@@ -314,10 +338,6 @@ public class Player implements Serializable {
 		return possibleActions;
 	}
 
-	public void setAsPresent() {
-		connectionStatus = PRESENT;
-	}
-
 	public void setAsMissing() {
 		connectionStatus = MISSING;
 		fold();
@@ -327,16 +347,12 @@ public class Player implements Serializable {
 		connectionStatus = IN_GAME;
 	}
 
-	public void setAsReady() {
-		connectionStatus = READY;
-	}
-
 	public void setAsFolded() {
 		folded = true;
 	}
 
-	public boolean isPresent() {
-		return connectionStatus == PRESENT;
+	public boolean isOutGame() {
+		return connectionStatus == OUTGAME;
 	}
 
 	public boolean isMissing() {
@@ -345,10 +361,6 @@ public class Player implements Serializable {
 
 	public boolean isInGame() {
 		return connectionStatus == IN_GAME;
-	}
-
-	public boolean isReady() {
-		return connectionStatus == READY;
 	}
 
 	public boolean isDealer() {
@@ -419,9 +431,23 @@ public class Player implements Serializable {
 
 	public void setGame(Game gamE) {
 		game = gamE;
+		setInGame();
 	}
 
 	public void initHand() {
+<<<<<<< HEAD
 		currentHand = new Hand();
 	}	
+=======
+		currentHand = cleanHand;
+	}
+
+	public int getLastAction() {
+		return lastAction;
+	}
+
+	public int getLastRaisedValue() {
+		return lastRaisedValue;
+	}
+>>>>>>> 76397b2eecc2bb1beab462e60397c9fecfadec3f
 }

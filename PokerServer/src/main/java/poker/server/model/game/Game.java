@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -28,7 +26,6 @@ import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.Parameters;
-import poker.server.model.game.parameters.ParametersI;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.service.ErrorMessage;
@@ -53,19 +50,16 @@ public class Game implements Serializable {
 
 	private static final String UNKNOWN_ROUND = "unknown round !";
 	private static final String NOT_YOUR_TURN = "It's not your turn ";
-	private static final String NOT_END_ROUND_POKER = "It's not the end of the poker round";
-	private static final String NOT_ENOUGH_FLIPED_CARDS = "There isn't enough cards to do showDown";
-	private static final String NO_PLAYER_IN_GAME = "There is no players in game";
 
 	public static final int FLOP = 1;
 	public static final int TOURNANT = 2;
 	public static final int RIVER = 3;
 	public static final int SHOWDOWN = 4;
 
-	public final static int STARTED = 1;
+	public final static int WAITING = 1;
 	public final static int READY_TO_START = 2;
-	public final static int ENDED = 3;
-	public final static int WAITING = 4;
+	public final static int STARTED = 3;
+	public final static int ENDED = 4;
 
 	private static final String GENERATED_NAME = "LabriTexasHoldem_";
 
@@ -81,14 +75,16 @@ public class Game implements Serializable {
 	@JoinColumn(name = "deck")
 	Deck deck;
 
+	transient Deck originalDeck = new Deck();
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
 	@IndexColumn(name = "playerRankIndex")
 	List<Player> playersRank;
 
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = Parameters.class, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, targetEntity = AbstractParameters.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parameters")
-	ParametersI gameType;
+	Parameters gameType;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
@@ -137,8 +133,9 @@ public class Game implements Serializable {
 	 * @see class Parameters
 	 * 
 	 */
-	Game(ParametersI gameT) {
+	Game(Parameters gameT) {
 		gameType = gameT;
+		gameType.increment();
 		buildGame();
 	}
 
@@ -160,7 +157,7 @@ public class Game implements Serializable {
 		playersAllIn = new HashMap<Player, Integer>();
 		sortedPlayersAllIn = new HashMap<Player, Integer>();
 		gameLevel = 0;
-		deck = new Deck();
+		deck = originalDeck;
 		flippedCards = new ArrayList<Card>();
 		players = new ArrayList<Player>();
 		playersRank = new ArrayList<Player>();
@@ -185,6 +182,7 @@ public class Game implements Serializable {
 		setInitBetGame();
 		++gameLevel;
 		status = STARTED;
+		gameType.decrement();
 		Event.addEvent("START GAME");
 		dealCards();
 	}
@@ -454,6 +452,7 @@ public class Game implements Serializable {
 			playersRank.add(players.get(0));
 			setPrizeForPlayers();
 			status = ENDED;
+			return;
 		}
 
 		resetPlayers();
@@ -462,7 +461,9 @@ public class Game implements Serializable {
 		nextBigBlindPlayer();
 		updateRoundPotAndBets();
 		totalPot = 0;
-		deck = new Deck();
+		deck = originalDeck;
+		flippedCards = null;
+		flippedCards = new ArrayList<Card>();
 		initPlayersHands();
 		dealCards();
 	}
@@ -486,6 +487,7 @@ public class Game implements Serializable {
 			if (player.getCurrentTokens() == 0) {
 				playersRank.add(0, player);
 				players.remove(player);
+				player.setOutGame();
 				--i;
 			}
 		}
@@ -658,7 +660,9 @@ public class Game implements Serializable {
 		players.add(player);
 		playersRank.add(player); // to...
 		player.setGame(this);
-		player.setAsPresent();
+
+		if (players.size() == gameType.getPlayerNumber())
+			status = READY_TO_START;
 	}
 
 	/**
@@ -676,7 +680,7 @@ public class Game implements Serializable {
 	public void nextPlayer() {
 
 		do {
-			if (currentPlayerInt == lastPlayerToPlay && verifyBet()) {
+			if (currentPlayerInt == lastPlayerToPlay) {
 
 				currentPlayerInt = smallBlindPlayerInt;
 				lastPlayerToPlay = dealerPlayerInt;
@@ -696,6 +700,7 @@ public class Game implements Serializable {
 
 	}
 
+	@SuppressWarnings("unused")
 	private boolean verifyBet() {
 		for (Player player : players) {
 			if (player.getCurrentBet() != getCurrentBet() && !player.isfolded() && !player.isAllIn())
@@ -727,11 +732,11 @@ public class Game implements Serializable {
 	public Map<String, Integer> showDown() {
 
 		if (currentRound != SHOWDOWN)
-			throw new GameException(NOT_END_ROUND_POKER);
+			throw new GameException(ErrorMessage.NOT_END_ROUND_POKER);
 		if (flippedCards.size() < 5)
-			throw new GameException(NOT_ENOUGH_FLIPED_CARDS);
-		if (players.isEmpty())
-			throw new GameException(NO_PLAYER_IN_GAME);
+			throw new GameException(ErrorMessage.NOT_ENOUGH_FLIPED_CARDS);
+		if (players.isEmpty() || players.size() == 1)
+			throw new GameException(ErrorMessage.NO_PLAYER_IN_GAME);
 
 		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
 		List<Player> playerToReward = new ArrayList<Player>();
@@ -853,8 +858,12 @@ public class Game implements Serializable {
 		return bigBlind;
 	}
 
-	public ParametersI getGameType() {
+	public Parameters getGameType() {
 		return gameType;
+	}
+
+	public void setGameType(Parameters gameType) {
+		this.gameType = gameType;
 	}
 
 	public List<Player> getPlayers() {
@@ -1076,4 +1085,10 @@ public class Game implements Serializable {
 		return status == ENDED;
 	}
 
+<<<<<<< HEAD
+=======
+	public void removePlayer(String playerName) {
+		players.remove(playerName);
+	}
+>>>>>>> 76397b2eecc2bb1beab462e60397c9fecfadec3f
 }

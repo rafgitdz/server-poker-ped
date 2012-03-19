@@ -2,8 +2,6 @@ package poker.server.model.game;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,11 +36,6 @@ public class TestCompleteGame {
 		game.add(player3);
 		game.add(player4);
 		game.add(player5);
-		player1.setAsReady();
-		player2.setAsReady();
-		player3.setAsReady();
-		player4.setAsReady();
-		player5.setAsReady();
 		game.start();
 	}
 
