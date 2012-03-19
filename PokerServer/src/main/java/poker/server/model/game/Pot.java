@@ -17,6 +17,8 @@ public class Pot {
 	int id;
 
 	int value;
+	int valueReward;
+	int diffValue;
 	List<Player> players;
 
 	public Pot(int value, Player player) {
@@ -29,6 +31,14 @@ public class Pot {
 		players.add(player);
 	}
 
+	public void calcValueReward(){
+		valueReward = this.players.size() * this.diffValue;
+	}
+	
+	public int getValueReward() {
+		return valueReward;
+	}
+	
 	public int getValue() {
 		return value;
 	}
@@ -37,11 +47,12 @@ public class Pot {
 		return players;
 	}
 
-	public void addPlayer(Player player) {
-		players.add(player);
+	public void setDiffValue(int value) {
+		this.diffValue = value;
 	}
-
-	public void updateValue(int value) {
-		this.value += value;
+	
+	public void addPlayer(Player player) {
+		if(!this.players.contains(player))
+			players.add(player);
 	}
 }
