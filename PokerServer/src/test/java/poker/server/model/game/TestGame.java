@@ -57,7 +57,7 @@ public class TestGame {
 		flipedCards = new ArrayList<Card>();
 	}
 
-	/*@Test
+	@Test
 	public void testNewGame() {
 		assertEquals(game.getCurrentBet(), 0);
 		assertEquals(game.getCurrentPot(), 0);
@@ -653,7 +653,7 @@ public class TestGame {
 		flipedCards.add(card3); // flop
 		flipedCards.add(card4); // tournant
 		flipedCards.add(card5); // river
-	}*/
+	}
 	
 	//POT ALL IN
 	@Test

@@ -22,13 +22,14 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.IndexColumn;
 
+import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
+import poker.server.model.game.parameters.AbstractParameters;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
-import poker.server.service.ErrorMessage;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -1085,10 +1086,7 @@ public class Game implements Serializable {
 		return status == ENDED;
 	}
 
-<<<<<<< HEAD
-=======
 	public void removePlayer(String playerName) {
 		players.remove(playerName);
 	}
->>>>>>> 76397b2eecc2bb1beab462e60397c9fecfadec3f
 }

@@ -71,15 +71,11 @@ public class Player implements Serializable {
 	int role;
 	boolean folded;
 	boolean allIn;
-<<<<<<< HEAD
 	int roundAllIn;
-	
-=======
 
 	int lastAction;
 	int lastRaisedValue;
-
->>>>>>> 76397b2eecc2bb1beab462e60397c9fecfadec3f
+	
 	/**
 	 * Default constructor
 	 */
@@ -435,10 +431,6 @@ public class Player implements Serializable {
 	}
 
 	public void initHand() {
-<<<<<<< HEAD
-		currentHand = new Hand();
-	}	
-=======
 		currentHand = cleanHand;
 	}
 
@@ -449,5 +441,4 @@ public class Player implements Serializable {
 	public int getLastRaisedValue() {
 		return lastRaisedValue;
 	}
->>>>>>> 76397b2eecc2bb1beab462e60397c9fecfadec3f
 }
