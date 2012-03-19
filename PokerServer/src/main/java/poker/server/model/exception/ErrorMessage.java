@@ -26,7 +26,10 @@ public enum ErrorMessage {
 	INCOMPATIBLE_RQTOKEN_CONSUMER (19, "Incompatible request token and consumer key"),
 	REQ_TOKEN_NOT_VALID (20, "The request token is not valid"), 
 	SITANDGO_ALREADY_EXISTS (21, "The game type SitAndGo is already exsits"),
-	NOT_EQUITABLE_REWARD(22, "The number of winners is not equals to the percent reward's array size");
+	NOT_EQUITABLE_REWARD(22, "The number of winners is not equals to the percent reward's array size"), 
+	INVALID_SIGNATURE (23, "Invalid signature"), 
+	UNKNOWN_ACCESS_TOKEN (24, "The access token is not valid"), 
+	INCOMPATIBLE_ACCESS_TOKEN_CONSUMER(25, "Incompatible access token and consumer key");
 	
 	private int code;
 	private String message;

@@ -97,9 +97,9 @@ public class Game implements Serializable {
 	@IndexColumn(name = "potIndex")
 	List<Pot> splitPots;
 
-	BiMap<Integer, List<Player>> splitPot;
-	Map<Player, Integer> playersAllIn;
-	Map<Player, Integer> sortedPlayersAllIn;
+	transient BiMap<Integer, List<Player>> splitPot;
+	transient Map<Player, Integer> playersAllIn;
+	transient Map<Player, Integer> sortedPlayersAllIn;
 
 	private int currentPlayerInt;
 	private int dealerPlayerInt;
@@ -395,7 +395,8 @@ public class Game implements Serializable {
 				if (player.isAllIn()
 						&& (player.getRoundAllIn() == currentRound)) {
 					// playersAllIn.put(player, player.getTotalBet());
-					for (Pot pot : splitPots) {
+					for (@SuppressWarnings("unused")
+					Pot pot : splitPots) {
 
 					}
 				}

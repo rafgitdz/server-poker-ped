@@ -26,6 +26,7 @@ import poker.server.infrastructure.RepositoryParameters;
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
+import poker.server.model.exception.SignatureException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
 import poker.server.model.game.card.Card;
@@ -35,6 +36,7 @@ import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
+import poker.server.service.sign.Signature;
 
 @Stateless
 @Path("/game")
@@ -55,6 +57,9 @@ public class GameService extends AbstractPokerService {
 	@EJB
 	private PlayerFactoryLocal playerFactory;
 
+	@EJB
+	private Signature signatureService;
+
 	/**
 	 * Insure the connection of a player in a game, the result is a
 	 * {@code JSONObject} that will contains the informations about the
@@ -73,11 +78,19 @@ public class GameService extends AbstractPokerService {
 	 * 
 	 */
 	@GET
-	@Path("/authenticate/{consumerKey}/{token}/{signature}/{name}/{pwd}")
+	@Path("/authenticate/{consumerKey}/{signature}")
 	public Response authenticate(@PathParam("consumerKey") String consumerKey,
-			@PathParam("token") String token,
-			@PathParam("signature") String signature,
-			@PathParam("name") String name, @PathParam("pwd") String pwd) {
+			@PathParam("signature") String signature) {
+
+		String[] infos = null;
+		try {
+			infos = signatureService.verifyAuthenticate(consumerKey, signature);
+		} catch (SignatureException e) {
+			return error(e.getError());
+		}
+
+		String name = infos[6];
+		String pwd = infos[8];
 
 		JSONObject json = new JSONObject();
 		Player player = repositoryPlayer.load(name);
