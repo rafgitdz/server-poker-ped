@@ -42,31 +42,31 @@ public class TestCompleteGame {
 	@Test
 	public void testCompleteGame() {
 
-		player4.call();
-		player5.call();
-		player1.call();
-		player2.call();
+		player4.fold();
+		player5.fold();
+		player1.fold();
+		player2.fold();
 		player3.call();
-		assertEquals(game.getCurrentRound(), Game.FLOP);
-		//player2.check();
-		player3.check();
-		player4.check();
-		player5.check();
-		player1.check();
-		assertEquals(game.getCurrentRound(), Game.TOURNANT);
-		player2.check();
-		player3.check();
-		player4.check();
-		player5.check();
-		player1.check();
-		assertEquals(game.getCurrentRound(), Game.RIVER);
-		player2.check();
-		player3.check();
-		player4.check();
-		player5.check();
-		player1.check();
 		assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
-		assertEquals(game.getFlipedCards().size(), 5);
+//		//player2.check();
+//		player3.check();
+//		player4.check();
+//		player5.check();
+//		player1.check();
+//		assertEquals(game.getCurrentRound(), Game.TOURNANT);
+//		//player2.check();
+//		player3.check();
+//		player4.check();
+//		player5.check();
+//		player1.check();
+//		assertEquals(game.getCurrentRound(), Game.RIVER);
+//		//player2.check();
+//		player3.check();
+//		player4.check();
+//		player5.check();
+//		player1.check();
+//		assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
+//		assertEquals(game.getFlipedCards().size(), 5);
 	}
 
 }

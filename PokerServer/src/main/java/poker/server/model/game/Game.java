@@ -588,6 +588,8 @@ public class Game implements Serializable {
 				currentPlayerInt = smallBlindPlayerInt;
 				lastPlayerToPlay = dealerPlayerInt;
 				nextRound();
+				if (currentRound == SHOWDOWN)
+					break;
 
 			} else {
 				if (currentPlayerInt == players.size() - 1)

@@ -303,24 +303,25 @@ public class Player implements Serializable {
 
 		Map<String, Integer> possibleActions = new HashMap<String, Integer>();
 
-		if (game.getCurrentBet() >= this.currentTokens) {
-			possibleActions.put("allIn", currentTokens);
-		} else {
+		if (game.getCurrentBet() < this.currentTokens) {
+
 			if (game.getCurrentBet() == this.currentBet)
 				possibleActions.put("check", 0);
 			else
 				possibleActions.put("call", game.getCurrentBet() - currentBet);
 
-			possibleActions.put("allIn", currentTokens);
 			possibleActions.put("raise", game.getCurrentBet());
 		}
+
+		possibleActions.put("allIn", currentTokens);
+		possibleActions.put("fold", 0);
 
 		return possibleActions;
 	}
 
 	public void setAsMissing() {
 		connectionStatus = MISSING;
-		fold();
+		folded = true;
 	}
 
 	public void setInGame() {

@@ -1,5 +1,6 @@
 package poker.server.service.sign;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,8 +16,9 @@ import poker.server.infrastructure.RepositoryRequestToken;
 import poker.server.infrastructure.auth.Consumer;
 import poker.server.infrastructure.auth.RequestToken;
 import poker.server.infrastructure.crypt.AesCrypto;
-import poker.server.service.AbstractPokerService;
+import poker.server.model.exception.ErrorMessage;
 import poker.server.model.player.Player;
+import poker.server.service.AbstractPokerService;
 
 @Stateless
 @Path("/sign")
@@ -34,6 +36,7 @@ public class SignRequestService extends AbstractPokerService {
 	@EJB
 	private RepositoryRequestToken repositoryRequestToken;
 
+	@SuppressWarnings("unused")
 	@EJB
 	private RepositoryAccessToken repositoryAccessToken;
 
