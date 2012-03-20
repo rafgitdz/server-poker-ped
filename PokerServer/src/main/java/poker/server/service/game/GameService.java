@@ -21,9 +21,12 @@ import javax.ws.rs.core.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import poker.server.infrastructure.RepositoryAccessToken;
+import poker.server.infrastructure.RepositoryConsumer;
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryParameters;
 import poker.server.infrastructure.RepositoryPlayer;
+import poker.server.infrastructure.auth.Consumer;
 import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
 import poker.server.model.exception.SignatureException;
@@ -36,7 +39,7 @@ import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
-import poker.server.service.sign.Signature;
+import poker.server.service.sign.SignatureService;
 
 @Stateless
 @Path("/game")
@@ -52,20 +55,22 @@ public class GameService extends AbstractPokerService {
 	private RepositoryParameters repositoryParameters;
 
 	@EJB
+	private RepositoryAccessToken repositoryAccessToken;
+
+	@EJB
 	private GameFactoryLocal gameFactory;
 
 	@EJB
 	private PlayerFactoryLocal playerFactory;
 
 	@EJB
-	private Signature signatureService;
+	private RepositoryConsumer repositoryConsumer;
 
 	/**
 	 * Insure the connection of a player in a game, the result is a
 	 * {@code JSONObject} that will contains the informations about the
 	 * connection's state, if the connection of the player is correct then
-	 * {@code stat = true} else {@code stat = false} and with
-	 * {@code message String}
+	 * {@code stat = true} else {@code stat = false} and with {@code message}
 	 * 
 	 * @param name
 	 *            the name of the player to connect
@@ -84,7 +89,8 @@ public class GameService extends AbstractPokerService {
 
 		String[] infos = null;
 		try {
-			infos = signatureService.verifyAuthenticate(consumerKey, signature);
+			infos = verifySignature(SignatureService.AUTHENTIFICATE,
+					consumerKey, signature);
 		} catch (SignatureException e) {
 			return error(e.getError());
 		}
@@ -122,12 +128,21 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 */
 	@GET
-	@Path("/connectGame/{consumerKey}/{token}/{signature}/{tableName}/{playerName}")
-	public Response connectGame(@PathParam("consumerKey") String consumerKey,
-			@PathParam("token") String token,
-			@PathParam("signature") String signature,
-			@PathParam("tableName") String tableName,
-			@PathParam("playerName") String playerName) {
+	@Path("/connectGame/{consumerKey}/{signature}")
+	public Response connect(@PathParam("consumerKey") String consumerKey,
+			@PathParam("signature") String signature) {
+
+		String[] infos = null;
+		try {
+			infos = SignatureService.getInstance().verifySignature(
+					SignatureService.CONNECT, consumerKey, signature,
+					repositoryConsumer, repositoryAccessToken);
+		} catch (SignatureException e) {
+			return error(e.getError());
+		}
+
+		String tableName = infos[6];
+		String playerName = infos[8];
 
 		Game game = repositoryGame.load(tableName);
 
@@ -160,6 +175,10 @@ public class GameService extends AbstractPokerService {
 	@GET
 	@Path("/getGamesStatus/{consumerKey}")
 	public Response getGamesStatus(@PathParam("consumerKey") String consumerKey) {
+
+		Consumer consumer = repositoryConsumer.load(consumerKey);
+		if (consumer == null)
+			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
 
 		List<Game> currentGames = new ArrayList<Game>();
 		List<Parameters> parameters = new ArrayList<Parameters>();
@@ -211,6 +230,10 @@ public class GameService extends AbstractPokerService {
 			@PathParam("tableName") String tableName,
 			@PathParam("playerName") String playerName) {
 
+		Consumer consumer = repositoryConsumer.load(consumerKey);
+		if (consumer == null)
+			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
+
 		Response resp = null;
 		Game currentGame = repositoryGame.load(tableName);
 
@@ -234,15 +257,26 @@ public class GameService extends AbstractPokerService {
 	@GET
 	@Path("/showDown/{consumerKey}/{token}/{signature}/{tableName}")
 	public Response showDown(@PathParam("consumerKey") String consumerKey,
-			@PathParam("token") String token,
-			@PathParam("signature") String signature,
-			@PathParam("tableName") String tableName) {
+			@PathParam("signature") String signature) {
+
+		String[] infos = null;
+		try {
+			infos = SignatureService.getInstance().verifySignature(
+					SignatureService.SHOWDOWN, consumerKey, signature,
+					repositoryConsumer, repositoryAccessToken);
+		} catch (SignatureException e) {
+			return error(e.getError());
+		}
+
+		String tableName = infos[6];
 
 		JSONObject json = new JSONObject();
 		Game game = repositoryGame.load(tableName);
 
 		if (game == null)
 			return error(ErrorMessage.GAME_NOT_EXIST);
+		else if (!game.isStarted())
+			return error(ErrorMessage.GAME_NOT_READY_TO_START);
 
 		Map<String, Integer> winners = null;
 
@@ -286,6 +320,10 @@ public class GameService extends AbstractPokerService {
 			@PathParam("percent2") int percentReward2,
 			@PathParam("percent3") int percentReward3) {
 
+		Consumer consumer = repositoryConsumer.load(consumerKey);
+		if (consumer == null)
+			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
+
 		Parameters param = new OtherGameType(name, potType, buyIn,
 				buyInIncreasing, multFactor, bigBlind, smallBlind,
 				initPlayersTokens, playerNumber, speakTime, timeChangeBlind,
@@ -306,6 +344,10 @@ public class GameService extends AbstractPokerService {
 	@GET
 	@Path("/defaultGameType/{consumerKey}")
 	public Response defaultGameType(@PathParam("consumerKey") String consumerKey) {
+
+		Consumer consumer = repositoryConsumer.load(consumerKey);
+		if (consumer == null)
+			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
 
 		JSONObject json = new JSONObject();
 
@@ -344,6 +386,7 @@ public class GameService extends AbstractPokerService {
 
 		updateJSON(json, "playersNames", getPlayerNames(currentGame));
 		updateJSON(json, "tableName", currentGame.getName());
+		updateJSON(json, "gameTypeName", currentGame.getGameType().getName());
 		updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
 		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
 		updateJSON(json, "bigBlind", currentGame.getBigBlind());
@@ -435,5 +478,17 @@ public class GameService extends AbstractPokerService {
 			flipedCards.add(card.getId());
 
 		return flipedCards;
+	}
+
+	/**
+	 * Call the verify method from signatureService conformed on type given as
+	 * parameter
+	 */
+	private String[] verifySignature(int type, String consumerKey,
+			String signature) {
+
+		return SignatureService.getInstance().verifySignature(
+				SignatureService.CONNECT, consumerKey, signature,
+				repositoryConsumer, repositoryAccessToken);
 	}
 }

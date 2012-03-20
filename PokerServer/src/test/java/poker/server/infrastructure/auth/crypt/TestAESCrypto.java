@@ -50,6 +50,7 @@ public class TestAESCrypto {
 			e.printStackTrace();
 		}
 		SignatureService sign = new SignatureService();
-		sign.verifyAuthenticate(consumer.getConsumerKey(), encrypted);
+		sign.verifySignature(0, consumer.getConsumerKey(), encrypted, null,
+				null);
 	}
 }

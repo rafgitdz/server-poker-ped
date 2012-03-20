@@ -46,11 +46,6 @@ public class PlayerService extends AbstractPokerService {
 			@PathParam("signature") String signature,
 			@PathParam("name") String name, @PathParam("quantity") int quantity) {
 
-		/*
-		 * decrypt the signature exist(token) , exist(consumerKey) verifier si
-		 * le token est conforme au consumerKey dans le DB si le token est
-		 * valide
-		 */
 		return handlePlayerAction(name, RAISE, quantity);
 	}
 

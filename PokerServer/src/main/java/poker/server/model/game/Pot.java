@@ -32,6 +32,9 @@ public class Pot implements Serializable {
 	@IndexColumn(name = "playerPotIndex")
 	List<Player> players;
 
+	int valueReward;
+	int diffValue;
+
 	public Pot() {
 
 	}
@@ -46,6 +49,14 @@ public class Pot implements Serializable {
 		players.add(player);
 	}
 
+	public void calcValueReward() {
+		valueReward = this.players.size() * this.diffValue;
+	}
+
+	public int getValueReward() {
+		return valueReward;
+	}
+
 	public int getValue() {
 		return value;
 	}
@@ -54,11 +65,12 @@ public class Pot implements Serializable {
 		return players;
 	}
 
-	public void addPlayer(Player player) {
-		players.add(player);
+	public void setDiffValue(int value) {
+		this.diffValue = value;
 	}
 
-	public void updateValue(int value) {
-		this.value += value;
+	public void addPlayer(Player player) {
+		if (!this.players.contains(player))
+			players.add(player);
 	}
 }
