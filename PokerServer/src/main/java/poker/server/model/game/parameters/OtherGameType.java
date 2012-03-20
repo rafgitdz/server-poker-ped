@@ -18,6 +18,9 @@ public class OtherGameType extends AbstractParameters {
 
 	private static final long serialVersionUID = 1169923728589316907L;
 
+	public OtherGameType() {
+	}
+
 	public OtherGameType(String name, int potType, int buyIn,
 			int buyInIncreasing, int multFactor, int bigBlind, int smallBlind,
 			int initPlayersTokens, int playerNumber, int speakTime,

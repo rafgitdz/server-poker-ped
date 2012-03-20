@@ -67,6 +67,7 @@ public class AuthProviderService extends AuthProvider {
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
 		updateJSON(json, "consumerKey", oauthConsumer.getKey());
+		updateJSON(json, "secret", oauthConsumer.getSecret());
 		return buildResponse(json);
 	}
 

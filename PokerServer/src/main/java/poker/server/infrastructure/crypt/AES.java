@@ -23,7 +23,6 @@ public class AES {
 			throws Exception {
 
 		byte[] RAWKey = getRawKey(seed.getBytes());
-		System.out.println("Raw : " +RAWKey.toString());
 		byte[] ciphertext = encrypt(RAWKey, cleartext.getBytes());
 		return toHex(ciphertext);
 	}
