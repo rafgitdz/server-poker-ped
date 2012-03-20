@@ -2,6 +2,7 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,6 +10,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -797,7 +802,8 @@ public class Game implements Serializable {
 		Map<String, Integer> bestPlayers = getWinners(playersBestHands, best,
 				playerToReward);
 
-		// sort playersBestHands
+		// sort BestPlayer
+		Map<String, Integer> sortedBestPlayers = sortMapByValue(bestPlayers);
 		// si egalite -> compare
 		// setRankPlayer
 		// for each pot (splitPots) rewards the winners
@@ -807,6 +813,29 @@ public class Game implements Serializable {
 		return bestPlayers;
 	}
 
+	@SuppressWarnings("unchecked")
+	private <K, V> Map<K, V> sortMapByValue(Map<K,V> map) {
+		
+		Map<K,V> sortedMap = new LinkedHashMap<K,V>();
+		 
+		List<K> mapKeys = new ArrayList<K>(map.keySet());
+		List<V> mapValues = new ArrayList<V>(map.values());
+		
+		TreeSet<V> sortedSet = new TreeSet<V>(mapValues);
+		Object[] sortedArray = sortedSet.toArray();
+		
+		int size = sortedArray.length; 
+		for (int i=0; i<size; i++) {
+			
+			int vIndex = mapValues.indexOf(sortedArray[i]);
+			K key = mapKeys.get(vIndex);
+			V value = (V)sortedArray[i];
+			sortedMap.put(key, value);
+		}
+		
+		return sortedMap;
+	}
+	
 	/**
 	 * At the end of round river, get the winners that have the best hand
 	 * 
