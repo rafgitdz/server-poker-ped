@@ -446,4 +446,8 @@ public class Player implements Serializable {
 	public void updateBestHand(Card c1, Card c2, Card c3) {
 		// update bestHand
 	}
+
+	public int getStatus() {
+		return connectionStatus;
+	}
 }

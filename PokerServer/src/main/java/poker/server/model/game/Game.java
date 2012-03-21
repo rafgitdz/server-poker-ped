@@ -448,7 +448,8 @@ public class Game implements Serializable {
 
 		cleanTable();
 		if (players.size() == 1) {
-			playersRank.add(players.get(0));
+			playersRank.remove(players.get(0));
+			playersRank.add(0, players.get(0));
 			setPrizeForPlayers();
 			status = ENDED;
 			return;
@@ -484,6 +485,7 @@ public class Game implements Serializable {
 			player = players.get(i);
 
 			if (player.getCurrentTokens() == 0) {
+				playersRank.remove(player);
 				playersRank.add(0, player);
 				players.remove(player);
 				player.setOutGame();
@@ -611,7 +613,7 @@ public class Game implements Serializable {
 	/**
 	 * After a certain time, update the blinds and increment the level of them
 	 */
-	protected void updateBlind() {
+	public void updateBlind() {
 
 		++gameLevel;
 		int blindMultFactor = gameType.getMultFactor();
@@ -1087,7 +1089,22 @@ public class Game implements Serializable {
 		return status == ENDED;
 	}
 
+	/**
+	 * Removes a player in the game
+	 */
 	public void removePlayer(String playerName) {
 		players.remove(playerName);
+	}
+
+	/**
+	 * Returns the list of the current pots if it exists
+	 */
+	public List<Integer> getPots() {
+
+		List<Integer> pots = new ArrayList<Integer>();
+		for (Pot pot : splitPots)
+			pots.add(pot.getValue());
+
+		return pots;
 	}
 }

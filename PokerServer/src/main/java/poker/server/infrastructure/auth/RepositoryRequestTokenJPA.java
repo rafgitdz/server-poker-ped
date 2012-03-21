@@ -18,7 +18,6 @@ public class RepositoryRequestTokenJPA extends
 
 	@Override
 	public RequestToken notAlreadyAttributed() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

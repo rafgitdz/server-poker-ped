@@ -89,8 +89,8 @@ public class GameService extends AbstractPokerService {
 
 		String[] infos = null;
 		try {
-			infos = verifySignature(SignatureService.AUTHENTIFICATE,
-					consumerKey, signature);
+			infos = verifySignature(SignatureService.AUTHENTICATE, consumerKey,
+					signature);
 		} catch (SignatureException e) {
 			return error(e.getError());
 		}
@@ -134,9 +134,8 @@ public class GameService extends AbstractPokerService {
 
 		String[] infos = null;
 		try {
-			infos = SignatureService.getInstance().verifySignature(
-					SignatureService.CONNECT, consumerKey, signature,
-					repositoryConsumer, repositoryAccessToken);
+			infos = verifySignature(SignatureService.CONNECT, consumerKey,
+					signature);
 		} catch (SignatureException e) {
 			return error(e.getError());
 		}
@@ -235,8 +234,15 @@ public class GameService extends AbstractPokerService {
 			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
 
 		Response resp = null;
-		Game currentGame = repositoryGame.load(tableName);
 
+		Player player = repositoryPlayer.load(playerName);
+
+		if (player == null)
+			return error(ErrorMessage.PLAYER_NOT_EXIST);
+		else if (!player.isInGame())
+			return error(ErrorMessage.PLAYER_NOT_CONNECTED);
+
+		Game currentGame = repositoryGame.load(tableName);
 		if (currentGame == null)
 			resp = error(ErrorMessage.GAME_NOT_EXIST);
 
@@ -245,7 +251,10 @@ public class GameService extends AbstractPokerService {
 			if (!currentGame.isStarted())
 				resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
 			else
-				resp = getGameData(currentGame);
+				resp = getGameData(currentGame, player);
+
+			System.out.println("Current ROUND = "
+					+ currentGame.getCurrentRound());
 		}
 
 		return resp;
@@ -255,15 +264,14 @@ public class GameService extends AbstractPokerService {
 	 * Returns the winners and the list of hand's players, after a showDown
 	 */
 	@GET
-	@Path("/showDown/{consumerKey}/{token}/{signature}/{tableName}")
+	@Path("/showDown/{consumerKey}/{signature}")
 	public Response showDown(@PathParam("consumerKey") String consumerKey,
 			@PathParam("signature") String signature) {
 
 		String[] infos = null;
 		try {
-			infos = SignatureService.getInstance().verifySignature(
-					SignatureService.SHOWDOWN, consumerKey, signature,
-					repositoryConsumer, repositoryAccessToken);
+			infos = verifySignature(SignatureService.SHOWDOWN, consumerKey,
+					signature);
 		} catch (SignatureException e) {
 			return error(e.getError());
 		}
@@ -375,6 +383,7 @@ public class GameService extends AbstractPokerService {
 		if (currentGame.isReady()) {
 
 			currentGame.start();
+			// startTimerUpdateBlinds(currentGame);
 			repositoryGame.update(currentGame);
 			updateJSON(json, "startGame", true);
 
@@ -403,29 +412,69 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 * 
 	 */
-	private Response getGameData(Game currentGame) {
+	private Response getGameData(Game currentGame, Player selectedPlayer) {
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
-		updateJSON(json, "dealer", currentGame.getDealerPlayer().getName());
-		updateJSON(json, "smallBlind", currentGame.getSmallBlindPlayer()
-				.getName());
-		updateJSON(json, "bigBlind", currentGame.getBigBlindPlayer().getName());
 
-		updateJSON(json, "playerNames", getPlayerNames(currentGame));
-		updateJSON(json, "size", currentGame.getPlayers().size());
-		updateJSON(json, "playerBudget", currentGame.getGameType().getTokens());
-		updateJSON(json, "buyIn", currentGame.getGameType().getBuyIn());
+		updateJSON(json, "tableName", currentGame.getName());
+		updateJSON(json, "bigBlind", currentGame.getBigBlind());
+		updateJSON(json, "smallBlind", currentGame.getSmallBlind());
+		updateJSON(json, "prizePool", currentGame.getPrizePool());
+
+		updateJSON(json, "dealer", currentGame.getDealerPlayer().getName());
+		updateJSON(json, "smallBlindPlayer", currentGame.getSmallBlindPlayer()
+				.getName());
+		updateJSON(json, "bigBlindPlayer", currentGame.getBigBlindPlayer()
+				.getName());
+		updateJSON(json, "currentPlayer", currentGame.getCurrentPlayer()
+				.getName());
+
+		List<JSONObject> playersInfos = new ArrayList<JSONObject>();
+
+		for (Player player : currentGame.getPlayers()) {
+
+			JSONObject jsonPlayer = new JSONObject();
+			updateJSON(jsonPlayer, "name", player.getName());
+			updateJSON(jsonPlayer, "tokens", player.getCurrentTokens());
+			updateJSON(jsonPlayer, "action", player.getLastAction());
+			updateJSON(jsonPlayer, "value", 0);
+			updateJSON(jsonPlayer, "status", player.getStatus());
+
+			playersInfos.add(jsonPlayer);
+		}
+
+		updateJSON(json, "players", playersInfos);
 
 		JSONObject flippedCardsJson = new JSONObject();
 		updateJSON(flippedCardsJson, "cards", getCards(currentGame));
 		updateJSON(flippedCardsJson, "state", currentGame.getCurrentRound());
 		updateJSON(json, "flippedCards", flippedCardsJson);
 
-		updateJSON(json, "playersCards", getPlayersCards(currentGame));
+		List<Integer> cards = new ArrayList<Integer>();
+		for (Card card : selectedPlayer.getCurrentHand().getCards())
+			cards.add(card.getId());
 
-		// TO DO
-		// add the others info
+		updateJSON(json, "userCards", cards);
+
+		updateJSON(json, "pots", currentGame.getPots());
+		updateJSON(json, "totalPot", currentGame.getTotalPot());
+
+		List<Player> playersRank = currentGame.getPlayersRank();
+
+		List<JSONObject> playersRanks = new ArrayList<JSONObject>();
+
+		for (Player player : playersRank) {
+
+			JSONObject jsonPlayer = new JSONObject();
+			updateJSON(jsonPlayer, "position", playersRank.indexOf(player));
+			updateJSON(jsonPlayer, "name", player.getName());
+
+			playersRanks.add(jsonPlayer);
+		}
+
+		updateJSON(json, "playerRanks", playersRanks);
+
 		return buildResponse(json);
 	}
 
@@ -487,8 +536,16 @@ public class GameService extends AbstractPokerService {
 	private String[] verifySignature(int type, String consumerKey,
 			String signature) {
 
-		return SignatureService.getInstance().verifySignature(
-				SignatureService.CONNECT, consumerKey, signature,
-				repositoryConsumer, repositoryAccessToken);
+		return SignatureService.getInstance().verifySignature(type,
+				consumerKey, signature, repositoryConsumer,
+				repositoryAccessToken);
+	}
+
+	/**
+	 * Updates Blinds
+	 */
+	@SuppressWarnings("unused")
+	private void startTimerUpdateBlinds(Game currentGame) {
+		new Thread(new TimerUpdateBlinds(currentGame, repositoryGame)).start();
 	}
 }
