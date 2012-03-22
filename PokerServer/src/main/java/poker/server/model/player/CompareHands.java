@@ -243,16 +243,16 @@ public class CompareHands {
 		Card card2 = hand.getCards().get(1);
 		Card card4 = hand.getCards().get(3);
 
-		nbCards = nbSameCards(hand, card2);
+		nbCards = nbSameCards(hand, card4);
 
 		if (nbCards == 2) {
-			rank = card2.getValue();
+			rank = card4.getValue();
 		} else {
 			
-			nbCards = nbSameCards(hand, card4);
+			nbCards = nbSameCards(hand, card2);
 			
 			if (nbCards == 2) {
-				rank = card4.getValue();
+				rank = card2.getValue();
 			}
 		}
 
@@ -286,8 +286,8 @@ public class CompareHands {
 		Card card2 = hand.getCards().get(1);
 		Card card4 = hand.getCards().get(3);
 
-		ranks.add(card4.getValue(), 0);
-		ranks.add(card2.getValue(), 1);
+		ranks.add(0, card4.getValue());
+		ranks.add(1, card2.getValue());
 
 		// unique card candidates
 		Card card1 = hand.getCards().get(0);
@@ -298,11 +298,11 @@ public class CompareHands {
 		int nbCard3 = nbSameCards(hand, card3);
 
 		if (nbCard1 == 1) {
-			ranks.add(card1.getValue(), 2);
+			ranks.add(2, card1.getValue());
 		} else if (nbCard3 == 1) {
-			ranks.add(card3.getValue(), 2);
+			ranks.add(2, card3.getValue());
 		} else {
-			ranks.add(card5.getValue(), 2);
+			ranks.add(2, card5.getValue());
 		}
 
 		return ranks;
