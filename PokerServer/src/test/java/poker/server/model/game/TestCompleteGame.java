@@ -48,31 +48,19 @@ public class TestCompleteGame {
 		// player2.fold();
 		// player3.call();
 		// assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
-		player4.call();
-		player5.call();
-		player1.call();
-		player2.call();
-		player3.call();
-		assertEquals(game.getCurrentRound(), Game.FLOP);
-		player2.call();
-		player3.call();
-		player4.call();
-		player5.call();
-		player1.call();
-		assertEquals(game.getCurrentRound(), Game.TOURNANT);
-		player2.call();
-		player3.call();
-		player4.call();
-		player5.call();
-		player1.call();
-		assertEquals(game.getCurrentRound(), Game.RIVER);
-		player2.call();
-		player3.call();
-		player4.call();
-		player5.call();
-		player1.call();
+		player4.allIn();
+		player5.allIn();
+		player1.allIn();
+		player2.allIn();
+		player3.allIn();
 		assertEquals(game.getCurrentRound(), Game.SHOWDOWN);
-		assertEquals(game.getFlipedCards().size(), 5);
+		
+		game.showDown();
+		
+		System.out.println("size = " + game.getPlayers().size());
+		for(Player p : game.getPlayersRank()) {
+			System.out.println(p.getName());
+		}
 	}
 
 }

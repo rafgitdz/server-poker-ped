@@ -20,7 +20,7 @@ public class SitAndGo extends AbstractParameters {
 		name = "Labri_Texas_Holdem_SitAndGo";
 		playerNumber = 5;
 		speakTime = 30;
-		timeChangeBlind = 180;
+		timeChangeBlind = 10;
 		buyIn = 10;
 		buyInIncreasing = 2;
 		multFactor = 2;

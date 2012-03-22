@@ -24,7 +24,7 @@ public class Chrono implements Runnable {
 
 	public Chrono(int duration) {
 
-		if (duration != 5 && duration != 180)
+		if (duration != 10 && duration != 180)
 			throw new GameException(FORBIDDEN_DURATION);
 
 		totalTime = duration;
@@ -43,7 +43,6 @@ public class Chrono implements Runnable {
 				timer.stop();
 				return;
 			}
-			System.out.println("Time = " + totalTime);
 		}
 	};
 
