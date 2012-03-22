@@ -333,7 +333,7 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.TWO_CLUB, Card.KING_DIAMOND,
 				Card.KING_CLUB, Card.KING_CLUB, Card.ACE_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareTrips(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(1, result);
 		
 		buildPlayerHand(player1, Card.FIVE_CLUB, Card.KING_DIAMOND,
@@ -342,17 +342,8 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.FIVE_CLUB, Card.QUEEN_CLUB,
 				Card.ACE_CLUB, Card.ACE_DIAMOND, Card.ACE_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareTrips(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(1, result);
-		
-		buildPlayerHand(player1, Card.FIVE_CLUB, Card.KING_DIAMOND,
-				Card.TWO_CLUB, Card.JACK_CLUB, Card.ACE_CLUB);
-		
-		buildPlayerHand(player2, Card.FOUR_CLUB, Card.FOUR_CLUB,
-				Card.FOUR_CLUB, Card.ACE_DIAMOND, Card.ACE_CLUB);
-		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
-		assertEquals(-1, result);
 	}
 	
 	
@@ -366,7 +357,7 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.TWO_CLUB, Card.KING_DIAMOND,
 				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareQuads(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(1, result);
 				
 		buildPlayerHand(player1, Card.TWO_CLUB, Card.ACE_DIAMOND,
@@ -375,7 +366,7 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.FIVE_CLUB, Card.ACE_DIAMOND,
 				Card.ACE_CLUB, Card.ACE_DIAMOND, Card.ACE_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareQuads(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(-1, result);	
 	}
 	
@@ -390,7 +381,7 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
 				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareFullHouse(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(1, result);
 		
 		buildPlayerHand(player1, Card.QUEEN_CLUB, Card.QUEEN_HEART,
@@ -399,7 +390,7 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
 				Card.ACE_HEART, Card.ACE_CLUB, Card.ACE_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareFullHouse(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(0, result);
 		
 		buildPlayerHand(player1, Card.QUEEN_CLUB, Card.QUEEN_HEART,
@@ -408,7 +399,32 @@ public class TestCompareHands {
 		buildPlayerHand(player2, Card.FOUR_CLUB, Card.QUEEN_CLUB,
 				Card.ACE_HEART, Card.ACE_CLUB, Card.ACE_CLUB);
 		
-		result = CompareHands.compareTwoPair(player1.getCurrentHand(), player2.getCurrentHand());
+		result = CompareHands.compareFullHouse(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(-1, result);
+	}
+	
+	
+	@Test
+	public void testCompareAllHands() {
+		
+		List<Player> result = new ArrayList<Player>();
+		List<Player> players = new ArrayList<Player>();
+		
+		buildPlayerHand(player1, Card.FIVE_CLUB, Card.FIVE_CLUB,
+				Card.ACE_CLUB, Card.ACE_DIAMOND, Card.ACE_CLUB);
+		
+		buildPlayerHand(player2, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
+				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
+		
+		buildPlayerHand(player3, Card.FOUR_CLUB, Card.FOUR_CLUB,
+				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
+		
+		players.add(player1);
+		players.add(player2);
+		players.add(player3);
+		
+		result = CompareHands.compareAllHands(players, 1);
+		assertEquals(1, result.size());
+		
 	}
 }
