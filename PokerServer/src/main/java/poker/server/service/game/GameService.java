@@ -229,6 +229,7 @@ public class GameService extends AbstractPokerService {
 			@PathParam("tableName") String tableName,
 			@PathParam("playerName") String playerName) {
 
+		JSONObject json = new JSONObject();
 		Consumer consumer = repositoryConsumer.load(consumerKey);
 		if (consumer == null)
 			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
@@ -250,11 +251,10 @@ public class GameService extends AbstractPokerService {
 
 			if (!currentGame.isStarted())
 				resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
-			else
-				resp = getGameData(currentGame, player);
-
-			System.out.println("Current ROUND = "
-					+ currentGame.getCurrentRound());
+			else {
+				json = getGameData(currentGame, player);
+				resp = buildResponse(json);
+			}
 		}
 
 		return resp;
@@ -385,6 +385,9 @@ public class GameService extends AbstractPokerService {
 			currentGame.start();
 			// startTimerUpdateBlinds(currentGame);
 			repositoryGame.update(currentGame);
+
+			System.out.println("GAME SERVICE AFTER TIMER");
+
 			updateJSON(json, "startGame", true);
 
 		} else if (currentGame.isStarted())
@@ -412,7 +415,7 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 * 
 	 */
-	private Response getGameData(Game currentGame, Player selectedPlayer) {
+	private JSONObject getGameData(Game currentGame, Player selectedPlayer) {
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
@@ -475,7 +478,7 @@ public class GameService extends AbstractPokerService {
 
 		updateJSON(json, "playerRanks", playersRanks);
 
-		return buildResponse(json);
+		return json;
 	}
 
 	/**

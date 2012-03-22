@@ -467,10 +467,14 @@ public class Game implements Serializable {
 		updateRoundPotAndBets();
 		totalPot = 0;
 		deck = originalDeck;
+		// deck = new Deck();
 		flippedCards = null;
 		flippedCards = new ArrayList<Card>();
 		initPlayersHands();
 		dealCards();
+		lastPlayerToPlay = bigBlindPlayerInt;
+		currentPlayerInt = (bigBlindPlayerInt + 1) % players.size();
+		currentRound = 0;
 	}
 
 	private void initPlayersHands() {
@@ -755,6 +759,7 @@ public class Game implements Serializable {
 
 			int bestHand = 0; // set to HighCard, that is the worst hand value
 			int result = 0;
+			playersBestHands.put(player.getName(), 0);
 
 			if (!player.isfolded()) {
 
