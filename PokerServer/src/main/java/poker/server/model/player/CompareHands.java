@@ -218,8 +218,6 @@ public class CompareHands {
 	public static int compareHightestCards(Hand hand1, Hand hand2) {
 		int result = 0;
 
-		System.out.println("///////////////////////////::");
-		
 		Card card1 = null;
 		Card card2 = null;
 
@@ -227,9 +225,6 @@ public class CompareHands {
 			card1 = hand1.getCards().get(i);
 			card2 = hand2.getCards().get(i);
 
-			System.out.println(card1.getValue());
-			System.out.println(card2.getValue());
-			
 			if (card1.getValue() != card2.getValue()) {
 				result = compareRanks(card1.getValue(), card2.getValue());
 				break;

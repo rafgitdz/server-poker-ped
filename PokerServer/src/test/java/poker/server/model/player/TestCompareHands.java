@@ -55,6 +55,26 @@ public class TestCompareHands {
 	// //////////////////////////////////////////////
 	// ////////////////////////////////////////////////////
 
+	@Test
+	public void testSortHand() {
+		
+		buildPlayerHand(player1, Card.TWO_CLUB, Card.EIGHT_CLUB, Card.FOUR_DIAMOND,
+				 Card.ACE_CLUB, Card.FIVE_SPADE);
+		
+		Hand hand = CompareHands.sortHand(player1.getCurrentHand());
+		
+		Card card1 = hand.getCards().get(0);
+		Card card2 = hand.getCards().get(1);
+		Card card3 = hand.getCards().get(2);
+		Card card4 = hand.getCards().get(3);
+		Card card5 = hand.getCards().get(4);
+		
+		assertEquals(Card.TWO_CLUB.getValue(), card1.getValue());
+		assertEquals(Card.FOUR_SPADE.getValue(), card2.getValue());
+		assertEquals(Card.FIVE_CLUB.getValue(), card3.getValue());
+		assertEquals(Card.EIGHT_CLUB.getValue(), card4.getValue());
+		assertEquals(Card.ACE_CLUB.getValue(), card5.getValue());
+	}
 	
 	@Test
 	public void testCompareRanks() {
@@ -191,5 +211,18 @@ public class TestCompareHands {
 		
 		result = CompareHands.compareHightestCards(player1.getCurrentHand(), player2.getCurrentHand());
 		assertEquals(1, result);
+	}
+	
+	
+	@Test
+	public void testEvaluatePair() {
+		
+		int rank = -1;
+		
+		buildPlayerHand(player1, Card.TWO_CLUB, Card.TWO_DIAMOND,
+				Card.FIVE_SPADE, Card.JACK_CLUB, Card.EIGHT_CLUB);
+		
+		rank = CompareHands.evaluatePair(player1.getCurrentHand());
+		assertEquals(2, rank);
 	}
 }
