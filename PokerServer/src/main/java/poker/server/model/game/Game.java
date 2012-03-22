@@ -788,7 +788,6 @@ public class Game implements Serializable {
 				playerToReward);
 
 		// sort BestPlayer
-		Map<String, Integer> sortedBestPlayers = sortMapByValue(bestPlayers);
 		// si egalite -> compare
 		// setRankPlayer
 		// for each pot (splitPots) rewards the winners
@@ -796,29 +795,6 @@ public class Game implements Serializable {
 		nextRoundTasks();
 
 		return bestPlayers;
-	}
-
-	@SuppressWarnings("unchecked")
-	private <K, V> Map<K, V> sortMapByValue(Map<K,V> map) {
-		
-		Map<K,V> sortedMap = new LinkedHashMap<K,V>();
-		 
-		List<K> mapKeys = new ArrayList<K>(map.keySet());
-		List<V> mapValues = new ArrayList<V>(map.values());
-		
-		TreeSet<V> sortedSet = new TreeSet<V>(mapValues);
-		Object[] sortedArray = sortedSet.toArray();
-		
-		int size = sortedArray.length; 
-		for (int i=0; i<size; i++) {
-			
-			int vIndex = mapValues.indexOf(sortedArray[i]);
-			K key = mapKeys.get(vIndex);
-			V value = (V)sortedArray[i];
-			sortedMap.put(key, value);
-		}
-		
-		return sortedMap;
 	}
 	
 	/**
