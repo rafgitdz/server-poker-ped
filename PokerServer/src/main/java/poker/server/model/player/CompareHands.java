@@ -1,13 +1,7 @@
 package poker.server.model.player;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.hibernate.hql.classic.HavingParser;
 
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Value;
@@ -176,21 +170,19 @@ public class CompareHands {
 		
 		Player ref, current;
 		Hand refHand, currentHand;
+		Hand sortedRefHand, sortedCurrentHand;
 		
-		List<Card> sortedRefHand = new ArrayList<Card>();
-		List<Card> sortedCurrentHand = new ArrayList<Card>();
-
-		while (!haveSameHand(players) && (winners.size() >= 2)) {
+		while (!haveSameHand(players)) {
 
 			ref = players.get(0);
 			refHand = ref.getCurrentHand();
-			refHand.sort(sortedRefHand);
+			sortedRefHand = sortHand(refHand);
 
 			current = players.get(1);
 			currentHand = current.getCurrentHand();
-			currentHand.sort(sortedCurrentHand);
+			sortedCurrentHand = sortHand(currentHand);
 
-			result = compareHands(refHand, currentHand, bestHand);
+			result = compareHands(sortedRefHand, sortedCurrentHand, bestHand);
 
 			switch (result) {
 			case -1:
