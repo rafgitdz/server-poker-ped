@@ -164,38 +164,44 @@ public class CompareHands {
 	public static List<Player> compareAllHands(List<Player> players,
 			Integer bestHand) {
 
-		List<Player> winners = players;
-		
+		List<Player> loosers = new ArrayList<Player>();
+
 		int result = 0;
 		
 		Player ref, current;
 		Hand refHand, currentHand;
 		Hand sortedRefHand, sortedCurrentHand;
-		
-		while (!haveSameHand(players)) {
 
-			ref = players.get(0);
-			refHand = ref.getCurrentHand();
-			sortedRefHand = sortHand(refHand);
+		for (int i = 0; i < players.size(); i++) {
 
-			current = players.get(1);
-			currentHand = current.getCurrentHand();
-			sortedCurrentHand = sortHand(currentHand);
+			ref = players.get(i);
 
-			result = compareHands(sortedRefHand, sortedCurrentHand, bestHand);
+			if (!loosers.contains(ref)) {
 
-			switch (result) {
-			case -1:
-				winners.remove(current);
-				break;
-			case 1:
-				winners.remove(ref);
-				ref = current;
-				break;
-			default:
-				break;
+				refHand = ref.getCurrentHand();
+				sortedRefHand = sortHand(refHand);
+
+				for (int j = i + 1; j < players.size(); j++) {
+
+					current = players.get(j);
+					currentHand = current.getCurrentHand();
+					sortedCurrentHand = sortHand(currentHand);
+
+					result = compareHands(sortedRefHand, sortedCurrentHand,
+							bestHand);
+
+					if (result == -1) {
+						loosers.add(ref);
+					} else if (result == 1) {
+						loosers.add(current);
+					}
+				}
 			}
 		}
+		
+		List<Player> winners = new ArrayList<Player>();
+		winners.addAll(players);
+		winners.removeAll(loosers);
 
 		return winners;
 	}

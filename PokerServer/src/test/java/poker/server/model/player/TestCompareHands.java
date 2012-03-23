@@ -417,7 +417,7 @@ public class TestCompareHands {
 				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
 		
 		buildPlayerHand(player3, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
-				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
+				Card.JACK_CLUB, Card.JACK_CLUB, Card.JACK_CLUB);
 		
 		players.add(player1);
 		players.add(player2);
@@ -425,24 +425,6 @@ public class TestCompareHands {
 		
 		result = CompareHands.compareAllHands(players, 6);
 		assertEquals(1, result.size());
-		
-		
-		players.clear();
-		
-		buildPlayerHand(player1, Card.FIVE_CLUB, Card.FIVE_CLUB,
-				Card.TWO_CLUB, Card.ACE_DIAMOND, Card.ACE_CLUB);
-		
-		buildPlayerHand(player2, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
-				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
-		
-		buildPlayerHand(player3, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
-				Card.KING_CLUB, Card.KING_CLUB, Card.KING_CLUB);
-		
-		players.add(player1);
-		players.add(player2);
-		players.add(player3);
-		
-		result = CompareHands.compareAllHands(players, 6);
-		assertEquals(2, result.size());
+		assertEquals(player1.getName(), result.get(0).getName());
 	}
 }
