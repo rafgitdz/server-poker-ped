@@ -49,7 +49,8 @@ public class AES {
 	private static byte[] getRawKey(byte[] seed) throws Exception {
 
 		KeyGenerator keygen = KeyGenerator.getInstance(CIPHER_ALGORITHM);
-		SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
+//		SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
+		SecureRandom sr = new SecureRandom();
 		sr.setSeed(seed);
 		keygen.init(128, sr);
 		SecretKey skey = keygen.generateKey();
