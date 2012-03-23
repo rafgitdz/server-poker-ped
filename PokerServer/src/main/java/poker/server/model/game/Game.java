@@ -2,16 +2,11 @@ package poker.server.model.game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -32,6 +27,7 @@ import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.AbstractParameters;
 import poker.server.model.game.parameters.Parameters;
 import poker.server.model.game.parameters.SitAndGo;
+import poker.server.model.player.Hand;
 import poker.server.model.player.Player;
 
 /**
@@ -776,8 +772,15 @@ public class Game implements Serializable {
 							if (result > bestHand) {
 
 								bestHand = result;
-								// updateBestHand
-								// updateValueBestHand
+								
+								Hand hand = new Hand();
+								hand.addCards(player.getCurrentHand().getCards());
+								hand.addCard(flippedCards.get(i));
+								hand.addCard(flippedCards.get(j));
+								hand.addCard(flippedCards.get(k));
+								player.setBestHand(hand);
+								player.setValueBestHand(bestHand);
+								
 								playersBestHands.put(player.getName(), result);
 							}
 
