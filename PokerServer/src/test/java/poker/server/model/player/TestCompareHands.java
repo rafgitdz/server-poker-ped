@@ -35,6 +35,9 @@ public class TestCompareHands {
 		player.setCurrentHand(sortedHand);
 	}
 
+	
+	
+	
 	@Before
 	public void beforeTest() {
 		player1 = playerFactory.newPlayer("rafik", "dsd");

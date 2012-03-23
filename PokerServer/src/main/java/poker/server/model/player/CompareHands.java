@@ -1,7 +1,11 @@
 package poker.server.model.player;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Value;
@@ -122,6 +126,37 @@ public class CompareHands {
 	//////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////
 	
+	public static Map<Player, Integer> getRanking(
+			Map<Player, Integer> playersWithHands) {
+
+		Map<Player, Integer> ranking = new TreeMap<Player, Integer>();
+		Map<Player, Integer> challengeRanking = new TreeMap<Player, Integer>();
+		List<Player> playersToCompare = new ArrayList<Player>();
+
+		Player player;
+		int handValue;
+		
+		for (int hv = 8; hv == 0; hv--) {
+
+			Iterator<Entry<Player, Integer>> it = playersWithHands.entrySet()
+					.iterator();
+			while (it.hasNext()) {
+				Entry<Player, Integer> pairs = it.next();
+				player = pairs.getKey();
+				handValue = pairs.getValue();
+				
+				if (handValue == hv) {
+					playersToCompare.add(player);
+				}
+			}
+			
+			challengeRanking = compareAllHands(playersToCompare, hv);
+			ranking.putAll(challengeRanking);
+		}
+
+		return ranking;
+	}
+	
 	public static int compareHands(Hand hand1, Hand hand2, Integer bestHand) {
 
 		int result = 0;
@@ -161,9 +196,10 @@ public class CompareHands {
 		return result;
 	}
 
-	public static List<Player> compareAllHands(List<Player> players,
+	public static Map<Player, Integer> compareAllHands(List<Player> players,
 			Integer bestHand) {
 
+		Map<Player, Integer> ranking = new TreeMap<Player, Integer>();
 		List<Player> loosers = new ArrayList<Player>();
 
 		int result = 0;
@@ -203,7 +239,7 @@ public class CompareHands {
 		winners.addAll(players);
 		winners.removeAll(loosers);
 
-		return winners;
+		return ranking;
 	}
 
 	
