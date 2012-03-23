@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - getGameData</title></head>
+<body>
+<div class="InfoCase">
+<h1>poker.server.service.game.getGameData</h1>
+<div class="MethodDescription">Retour toutes les informations liées à la table demandée&nbsp;</div>
+<h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/game/getGameData/{consumerKey}</a><a href="http://localhost:8080/PokerServer/rest/"></a><a href="http://localhost:8080/PokerServer/rest/">/{tableName}/{playerName}</a></pre><h3>Authentification</h3>
+<p>Cette méthode n'exige pas une <a href="/services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl><dt><b><code>consumerKey: String</code></b>
+(Obligatoire)</dt><dd>Your API application key. <a href="file:///services/api/misc.api_keys.html">See here</a>
+for more details.</dd><dt><b><code>tableName : String </code></b>(Obligatoire)</dt>
+<dd>Name of &nbsp;the game to start</dd><dt><b><code>playerName : String </code></b>(Obligatoire)</dt><dd>Name of the player (for the cards only)</dd>
+</dl>
+<h3>Returns</h3>
+<dl>
+<dt><b><code>tableName : String</code></b></dt>
+<dd>Name of &nbsp;the game to start</dd><dt><b><code>smallBlind: int</code></b></dt>
+<dd>The value of the small blind</dd>
+<dt><b><code>bigBlind: int</code></b></dt>
+<dd>The value of the big blind</dd>
+<dt><b><code>prizePool: int</code></b></dt>
+<dd>The prize of the game</dd><dt><b><code>players: List&lt;info:JSONObject&gt;</code></b></dt><dd>All the informations about each player</dd><dt><b><code>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; info: JSONObject
+{name:String, tokens:int, action:int, value:int, present:boolean}</code></b></dt><dd>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;Informations about the player&nbsp;</dd><dt></dt><dt><b><code>currentPlayer: JSONObject {name:String, remainingTime:int}</code></b></dt><dd>The name of the current player</dd><dt><b><code>dealer:&nbsp;name:String</code></b></dt><dd>The name of the current player</dd><dt><b><code>bigBlindPlayer: String</code></b></dt><dd>The name of the current player</dd><dt><b><code>smallBlindPlayer: String</code></b></dt><dd>The name of the current player</dd><dt><b><code>flippedCards: JSONObject {List&lt;int&gt; cards, state:int}</code></b></dt><dd>The name of the current player</dd><dt><b><code>userCards: JSONObject {List&lt;int&gt; cards}</code></b></dt><dd>Les deux cartes du joueur donné en paramètre </dd><dt><b><code>pots: List&lt;int&gt;</code></b></dt><dd>All the current pots (if there is one element, then it is current pot else display several pots)</dd><dt><b><code>totalpot: int</code></b></dt><dd>Le pot total</dd><dt><b><code>playerRanks: List&lt;rankInfo:JSONObject&gt;&nbsp;</code></b></dt><dt>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Classement des joueurs au fur et à mesure de leur du jeu ainsi que leur gain</dt><dt><b><code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;rankInfo:JSONObject {int:position, String:name, int reward}</code></b></dt></dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre style="color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;">{<br>   "userCards":[<br>      1,<br>      6<br>   ],<br>   "totalPot":100,<br>   "bigBlindPlayer":"Lucas",<br>   "stat":"ok",<br>   "smallBlindPlayer":"Milan",<br>   "prizePool":50,<br>   "dealer":"Rafik",<br>   "tableName":"LabriTexasHoldem_ef690866-54cf-4d1e-a862-046e1010bc8e",<br>   "bigBlind":20,<br>   "players":[<br>      {<br>         "status":3,<br>         "name":"Rafik",<br>         "value":0,<br>         "action":5,<br>         "tokens":1480<br>      },<br>      {<br>         "status":3,<br>         "name":"Milan",<br>         "value":0,<br>         "action":5,<br>         "tokens":1480<br>      },<br>      {<br>         "status":3,<br>         "name":"Lucas",<br>         "value":0,<br>         "action":5,<br>         "tokens":1480<br>      },<br>      {<br>         "status":3,<br>         "name":"Audrey",<br>         "value":0,<br>         "action":5,<br>         "tokens":1480<br>      },<br>      {<br>         "status":3,<br>         "name":"Zlatan",<br>         "value":0,<br>         "action":5,<br>         "tokens":1480<br>      }<br>   ],<br>   "playerRanks":[<br>      {<br>         "position":0,<br>         "name":"Rafik"<br>      },<br>      {<br>         "position":1,<br>         "name":"Milan"<br>      },<br>      {<br>         "position":2,<br>         "name":"Lucas"<br>      },<br>      {<br>         "position":3,<br>         "name":"Audrey"<br>      },<br>      {<br>         "position":4,<br>         "name":"Zlatan"<br>      }<br>   ],<br>   "flippedCards":{<br>      "state":4,<br>      "cards":[<br>         51,<br>         11,<br>         12,<br>         14,<br>         16<br>      ]<br>   },<br>   "pots":[<br>      20<br>   ],<br>   "smallBlind":10,<br>   "currentPlayer":"Milan"<br>}</pre>
+<h3>Codes d'erreur</h3>
+<dl><dt><b><code>3: GAME_NOT_READY_TO_START</code></b></dt>
+<dd>The game is not ready to start</dd>
+<dt><b><code>7: GAME_NOT_EXIST</code></b></dt>
+<dd>The game doesn't exist</dd><dt><b><code>17: UNKNOWN_CONSUMER_KEY</code></b></dt><dd>Unknown consumer key</dd><span style="font-family: monospace;"><span style="font-weight: bold;"></span></span>
+</dl>
+</div>
+</body></html>

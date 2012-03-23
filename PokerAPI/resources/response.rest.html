@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerApi - REST</title>
+
+</head>
+<body>
+<div class="TopBar TopBarWide" id="TopBar" role="banner">
+<br>
+</div>
+<a data-track="home-logo" href="/" data-rapid_p="1"><img src="C:/Users/Rafik/Desktop/PokerAPI/PokerLogo.png" id="FlickrLogo" alt="Logo Flickr. Si vous cliquez dessus, vous reviendrez à la page d'accueil" height="70" width="200"></a> &nbsp;<br>
+<a data-track="help" href="/help/" data-rapid_p="2">Aide</a>
+<h2 style="font-size: 20px; font-weight: normal; margin-bottom: 10px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);"><br>
+</h2>
+<h2 style="font-size: 20px; font-weight: normal; margin-bottom: 10px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;">Format
+de requête REST</h2>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;">REST
+est le format de requête le plus simple à utiliser &#8211; c'est aussi simple
+que les actions HTTP GET ou POST.</p>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;">L'URL
+du point terminal REST est&nbsp;<a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/</a></p>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;"></p>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;">Pour
+appeler des services "auth" (pour l'authentification), il faut procéder
+comm suit :</p>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/auth/{name_service}/{parameters}</a></pre>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;">Pour
+appeler des services "game", il faut procéder comm suit :</p>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/game/{name_service}/{parameters}</a></pre>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); text-align: left;">Pour
+appeler des services "player", il faut procéder comm suit :</p>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/player/{name_service}/{parameters}</a><br><br></pre>
+</body></html>

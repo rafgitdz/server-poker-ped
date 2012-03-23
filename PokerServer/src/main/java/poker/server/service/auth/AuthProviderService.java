@@ -94,8 +94,8 @@ public class AuthProviderService extends AuthProvider {
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
-		updateJSON(json, "oauth_token", oauthRequestToken.getToken());
-		updateJSON(json, "oauth_token_secret", oauthRequestToken.getSecret());
+		updateJSON(json, "oauthToken", oauthRequestToken.getToken());
+		updateJSON(json, "oauthTokenSecret", oauthRequestToken.getSecret());
 		return buildResponse(json);
 	}
 
@@ -152,8 +152,8 @@ public class AuthProviderService extends AuthProvider {
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
-		updateJSON(json, "oauth_token", newOAuthToken.getToken());
-		updateJSON(json, "oauth_secret_token", newOAuthToken.getSecret());
+		updateJSON(json, "oauthToken", newOAuthToken.getToken());
+		updateJSON(json, "oauthTokenSecret", newOAuthToken.getSecret());
 		return buildResponse(json);
 	}
 
