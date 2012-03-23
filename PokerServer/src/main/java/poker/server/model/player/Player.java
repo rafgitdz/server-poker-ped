@@ -76,6 +76,10 @@ public class Player implements Serializable {
 	int lastAction;
 	int lastRaisedValue;
 
+	protected transient Hand bestHand;
+
+	protected int valueBestHand;
+
 	/**
 	 * Default constructor
 	 */
@@ -449,5 +453,13 @@ public class Player implements Serializable {
 
 	public int getStatus() {
 		return connectionStatus;
+	}
+
+	public void setBestHand(Hand hand) {
+		bestHand = hand;
+	}
+
+	public void setValueBestHand(int valBestHand) {
+		valueBestHand = valBestHand;
 	}
 }
