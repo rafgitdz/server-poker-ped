@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - getGameStatus</title></head>
+<body>
+<div class="InfoCase">
+<h1>poker.server.service.game.getGamesStatus</h1>
+<div class="MethodDescription">Retourne les informations qui concernent les tables de jeux en attente<h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/game/getGamesStatus/{consumerKey}</a></pre></div>
+<h3>Authentification</h3>
+<p>Cette méthode n'exige pas une <a href="/services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl>
+<dt><b><code>consumerKey : String</code></b>
+(Obligatoire)</dt>
+<dd>Your API application key. <a href="/services/api/misc.api_keys.html">See here</a>
+for more details.</dd></dl>
+<h3>Returns</h3>
+<dl>
+<dt><b><code>gamesStatus: List&lt;JSONObject&gt;</code></b></dt><dd>La liste des tables de jeux en attente</dd></dl>Chaque <span style="font-weight: bold;">JSONObject</span> contient :<br><dl><dt><b><code>tableName : String</code></b></dt><dd>Name of &nbsp;the game to start</dd><dt><b><code>gameTypeName : String</code></b></dt><dd>Nom du type du jeu de la table&nbsp;</dd><dt><b><code>startGame: boolean</code></b></dt>
+<dd>State of the game</dd><dt><b><code>playerNames: List&lt;String&gt;</code></b></dt><dd>The list of names of players' game</dd><dt><b><code>playerBudget: int</code></b></dt>
+<dd>The number of the tokens that player has at the start of
+the game</dd>
+<dt><b><code>buyIn: int</code></b></dt>
+<dd>The money's player to play the game</dd><dt><b><code>smallBlind: int</code></b></dt><dd>The value of the small blind</dd><dt><b><code>bigBlind: int</code></b></dt><dd>The value of the big blind</dd><dt><b><code>prizePool: int</code></b></dt><dd>The prize of the game</dd></dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre style="color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;">{<br> "stat":"ok",<br> "tableName":"Labri_Texas_Holdem_1203203",<br> "gameTypeName":"CashSitAndGo",<br> "playerBudget":1500,<br> "buyIn":10,<br> "playerNames":["John","Laura","Markus","Claudio","Patxi"],<br> "bigBlind":20<br> "smallBlind":10<br> "prizePool":50<br>}</pre>
+<h3>Codes d'erreur</h3>
+<dl><dt><b><code>17: UNKNOWN_CONSUMER_KEY</code></b></dt>
+<dd>Unknown consumer key</dd><span style="font-family: monospace;"><span style="font-weight: bold;"></span></span>
+</dl>
+</div>
+</body></html>

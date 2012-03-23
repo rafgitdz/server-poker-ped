@@ -39,6 +39,7 @@ import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
+import poker.server.service.game.timer.TimerUpdateBlinds;
 import poker.server.service.sign.SignatureService;
 
 @Stateless
@@ -172,8 +173,9 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 */
 	@GET
-	@Path("/getGamesStatus/{consumerKey}")
-	public Response getGamesStatus(@PathParam("consumerKey") String consumerKey) {
+	@Path("/getWaitingTablesList/{consumerKey}")
+	public Response getWaitingTablesList(
+			@PathParam("consumerKey") String consumerKey) {
 
 		Consumer consumer = repositoryConsumer.load(consumerKey);
 		if (consumer == null)
@@ -219,13 +221,45 @@ public class GameService extends AbstractPokerService {
 	}
 
 	/**
+	 * Returns the status of all games (types) that is not ready to start
+	 * 
+	 * @return
+	 */
+	@GET
+	@Path("/getWaitingGameData/{consumerKey}/{tableName}")
+	public Response getWaitingGameData(
+			@PathParam("consumerKey") String consumerKey,
+			@PathParam("tableName") String tableName) {
+
+		Consumer consumer = repositoryConsumer.load(consumerKey);
+		if (consumer == null)
+			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
+
+		Response resp = null;
+		Game currentGame = repositoryGame.load(tableName);
+
+		if (currentGame == null)
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
+
+		else if (currentGame != null) {
+			if (currentGame.isStarted())
+				resp = error(ErrorMessage.GAME_ALREADY_STARTED);
+			else
+				resp = buildResponse(getGameStatus(currentGame));
+		}
+
+		return resp;
+	}
+
+	/**
 	 * Returns all the informations about the current game {@code tableName}
 	 * 
 	 * @return
 	 */
 	@GET
-	@Path("/getGameData/{consumerKey}/{tableName}/{playerName}")
-	public Response getGameData(@PathParam("consumerKey") String consumerKey,
+	@Path("/getCurrentGameData/{consumerKey}/{tableName}/{playerName}")
+	public Response getCurrentGameData(
+			@PathParam("consumerKey") String consumerKey,
 			@PathParam("tableName") String tableName,
 			@PathParam("playerName") String playerName) {
 
@@ -256,7 +290,6 @@ public class GameService extends AbstractPokerService {
 				resp = buildResponse(json);
 			}
 		}
-
 		return resp;
 	}
 
