@@ -13,6 +13,126 @@ import poker.server.model.game.card.Value;
 
 public class CompareHands {
 
+	// ////////////////////////////////////////////////////////////
+	// COMPARE BEST HANDS
+	// ////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////
+
+	public static Map<Player, Integer> getRanking(
+			Map<Player, Integer> playersWithHands) {
+
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
+		ranking = initRanks(playersWithHands, 1);
+		
+		List<Player> playersToCompare = new ArrayList<Player>();
+
+		Player player;
+		int handValue, worstRank;
+
+		Iterator<Entry<Player, Integer>> it;
+
+		for (int hv = 8; hv >= 0; hv--) {
+
+			it = playersWithHands.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<Player, Integer> pairs = it.next();
+				player = pairs.getKey();
+				handValue = pairs.getValue();
+
+				if (handValue == hv) {
+					playersToCompare.add(player);
+				}
+			}
+
+			worstRank = getWorstRank(ranking);
+			setMinRankTo(ranking, worstRank + 1, playersToCompare);
+			compareAllHands(ranking, playersToCompare, hv);
+		}
+
+		return ranking;
+	}
+
+	public static void compareAllHands(Map<Player, Integer> ranking,
+			List<Player> playersToCompare, int handValue) {
+
+		Player ref, current;
+		Hand refHand, currentHand;
+		Hand sortedRefHand, sortedCurrentHand;
+		int result, refRank, currentRank;
+
+		for (int i = 0; i < playersToCompare.size(); i++) {
+
+			ref = playersToCompare.get(i);
+
+			refHand = ref.getCurrentHand();
+			sortedRefHand = sortHand(refHand);
+
+			for (int j = i + 1; j < playersToCompare.size(); j++) {
+
+				current = playersToCompare.get(j);
+				currentHand = current.getCurrentHand();
+				sortedCurrentHand = sortHand(currentHand);
+
+				result = compareHands(sortedRefHand, sortedCurrentHand,
+						handValue);
+
+				switch (result) {
+				case 1:
+					refRank = ranking.get(ref);
+					currentRank = refRank + 1;
+					ranking.put(current, currentRank);
+					break;
+				case -1:
+					currentRank = ranking.get(ref);
+					ranking = updateRanksFor(ranking, currentRank);
+					ranking.put(current, currentRank);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	public static int compareHands(Hand hand1, Hand hand2, Integer bestHand) {
+
+		int result = 0;
+
+		switch (bestHand) {
+		case 0:
+			result = compareHightestCards(hand1, hand2);
+			break;
+		case 1:
+			result = compareOnePair(hand1, hand2);
+			break;
+		case 2:
+			result = compareTwoPair(hand1, hand2);
+			break;
+		case 3:
+			result = compareTrips(hand1, hand2);
+			break;
+		case 4:
+			result = compareStraight(hand1, hand2);
+			break;
+		case 5:
+			result = compareFlush(hand1, hand2);
+			break;
+		case 6:
+			result = compareFullHouse(hand1, hand2);
+			break;
+		case 7:
+			result = compareQuads(hand1, hand2);
+			break;
+		case 8:
+			result = compareStraightFlush(hand1, hand2);
+			break;
+		default:
+			break;
+		}
+
+		return result;
+	}
+	
 	// ////////////////////////////////////////////
 	// TOOLS
 	// //////////////////////////////////////////////
@@ -162,6 +282,24 @@ public class CompareHands {
 		return worstRank;
 	}
 
+	public static Map<Player, Integer> initRanks(Map<Player, Integer> players, int rank) {
+
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
+		
+		Iterator<Entry<Player, Integer>> it;
+		it = players.entrySet().iterator();
+		Player player;
+
+		while (it.hasNext()) {
+			Entry<Player, Integer> pairs = it.next();
+			player = pairs.getKey();
+
+			ranking.put(player, rank);
+		}
+		
+		return ranking;
+	}
+	
 	public static void setMinRankTo(Map<Player, Integer> ranking, int rank,
 			List<Player> players) {
 
@@ -179,123 +317,7 @@ public class CompareHands {
 		}
 	}
 
-	// ////////////////////////////////////////////////////////////
-	// COMPARE BEST HANDS
-	// ////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////
 
-	public static Map<Player, Integer> getRanking(
-			Map<Player, Integer> playersWithHands) {
-
-		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
-		List<Player> playersToCompare = new ArrayList<Player>();
-
-		Player player;
-		int handValue, worstRank;
-
-		Iterator<Entry<Player, Integer>> it;
-
-		for (int hv = 8; hv >= 0; hv--) {
-
-			it = playersWithHands.entrySet().iterator();
-			while (it.hasNext()) {
-				Entry<Player, Integer> pairs = it.next();
-				player = pairs.getKey();
-				handValue = pairs.getValue();
-
-				if (handValue == hv) {
-					playersToCompare.add(player);
-				}
-			}
-
-			worstRank = getWorstRank(ranking);
-			setMinRankTo(ranking, worstRank + 1, playersToCompare);
-			compareAllHands(ranking, playersToCompare, hv);
-		}
-
-		return ranking;
-	}
-
-	public static void compareAllHands(Map<Player, Integer> ranking,
-			List<Player> playersToCompare, int handValue) {
-
-		Player ref, current;
-		Hand refHand, currentHand;
-		Hand sortedRefHand, sortedCurrentHand;
-		int result, refRank, currentRank;
-
-		for (int i = 0; i < playersToCompare.size(); i++) {
-
-			ref = playersToCompare.get(i);
-
-			refHand = ref.getCurrentHand();
-			sortedRefHand = sortHand(refHand);
-
-			for (int j = i + 1; j < playersToCompare.size(); j++) {
-
-				current = playersToCompare.get(j);
-				currentHand = current.getCurrentHand();
-				sortedCurrentHand = sortHand(currentHand);
-
-				result = compareHands(sortedRefHand, sortedCurrentHand,
-						handValue);
-
-				switch (result) {
-				case 1:
-					refRank = ranking.get(ref);
-					currentRank = refRank + 1;
-					ranking.put(current, currentRank);
-					break;
-				case -1:
-					currentRank = ranking.get(ref);
-					ranking = updateRanksFor(ranking, currentRank);
-					ranking.put(current, currentRank);
-					break;
-				default:
-					break;
-				}
-			}
-		}
-	}
-
-	public static int compareHands(Hand hand1, Hand hand2, Integer bestHand) {
-
-		int result = 0;
-
-		switch (bestHand) {
-		case 0:
-			result = compareHightestCards(hand1, hand2);
-			break;
-		case 1:
-			result = compareOnePair(hand1, hand2);
-			break;
-		case 2:
-			result = compareTwoPair(hand1, hand2);
-			break;
-		case 3:
-			result = compareTrips(hand1, hand2);
-			break;
-		case 4:
-			result = compareStraight(hand1, hand2);
-			break;
-		case 5:
-			result = compareFlush(hand1, hand2);
-			break;
-		case 6:
-			result = compareFullHouse(hand1, hand2);
-			break;
-		case 7:
-			result = compareQuads(hand1, hand2);
-			break;
-		case 8:
-			result = compareStraightFlush(hand1, hand2);
-			break;
-		default:
-			break;
-		}
-
-		return result;
-	}
 
 	// ////////////////////////////////////////////////////
 	// / COMPARE HANDS BY TYPE

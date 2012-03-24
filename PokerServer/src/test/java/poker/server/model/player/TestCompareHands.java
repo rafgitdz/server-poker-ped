@@ -18,7 +18,7 @@ public class TestCompareHands {
 
 	private PlayerFactoryLocal playerFactory = new PlayerFactory();
 
-	private Player player1, player2, player3;
+	private Player player1, player2, player3, player4, player5;
 
 	private void buildPlayerHand(Player player, Card card1, Card card2,
 			Card card3, Card card4, Card card5) {
@@ -42,6 +42,8 @@ public class TestCompareHands {
 		player1 = playerFactory.newPlayer("rafik", "dsd");
 		player2 = playerFactory.newPlayer("youga", "cvcx");
 		player3 = playerFactory.newPlayer("balla", "vcvx");
+		player4 = playerFactory.newPlayer("lucas", "dsd");
+		player5 = playerFactory.newPlayer("xan", "cvcx");
 	}
 
 	@After
@@ -50,6 +52,8 @@ public class TestCompareHands {
 		player1 = null;
 		player2 = null;
 		player3 = null;
+		player4 = null;
+		player5 = null;
 	}
 
 	// ////////////////////////////////////////////
@@ -225,6 +229,22 @@ public class TestCompareHands {
 		assertTrue(ranking.get(player3) == 3);
 	}
 
+	@Test
+	public void testInitRanks() {
+
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
+		int rank = 1;
+		
+		Map<Player, Integer> playersWithHands = new HashMap<Player, Integer>();
+		playersWithHands.put(player1, 6);
+		playersWithHands.put(player2, 1);
+		
+		ranking = CompareHands.initRanks(playersWithHands, rank);
+
+		assertTrue(ranking.get(player1) == 1);
+		assertTrue(ranking.get(player2) == 1);
+	}
+	
 	// ////////////////////////////////////////////////////
 	// / COMPARE HANDS BY TYPE
 	// /////////////////////////////////////////////////////
@@ -620,5 +640,42 @@ public class TestCompareHands {
 		assertTrue(ranking.get(player1) == 4);
 		assertTrue(ranking.get(player2) == 1);
 		assertTrue(ranking.get(player3) == 3);
+	}
+	
+	
+	@Test
+	public void testGetRanking() {
+
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
+		
+		buildPlayerHand(player1, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
+				Card.JACK_CLUB, Card.JACK_SPADE, Card.JACK_CLUB);
+		
+		buildPlayerHand(player2, Card.TWO_CLUB, Card.FOUR_DIAMOND,
+				Card.FIVE_SPADE, Card.EIGHT_CLUB, Card.EIGHT_CLUB);
+		
+		buildPlayerHand(player3, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
+				Card.JACK_CLUB, Card.JACK_CLUB, Card.JACK_CLUB);
+		
+		buildPlayerHand(player4, Card.TEN_CLUB, Card.JACK_CLUB,
+				Card.QUEEN_CLUB, Card.KING_CLUB, Card.ACE_CLUB);
+		
+		buildPlayerHand(player5, Card.TWO_DIAMOND, Card.EIGHT_CLUB,
+				Card.JACK_CLUB, Card.JACK_CLUB, Card.JACK_CLUB);
+		
+		Map<Player, Integer> playersWithHands = new HashMap<Player, Integer>();
+		playersWithHands.put(player1, 6);
+		playersWithHands.put(player2, 1);
+		playersWithHands.put(player3, 6);
+		playersWithHands.put(player4, 9);
+		playersWithHands.put(player5, 3);
+		
+		ranking = CompareHands.getRanking(playersWithHands);
+
+		assertTrue(ranking.get(player1) == 2);
+		assertTrue(ranking.get(player2) == 4);
+		assertTrue(ranking.get(player3) == 2);
+		assertTrue(ranking.get(player4) == 1);
+		assertTrue(ranking.get(player5) == 3);
 	}
 }
