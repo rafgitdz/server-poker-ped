@@ -18,16 +18,14 @@ public class CompareHands {
 	// ////////////////////////////////////////////////////
 
 	/**
-	 * Main function of this class... 
-	 * Return the ranking of given players. 
+	 * Main function of this class... Return the ranking of given players.
 	 * 
 	 * @param playersWithHands
 	 *            map associating players with their hand value
-	 *            @see <@links Hand>
+	 * @see <@links Hand>
 	 * 
 	 * @return ranking map associating players with an integer value (rank).
 	 */
-	
 	public static Map<Player, Integer> getRanking(
 			Map<Player, Integer> playersWithHands) {
 
@@ -57,9 +55,9 @@ public class CompareHands {
 
 			worstRank = getWorstRank(ranking);
 			setMinRankTo(ranking, worstRank + 1, playersToCompare);
-			
+
 			compareAllHands(ranking, playersToCompare, hv);
-			
+
 			playersToCompare.clear();
 		}
 
@@ -67,20 +65,19 @@ public class CompareHands {
 	}
 
 	/**
-	 * Modify an existing ranking map, comparing given players.
-	 * All players must have the same kind of hand. 
+	 * Modify an existing ranking map, comparing given players. All players must
+	 * have the same kind of hand.
 	 * 
 	 * @param ranking
 	 *            existing ranking map to modify
-	 *        
+	 * 
 	 * @param playersToCompare
 	 *            A list of players to compare.
 	 * 
 	 * @param handValue
 	 *            An integer value to specify the kind of hand to deal with.
-	 *            @see <@links Hand>
+	 * @see <@links Hand>
 	 */
-	
 	public static void compareAllHands(Map<Player, Integer> ranking,
 			List<Player> playersToCompare, int handValue) {
 
@@ -123,7 +120,6 @@ public class CompareHands {
 		}
 	}
 
-	
 	public static int compareHands(Hand hand1, Hand hand2, Integer handValue) {
 
 		int result = 0;
@@ -191,23 +187,19 @@ public class CompareHands {
 		return sortedHand;
 	}
 
-	
 	/**
-	 * Function used in all comparaisons from this classe.
-	 * Compare two integer values.
+	 * Function used in all comparaisons from this classe. Compare two integer
+	 * values.
 	 * 
 	 * @param rank1
 	 *            first value
-	 *        
+	 * 
 	 * @param rank2
 	 *            second value.
 	 * 
-	 * @return result
-	 *            this integer value could be :
-	 *            		 1 = rank1 > rank2
-	 *            		-1 = rank1 < rank2
-	 *            		 0 = rank1 = rank2
-	 *            
+	 * @return result this integer value could be : 1 = rank1 > rank2 -1 = rank1
+	 *         < rank2 0 = rank1 = rank2
+	 * 
 	 */
 	public static int compareRanks(int rank1, int rank2) {
 
@@ -288,19 +280,17 @@ public class CompareHands {
 		return haveSameHand;
 	}
 
-	
 	/**
-	 * Update all ranks superior or equal to a given integer value. 
+	 * Update all ranks superior or equal to a given integer value.
 	 * 
 	 * @param ranking
-	 *            A ranking map to modify. 
-	 *        
-	 * @param rank
-	 *            A reference integer value.
-	 *            all the ranks, superior or equal to this value will be updated.
+	 *            A ranking map to modify.
 	 * 
-	 * @return updatedRanking
-	 *            A new ranking map. 
+	 * @param rank
+	 *            A reference integer value. all the ranks, superior or equal to
+	 *            this value will be updated.
+	 * 
+	 * @return updatedRanking A new ranking map.
 	 */
 	public static Map<Player, Integer> updateRanksFor(
 			Map<Player, Integer> ranking, int rank) {
@@ -345,18 +335,19 @@ public class CompareHands {
 	}
 
 	/**
-	 * Create a new ranking map, according to a given player map. 
-	 * The ranking of each players will be initialized with the same value given as a second parameter.
+	 * Create a new ranking map, according to a given player map. The ranking of
+	 * each players will be initialized with the same value given as a second
+	 * parameter.
 	 * 
 	 * @param players
-	 *            A map associationg players with an integer value. This value is not important. 
-	 *        
-	 * @param rank
-	 *            A default integer value.
-	 *            all players will have this default rank.
+	 *            A map associationg players with an integer value. This value
+	 *            is not important.
 	 * 
-	 * @return ranking
-	 *            A new ranking map. 
+	 * @param rank
+	 *            A default integer value. all players will have this default
+	 *            rank.
+	 * 
+	 * @return ranking A new ranking map.
 	 */
 	public static Map<Player, Integer> initRanks(Map<Player, Integer> players,
 			int rank) {
@@ -402,16 +393,16 @@ public class CompareHands {
 		int value;
 
 		System.out.println("//////////////////////////");
-		
+
 		while (it.hasNext()) {
-			
+
 			Entry<Player, Integer> pairs = it.next();
 			player = pairs.getKey();
 			value = pairs.getValue();
 			System.out.println(map.get(player + " : " + value));
 		}
 	}
-	
+
 	// ////////////////////////////////////////////////////
 	// / COMPARE HANDS BY TYPE
 	// /////////////////////////////////////////////////////
@@ -436,16 +427,15 @@ public class CompareHands {
 		return result;
 	}
 
-	
 	/**
 	 * Get the value of the pair contained in the given hand.
 	 * 
 	 * @param hand
 	 *            The hand containing the pair to check.
 	 * 
-	 * @return rank
-	 *            An integer value, corresponding to the card value of the pair. 
-	 *             @see <@links Card>
+	 * @return rank An integer value, corresponding to the card value of the
+	 *         pair.
+	 * @see <@links Card>
 	 */
 	public static int evaluatePair(Hand hand) {
 
@@ -488,19 +478,17 @@ public class CompareHands {
 		return result;
 	}
 
-	
 	/**
 	 * Get the value of the two pairs contained in the given hand.
 	 * 
 	 * @param hand
 	 *            The hand containing the pair to check.
 	 * 
-	 * @return ranks
-	 *            A list of integer values : 
-	 *            The first value is the card value of the best pair. 
-	 *            The second value is the card value of the second pair.
-	 *            The third value is the card value of last isolated card.  
-	 *            @see <@links Card>
+	 * @return ranks A list of integer values : The first value is the card
+	 *         value of the best pair. The second value is the card value of the
+	 *         second pair. The third value is the card value of last isolated
+	 *         card.
+	 * @see <@links Card>
 	 */
 	public static List<Integer> evaluateTwoPairs(Hand hand) {
 
@@ -546,7 +534,7 @@ public class CompareHands {
 		if (ranksTwoPair1.get(0) != ranksTwoPair2.get(0)) {
 			result = compareRanks(ranksTwoPair1.get(0), ranksTwoPair2.get(0));
 		} else {
-			//compare second pair
+			// compare second pair
 			if (ranksTwoPair1.get(1) != ranksTwoPair2.get(1)) {
 				result = compareRanks(ranksTwoPair1.get(1),
 						ranksTwoPair2.get(1));
