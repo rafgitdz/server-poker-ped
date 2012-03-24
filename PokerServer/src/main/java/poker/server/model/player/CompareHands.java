@@ -1,6 +1,7 @@
 package poker.server.model.player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +13,20 @@ import poker.server.model.game.card.Value;
 
 public class CompareHands {
 
-	//////////////////////////////////////////////
+	// ////////////////////////////////////////////
 	// TOOLS
-	////////////////////////////////////////////////
-	//////////////////////////////////////////////////////
-	
+	// //////////////////////////////////////////////
+	// ////////////////////////////////////////////////////
+
 	public static Hand sortHand(Hand hand) {
-		
+
 		Hand sortedHand = new Hand();
-		
+
 		List<Card> aces = new ArrayList<Card>();
 		List<Card> rest = new ArrayList<Card>();
-		
+
 		hand.sort(hand.getCards());
-		
+
 		for (Card card : hand.getCards()) {
 			if (card.getValue() == Value.ACE) {
 				aces.add(card);
@@ -33,19 +34,19 @@ public class CompareHands {
 				rest.add(card);
 			}
 		}
-		
+
 		sortedHand.addCards(rest);
 		sortedHand.addCards(aces);
-		
+
 		return sortedHand;
 	}
-	
+
 	public static int compareRanks(int rank1, int rank2) {
 
 		int result = 0;
 
 		if (rank1 != rank2) {
-			
+
 			if (rank1 == Value.ACE) {
 				result = 1;
 			} else if (rank2 == Value.ACE) {
@@ -62,7 +63,7 @@ public class CompareHands {
 
 		return result;
 	}
-	
+
 	public static int nbSameCards(Hand hand, Card card) {
 		int nb = 0;
 		Card cardTmp = null;
@@ -77,7 +78,7 @@ public class CompareHands {
 
 		return nb;
 	}
-	
+
 	public static Boolean sameHand(Hand hand1, Hand hand2) {
 		boolean sameHand = true;
 
@@ -119,44 +120,144 @@ public class CompareHands {
 		return haveSameHand;
 	}
 
-	
-	
-	//////////////////////////////////////////////////////////////
-	// COMPARE BEST HANDS
-	//////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////
-	
-	public static Map<Player, Integer> getRanking(
-			Map<Player, Integer> playersWithHands) {
+	public static Map<Player, Integer> updateRanksFor(
+			Map<Player, Integer> ranking, int rank) {
 
-		Map<Player, Integer> ranking = new TreeMap<Player, Integer>();
-		Map<Player, Integer> challengeRanking = new TreeMap<Player, Integer>();
-		List<Player> playersToCompare = new ArrayList<Player>();
+		Map<Player, Integer> updatedRanking = ranking;
 
-		Player player;
-		int handValue;
-		
-		for (int hv = 8; hv == 0; hv--) {
+		Iterator<Entry<Player, Integer>> it;
+		it = updatedRanking.entrySet().iterator();
 
-			Iterator<Entry<Player, Integer>> it = playersWithHands.entrySet()
-					.iterator();
-			while (it.hasNext()) {
-				Entry<Player, Integer> pairs = it.next();
-				player = pairs.getKey();
-				handValue = pairs.getValue();
-				
-				if (handValue == hv) {
-					playersToCompare.add(player);
-				}
+		int value;
+
+		while (it.hasNext()) {
+			Entry<Player, Integer> pairs = it.next();
+			value = pairs.getValue();
+
+			if (value >= rank) {
+				pairs.setValue(value + 1);
 			}
-			
-			challengeRanking = compareAllHands(playersToCompare, hv);
-			ranking.putAll(challengeRanking);
 		}
 
 		return ranking;
 	}
-	
+
+	public static int getWorstRank(Map<Player, Integer> ranking) {
+
+		int worstRank = 0;
+		int value;
+
+		Iterator<Entry<Player, Integer>> it;
+		it = ranking.entrySet().iterator();
+
+		while (it.hasNext()) {
+			Entry<Player, Integer> pairs = it.next();
+			value = pairs.getValue();
+
+			if (value > worstRank) {
+				worstRank = value;
+			}
+		}
+
+		return worstRank;
+	}
+
+	public static void setMinRankTo(Map<Player, Integer> ranking, int rank,
+			List<Player> players) {
+
+		Iterator<Entry<Player, Integer>> it;
+		it = ranking.entrySet().iterator();
+		Player player;
+
+		while (it.hasNext()) {
+			Entry<Player, Integer> pairs = it.next();
+			player = pairs.getKey();
+
+			if (players.contains(player)) {
+				ranking.put(player, rank);
+			}
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////
+	// COMPARE BEST HANDS
+	// ////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////
+
+	public static Map<Player, Integer> getRanking(
+			Map<Player, Integer> playersWithHands) {
+
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
+		List<Player> playersToCompare = new ArrayList<Player>();
+
+		Player player;
+		int handValue, worstRank;
+
+		Iterator<Entry<Player, Integer>> it;
+
+		for (int hv = 8; hv >= 0; hv--) {
+
+			it = playersWithHands.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<Player, Integer> pairs = it.next();
+				player = pairs.getKey();
+				handValue = pairs.getValue();
+
+				if (handValue == hv) {
+					playersToCompare.add(player);
+				}
+			}
+
+			worstRank = getWorstRank(ranking);
+			setMinRankTo(ranking, worstRank + 1, playersToCompare);
+			compareAllHands(ranking, playersToCompare, hv);
+		}
+
+		return ranking;
+	}
+
+	public static void compareAllHands(Map<Player, Integer> ranking,
+			List<Player> playersToCompare, int handValue) {
+
+		Player ref, current;
+		Hand refHand, currentHand;
+		Hand sortedRefHand, sortedCurrentHand;
+		int result, refRank, currentRank;
+
+		for (int i = 0; i < playersToCompare.size(); i++) {
+
+			ref = playersToCompare.get(i);
+
+			refHand = ref.getCurrentHand();
+			sortedRefHand = sortHand(refHand);
+
+			for (int j = i + 1; j < playersToCompare.size(); j++) {
+
+				current = playersToCompare.get(j);
+				currentHand = current.getCurrentHand();
+				sortedCurrentHand = sortHand(currentHand);
+
+				result = compareHands(sortedRefHand, sortedCurrentHand,
+						handValue);
+
+				switch (result) {
+				case 1:
+					refRank = ranking.get(ref);
+					currentRank = refRank + 1;
+					ranking.put(current, currentRank);
+					break;
+				case -1:
+					currentRank = ranking.get(ref);
+					ranking = updateRanksFor(ranking, currentRank);
+					ranking.put(current, currentRank);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
 	public static int compareHands(Hand hand1, Hand hand2, Integer bestHand) {
 
 		int result = 0;
@@ -196,59 +297,11 @@ public class CompareHands {
 		return result;
 	}
 
-	public static Map<Player, Integer> compareAllHands(List<Player> players,
-			Integer bestHand) {
+	// ////////////////////////////////////////////////////
+	// / COMPARE HANDS BY TYPE
+	// /////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////
 
-		Map<Player, Integer> ranking = new TreeMap<Player, Integer>();
-		List<Player> loosers = new ArrayList<Player>();
-
-		int result = 0;
-		
-		Player ref, current;
-		Hand refHand, currentHand;
-		Hand sortedRefHand, sortedCurrentHand;
-
-		for (int i = 0; i < players.size(); i++) {
-
-			ref = players.get(i);
-
-			if (!loosers.contains(ref)) {
-
-				refHand = ref.getCurrentHand();
-				sortedRefHand = sortHand(refHand);
-
-				for (int j = i + 1; j < players.size(); j++) {
-
-					current = players.get(j);
-					currentHand = current.getCurrentHand();
-					sortedCurrentHand = sortHand(currentHand);
-
-					result = compareHands(sortedRefHand, sortedCurrentHand,
-							bestHand);
-
-					if (result == -1) {
-						loosers.add(ref);
-					} else if (result == 1) {
-						loosers.add(current);
-					}
-				}
-			}
-		}
-		
-		List<Player> winners = new ArrayList<Player>();
-		winners.addAll(players);
-		winners.removeAll(loosers);
-
-		return ranking;
-	}
-
-	
-	//////////////////////////////////////////////////////
-	/// COMPARE HANDS BY TYPE
-	///////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////
-	
-	
 	public static int compareHightestCards(Hand hand1, Hand hand2) {
 		int result = 0;
 
@@ -267,7 +320,7 @@ public class CompareHands {
 
 		return result;
 	}
-	
+
 	public static int evaluatePair(Hand hand) {
 
 		int rank = -1;
@@ -282,9 +335,9 @@ public class CompareHands {
 		if (nbCards == 2) {
 			rank = card4.getValue();
 		} else {
-			
+
 			nbCards = nbSameCards(hand, card2);
-			
+
 			if (nbCards == 2) {
 				rank = card2.getValue();
 			}
@@ -341,7 +394,7 @@ public class CompareHands {
 
 		return ranks;
 	}
-	
+
 	public static int compareTwoPair(Hand hand1, Hand hand2) {
 
 		int result = 0;
@@ -363,82 +416,76 @@ public class CompareHands {
 
 		return result;
 	}
-	
-	public static int compareTrips(Hand hand1, Hand hand2)
-    {
-        int result = 0;
 
-        int rankTrip1 = hand1.getCards().get(2).getValue();
-        int rankTrip2 = hand2.getCards().get(2).getValue();
-   
-        if (rankTrip1 == rankTrip2) {
-        	result = compareHightestCards(hand1, hand2);
-        } else {
-        	result = compareRanks(rankTrip1, rankTrip2);
-        }
+	public static int compareTrips(Hand hand1, Hand hand2) {
+		int result = 0;
 
-        return result;
-    }
-	
-	public static int compareQuads(Hand hand1, Hand hand2)
-    {
-        int result = 0;
+		int rankTrip1 = hand1.getCards().get(2).getValue();
+		int rankTrip2 = hand2.getCards().get(2).getValue();
 
-        int rankQuad1 = hand1.getCards().get(1).getValue();
-        int rankQuad2 = hand2.getCards().get(1).getValue();
-   
-        if (rankQuad1 == rankQuad2) {
-        	result = compareHightestCards(hand1, hand2);
-        } else {
-        	result = compareRanks(rankQuad1, rankQuad2);
-        }
+		if (rankTrip1 == rankTrip2) {
+			result = compareHightestCards(hand1, hand2);
+		} else {
+			result = compareRanks(rankTrip1, rankTrip2);
+		}
 
-        return result;
-    }
-	
-	public static int compareFullHouse(Hand hand1, Hand hand2)
-    {
-        int result = 0;
-        
-        int rankTrip1 = hand1.getCards().get(2).getValue();
-        int rankTrip2 = hand2.getCards().get(2).getValue();
-        
-        int rankPair1 = evaluatePair(hand1);
-        int rankPair2 = evaluatePair(hand2);
-        
-        if (rankTrip1 != rankTrip2) {
-        	result = compareRanks(rankTrip1, rankTrip2);
-        } else if (rankPair1 != rankPair2) {
-        	result = compareRanks(rankPair1, rankPair2);
-        } 
-        
-        return result;
-    }
-	
-	public static int compareStraight(Hand hand1, Hand hand2)
-    {
-        int result = 0;
-        
-        result = compareHightestCards(hand1, hand2);
-       
-        return result;
-    }
-	
-	public static int compareFlush(Hand hand1, Hand hand2)
-    {
-        int result = 0;
-        
-        result = compareHightestCards(hand1, hand2);
-       
-        return result;
-    }
-	
-	public static int compareStraightFlush(Hand hand1, Hand hand2)
-    {
-        int result = 0;
-        
-        result = compareHightestCards(hand1, hand2);
-       
-        return result;
-    }
+		return result;
+	}
+
+	public static int compareQuads(Hand hand1, Hand hand2) {
+		int result = 0;
+
+		int rankQuad1 = hand1.getCards().get(1).getValue();
+		int rankQuad2 = hand2.getCards().get(1).getValue();
+
+		if (rankQuad1 == rankQuad2) {
+			result = compareHightestCards(hand1, hand2);
+		} else {
+			result = compareRanks(rankQuad1, rankQuad2);
+		}
+
+		return result;
+	}
+
+	public static int compareFullHouse(Hand hand1, Hand hand2) {
+		int result = 0;
+
+		int rankTrip1 = hand1.getCards().get(2).getValue();
+		int rankTrip2 = hand2.getCards().get(2).getValue();
+
+		int rankPair1 = evaluatePair(hand1);
+		int rankPair2 = evaluatePair(hand2);
+
+		if (rankTrip1 != rankTrip2) {
+			result = compareRanks(rankTrip1, rankTrip2);
+		} else if (rankPair1 != rankPair2) {
+			result = compareRanks(rankPair1, rankPair2);
+		}
+
+		return result;
+	}
+
+	public static int compareStraight(Hand hand1, Hand hand2) {
+		int result = 0;
+
+		result = compareHightestCards(hand1, hand2);
+
+		return result;
+	}
+
+	public static int compareFlush(Hand hand1, Hand hand2) {
+		int result = 0;
+
+		result = compareHightestCards(hand1, hand2);
+
+		return result;
+	}
+
+	public static int compareStraightFlush(Hand hand1, Hand hand2) {
+		int result = 0;
+
+		result = compareHightestCards(hand1, hand2);
+
+		return result;
+	}
 }
