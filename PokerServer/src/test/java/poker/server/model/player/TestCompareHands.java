@@ -671,7 +671,7 @@ public class TestCompareHands {
 		playersWithHands.put(player5, 3);
 		
 		ranking = CompareHands.getRanking(playersWithHands);
-
+		
 		assertTrue(ranking.get(player1) == 2);
 		assertTrue(ranking.get(player2) == 4);
 		assertTrue(ranking.get(player3) == 2);

@@ -23,7 +23,7 @@ public class CompareHands {
 
 		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
 		ranking = initRanks(playersWithHands, 1);
-		
+
 		List<Player> playersToCompare = new ArrayList<Player>();
 
 		Player player;
@@ -35,6 +35,7 @@ public class CompareHands {
 
 			it = playersWithHands.entrySet().iterator();
 			while (it.hasNext()) {
+
 				Entry<Player, Integer> pairs = it.next();
 				player = pairs.getKey();
 				handValue = pairs.getValue();
@@ -46,7 +47,10 @@ public class CompareHands {
 
 			worstRank = getWorstRank(ranking);
 			setMinRankTo(ranking, worstRank + 1, playersToCompare);
+			
 			compareAllHands(ranking, playersToCompare, hv);
+			
+			playersToCompare.clear();
 		}
 
 		return ranking;
@@ -132,7 +136,7 @@ public class CompareHands {
 
 		return result;
 	}
-	
+
 	// ////////////////////////////////////////////
 	// TOOLS
 	// //////////////////////////////////////////////
@@ -282,10 +286,11 @@ public class CompareHands {
 		return worstRank;
 	}
 
-	public static Map<Player, Integer> initRanks(Map<Player, Integer> players, int rank) {
+	public static Map<Player, Integer> initRanks(Map<Player, Integer> players,
+			int rank) {
 
 		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
-		
+
 		Iterator<Entry<Player, Integer>> it;
 		it = players.entrySet().iterator();
 		Player player;
@@ -296,10 +301,10 @@ public class CompareHands {
 
 			ranking.put(player, rank);
 		}
-		
+
 		return ranking;
 	}
-	
+
 	public static void setMinRankTo(Map<Player, Integer> ranking, int rank,
 			List<Player> players) {
 
@@ -317,8 +322,24 @@ public class CompareHands {
 		}
 	}
 
+	public static void displayMap(Map<Player, Integer> map) {
 
+		Iterator<Entry<Player, Integer>> it;
+		it = map.entrySet().iterator();
+		Player player;
+		int value;
 
+		System.out.println("//////////////////////////");
+		
+		while (it.hasNext()) {
+			
+			Entry<Player, Integer> pairs = it.next();
+			player = pairs.getKey();
+			value = pairs.getValue();
+			System.out.println(map.get(player + " : " + value));
+		}
+	}
+	
 	// ////////////////////////////////////////////////////
 	// / COMPARE HANDS BY TYPE
 	// /////////////////////////////////////////////////////
