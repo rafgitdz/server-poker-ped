@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - deleteGameType</title>
+
+</head>
+<body>
+<div class="InfoCase">
+<h1>poker.server.service.gameType.deleteGameType</h1>
+<div class="MethodDescription">Supprimer le type de jeu de la base de données</div>
+<h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://server:port/PokerServer/rest/</a><a href="http://localhost:8080/PokerServer/rest/">gameType/deleteGameType/{consumerKey}/{gameName}</a></pre>
+<h3>Authentification</h3>
+<p>Cette méthode n'exige pas une <a href="/services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl>
+<dt><b><code>consumerKey: String</code></b>
+(Obligatoire)</dt>
+<dd>L'unique clé API Poker délivré à l'administrateur</dd>
+<dt><b><code>gameName: String</code></b>
+(Obligatoire)</dt>
+<dd>Le nom du type de jeu</dd>
+</dl>
+<h3>Returns</h3>
+<dl>
+<dt><b><code>stat: String</code></b></dt>
+<dd>Le statut de la requête&nbsp;</dd>
+</dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre>{<br> "stat":"ok",<br>}</pre>
+<h3>Codes d'erreur</h3>
+<dl>
+<dt><b><code>17: UNKNOWN_CONSUMER_KEY</code></b></dt>
+<dd>Unknown consumer key</dd>
+<dt><b><code>29: UNKNOWN_GAME_TYPE</code></b></dt>
+<dd>Unknown game type</dd>
+<span style="font-family: monospace;"><span style="font-weight: bold;"></span></span>
+</dl>
+</div>
+</body></html>

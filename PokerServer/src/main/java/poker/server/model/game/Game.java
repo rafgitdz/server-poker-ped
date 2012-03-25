@@ -24,20 +24,25 @@ import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
-import poker.server.model.game.parameters.AbstractParameters;
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Hand;
 import poker.server.model.player.Player;
 
 /**
- * @author PokerServerGroup <br/>
- * <br/>
+ * Manages all the entities and actions related to the poker game. The type of
+ * poker is Texas Holde'em Poker and the variant is SitAndGo, Note that it can
+ * be affect other variant than SitAndGo
  * 
- *         Manages all the entities and actions related to the poker game. The
- *         type of poker is Texas Holde'em Poker and the variant is SitAndGo
- *         Note that it can affect other variant than SitAndGo (Entity :
- *         gameType)
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Luc </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see GameType
  */
 
 @Entity
@@ -79,9 +84,9 @@ public class Game implements Serializable {
 	@IndexColumn(name = "playerRankIndex")
 	List<Player> playersRank;
 
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = AbstractParameters.class, fetch = FetchType.EAGER)
-	@JoinColumn(name = "parameters")
-	Parameters gameType;
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "gameType")
+	GameType gameType;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
@@ -131,7 +136,7 @@ public class Game implements Serializable {
 	 * @see class Parameters
 	 * 
 	 */
-	Game(Parameters gameT) {
+	Game(GameType gameT) {
 		gameType = gameT;
 		gameType.increment();
 		buildGame();
@@ -772,15 +777,16 @@ public class Game implements Serializable {
 							if (result > bestHand) {
 
 								bestHand = result;
-								
+
 								Hand hand = new Hand();
-								hand.addCards(player.getCurrentHand().getCards());
+								hand.addCards(player.getCurrentHand()
+										.getCards());
 								hand.addCard(flippedCards.get(i));
 								hand.addCard(flippedCards.get(j));
 								hand.addCard(flippedCards.get(k));
 								player.setBestHand(hand);
 								player.setValueBestHand(bestHand);
-								
+
 								playersBestHands.put(player.getName(), result);
 							}
 
@@ -804,7 +810,7 @@ public class Game implements Serializable {
 
 		return bestPlayers;
 	}
-	
+
 	/**
 	 * At the end of round river, get the winners that have the best hand
 	 * 
@@ -883,11 +889,11 @@ public class Game implements Serializable {
 		return bigBlind;
 	}
 
-	public Parameters getGameType() {
+	public GameType getGameType() {
 		return gameType;
 	}
 
-	public void setGameType(Parameters gameType) {
+	public void setGameType(GameType gameType) {
 		this.gameType = gameType;
 	}
 

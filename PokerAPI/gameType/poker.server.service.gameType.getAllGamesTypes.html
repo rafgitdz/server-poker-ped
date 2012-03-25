@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - getAllGamesTypes</title>
+
+</head>
+<body>
+<div class="InfoCase">
+<h1>poker.server.service.gameType.getAllGamesTypes</h1>
+<div class="MethodDescription">Retourne tous les types de jeu stockés dans la base de données</div>
+<h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/</a><a href="http://localhost:8080/PokerServer/rest/">gameType/getAllGamesTypes/{consumerKey}</a></pre>
+<h3>Authentification</h3>
+<p>Cette méthode n'exige pas une <a href="/services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl>
+<dt><b><code>consumerKey: String</code></b>
+(Obligatoire)</dt>
+<dd>L'unique clé API Poker délivré à l'administrateur</dd>
+</dl>
+<h3>Returns</h3>
+<dl>
+<dt><b><code>gamesStatus: JSONArray(JSONObject :
+gameType)</code></b></dt>
+<dd>L'unique clé API Poker délivré à l'administrateur</dd>
+</dl>
+<span style="text-decoration: underline;">Chaque&nbsp;</span><b style="text-decoration: underline;"><code>gameType&nbsp;</code></b><span style="text-decoration: underline;">contient :</span>
+<dl>
+<dt><b><code>gameName: String</code></b>&nbsp;</dt>
+<dd>Le nom du type de jeu</dd>
+<dt><b><code>playerNumber: Integer&nbsp;</code></b></dt>
+<dd>Le nombre de joueurs pour ce type de jeu</dd>
+<dt><b><code>playerTokens: Integer&nbsp;</code></b></dt>
+<dd>Le nombre de tokens que chaque joueur peut avoir au début
+du jeu</dd>
+<dt><b><code>buyIn: Integer&nbsp;</code></b></dt>
+<dd>Le montant fixé pour jouer à ce type de jeu</dd>
+<dt><b><code>speakTime: Integer&nbsp;</code></b></dt>
+<dd>Le temps qu'aura un joueur pour faire une action</dd>
+<dt><b><code>smallBlind: Integer&nbsp;</code></b></dt>
+<dd>Le montant de la small blind</dd>
+<dt><b><code>factorUpdateBlind</code></b><b><code>:
+Integer&nbsp;</code></b></dt>
+<dd>Le facteur de multiplication à la mise à jour des blinds</dd>
+<dt><b><code>updateBlindTime: Integer&nbsp;</code></b></dt>
+<dd>L'unique clé API Poker délivré à l'administrateur</dd>
+<dt><b><code>potType: Integer&nbsp;</code></b></dt>
+<dd>Le type de pot à joueur (CASH ou TOKEN)</dd>
+<dt><b><code>numberOfWinners: Integer&nbsp;</code></b></dt>
+<dd>Le nombre des vainqueurs finaux&nbsp;</dd>
+</dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre>{<br> "stat":"ok",<br> "gamesTypes" : [<br>	"gameType" : {"gameName":"CashGame","playerNumber":8, "playerTokens":1500, "buyIn":10, "speakTime":30, "smallBlind":15, "factorUpdateBlind":2,<br>	"updateBlindTime":300, "potType":1, "numberOfWinners":4 <br> ]<br>}</pre>
+<h3>Codes d'erreur</h3>
+<dl>
+<dt><b><code>17: UNKNOWN_CONSUMER_KEY</code></b></dt>
+<dd>Unknown consumer key</dd>
+<span style="font-family: monospace;"><span style="font-weight: bold;"></span></span>
+</dl>
+</div>
+</body></html>
