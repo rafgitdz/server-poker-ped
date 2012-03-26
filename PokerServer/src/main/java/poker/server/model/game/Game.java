@@ -36,7 +36,7 @@ import poker.server.model.player.Player;
  * 
  * @author <b> Rafik Ferroukh </b> <br>
  *         <b> Lucas Kerdoncuff </b> <br>
- *         <b> Xan Luc </b> <br>
+ *         <b> Xan Lucu </b> <br>
  *         <b> Youga Mbaye </b> <br>
  *         <b> Balla Seck </b> <br>
  * <br>

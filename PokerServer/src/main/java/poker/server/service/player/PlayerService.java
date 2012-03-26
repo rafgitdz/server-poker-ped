@@ -1,11 +1,5 @@
 package poker.server.service.player;
 
-/**
- * @author PokerServerGroup
- * 
- *         Service class : PlayerService
- */
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -20,10 +14,24 @@ import poker.server.infrastructure.RepositoryConsumer;
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.SignatureException;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.player.Player;
 import poker.server.service.AbstractPokerService;
 import poker.server.service.sign.SignatureService;
 
+/**
+ * Service class : PlayerService
+ *         
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Player
+ */
 @Stateless
 @Path("/player")
 public class PlayerService extends AbstractPokerService {
