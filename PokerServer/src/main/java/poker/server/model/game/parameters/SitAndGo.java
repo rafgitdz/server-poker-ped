@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import javax.persistence.Entity;
 
 @Entity
-public class SitAndGo extends AbstractParameters {
+public class SitAndGo extends GameType {
 
 	private static final long serialVersionUID = 6407941111548541169L;
 
@@ -20,10 +20,9 @@ public class SitAndGo extends AbstractParameters {
 		name = "Labri_Texas_Holdem_SitAndGo";
 		playerNumber = 5;
 		speakTime = 30;
-		timeChangeBlind = 180;
+		timeChangeBlind = 10;
 		buyIn = 10;
-		buyInIncreasing = 2;
-		multFactor = 2;
+		factorUpdateBlinds = 2;
 		initPlayersTokens = 1500;
 		buyInSplit = new ArrayList<Percent>();
 		buyInSplit.add(new Percent(50));

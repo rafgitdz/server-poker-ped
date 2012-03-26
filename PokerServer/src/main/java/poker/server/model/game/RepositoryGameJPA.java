@@ -14,7 +14,7 @@ import javax.persistence.Query;
 
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryGenericJPA;
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.GameType;
 
 @Stateless
 public class RepositoryGameJPA extends RepositoryGenericJPA<Game, String>
@@ -36,7 +36,7 @@ public class RepositoryGameJPA extends RepositoryGenericJPA<Game, String>
 	}
 
 	@Override
-	public boolean exist(Parameters param) {
+	public boolean exist(GameType param) {
 
 		Query q = em
 				.createQuery("SELECT g FROM AbstractParameters g WHERE g.name=:paramName AND g.numberOfCurrentGames = :num");

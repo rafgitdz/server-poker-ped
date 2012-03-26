@@ -24,7 +24,7 @@ import org.json.JSONObject;
 import poker.server.infrastructure.RepositoryAccessToken;
 import poker.server.infrastructure.RepositoryConsumer;
 import poker.server.infrastructure.RepositoryGame;
-import poker.server.infrastructure.RepositoryParameters;
+import poker.server.infrastructure.RepositoryGameType;
 import poker.server.infrastructure.RepositoryPlayer;
 import poker.server.infrastructure.auth.Consumer;
 import poker.server.model.exception.ErrorMessage;
@@ -33,12 +33,11 @@ import poker.server.model.exception.SignatureException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
 import poker.server.model.game.card.Card;
-import poker.server.model.game.parameters.OtherGameType;
-import poker.server.model.game.parameters.Parameters;
-import poker.server.model.game.parameters.SitAndGo;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
+import poker.server.service.game.timer.TimerUpdateBlinds;
 import poker.server.service.sign.SignatureService;
 
 @Stateless
@@ -52,7 +51,7 @@ public class GameService extends AbstractPokerService {
 	private RepositoryPlayer repositoryPlayer;
 
 	@EJB
-	private RepositoryParameters repositoryParameters;
+	private RepositoryGameType repositoryParameters;
 
 	@EJB
 	private RepositoryAccessToken repositoryAccessToken;
@@ -172,15 +171,16 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 */
 	@GET
-	@Path("/getGamesStatus/{consumerKey}")
-	public Response getGamesStatus(@PathParam("consumerKey") String consumerKey) {
+	@Path("/getWaitingTablesList/{consumerKey}")
+	public Response getWaitingTablesList(
+			@PathParam("consumerKey") String consumerKey) {
 
 		Consumer consumer = repositoryConsumer.load(consumerKey);
 		if (consumer == null)
 			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
 
 		List<Game> currentGames = new ArrayList<Game>();
-		List<Parameters> parameters = new ArrayList<Parameters>();
+		List<GameType> parameters = new ArrayList<GameType>();
 
 		currentGames = repositoryGame.getNotReadyGames();
 		parameters = repositoryParameters.loadAll();
@@ -191,10 +191,10 @@ public class GameService extends AbstractPokerService {
 			Game newGame = gameFactory.newGame();
 			newGame = repositoryGame.save(newGame);
 			currentGames.add(newGame);
-
+			
 		} else if (currentGames.size() < parameters.size()) {
 
-			for (Parameters param : parameters) {
+			for (GameType param : parameters) {
 
 				if (!repositoryGame.exist(param)) {
 					Game newGame = gameFactory.newGame(param);
@@ -219,16 +219,49 @@ public class GameService extends AbstractPokerService {
 	}
 
 	/**
+	 * Returns the status of all games (types) that is not ready to start
+	 * 
+	 * @return
+	 */
+	@GET
+	@Path("/getWaitingGameData/{consumerKey}/{tableName}")
+	public Response getWaitingGameData(
+			@PathParam("consumerKey") String consumerKey,
+			@PathParam("tableName") String tableName) {
+
+		Consumer consumer = repositoryConsumer.load(consumerKey);
+		if (consumer == null)
+			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
+
+		Response resp = null;
+		Game currentGame = repositoryGame.load(tableName);
+
+		if (currentGame == null)
+			resp = error(ErrorMessage.GAME_NOT_EXIST);
+
+		else if (currentGame != null) {
+			if (currentGame.isStarted())
+				resp = error(ErrorMessage.GAME_ALREADY_STARTED);
+			else
+				resp = buildResponse(getGameStatus(currentGame));
+		}
+
+		return resp;
+	}
+
+	/**
 	 * Returns all the informations about the current game {@code tableName}
 	 * 
 	 * @return
 	 */
 	@GET
-	@Path("/getGameData/{consumerKey}/{tableName}/{playerName}")
-	public Response getGameData(@PathParam("consumerKey") String consumerKey,
+	@Path("/getCurrentGameData/{consumerKey}/{tableName}/{playerName}")
+	public Response getCurrentGameData(
+			@PathParam("consumerKey") String consumerKey,
 			@PathParam("tableName") String tableName,
 			@PathParam("playerName") String playerName) {
 
+		JSONObject json = new JSONObject();
 		Consumer consumer = repositoryConsumer.load(consumerKey);
 		if (consumer == null)
 			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
@@ -250,13 +283,11 @@ public class GameService extends AbstractPokerService {
 
 			if (!currentGame.isStarted())
 				resp = error(ErrorMessage.GAME_NOT_READY_TO_START);
-			else
-				resp = getGameData(currentGame, player);
-
-			System.out.println("Current ROUND = "
-					+ currentGame.getCurrentRound());
+			else {
+				json = getGameData(currentGame, player);
+				resp = buildResponse(json);
+			}
 		}
-
 		return resp;
 	}
 
@@ -305,70 +336,6 @@ public class GameService extends AbstractPokerService {
 		return buildResponse(json);
 	}
 
-	/**
-	 * Adds a new game type
-	 */
-	@GET
-	@Path("/addGameType/{consumerKey}/{name}/{potType}/{buyIn}/{buyInIncreasing}/{multFactor}/{bigBlind}"
-			+ "/{smallBlind}/{initPlayersTokens}/{playerNumber}/{speakTime}/{timeChangeBlind}/{numberOfWinners}"
-			+ "/{percent1}/{percent2}/{percent3}/")
-	public Response addGameType(@PathParam("consumerKey") String consumerKey,
-			@PathParam("name") String name, @PathParam("potType") int potType,
-			@PathParam("buyIn") int buyIn,
-			@PathParam("buyInIncreasing") int buyInIncreasing,
-			@PathParam("multFactor") int multFactor,
-			@PathParam("bigBlind") int bigBlind,
-			@PathParam("smallBlind") int smallBlind,
-			@PathParam("initPlayersTokens") int initPlayersTokens,
-			@PathParam("playerNumber") int playerNumber,
-			@PathParam("speakTime") int speakTime,
-			@PathParam("timeChangeBlind") int timeChangeBlind,
-			@PathParam("numberOfWinners") int numberOfWinners,
-			@PathParam("percent1") int percentReward1,
-			@PathParam("percent2") int percentReward2,
-			@PathParam("percent3") int percentReward3) {
-
-		Consumer consumer = repositoryConsumer.load(consumerKey);
-		if (consumer == null)
-			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
-
-		Parameters param = new OtherGameType(name, potType, buyIn,
-				buyInIncreasing, multFactor, bigBlind, smallBlind,
-				initPlayersTokens, playerNumber, speakTime, timeChangeBlind,
-				numberOfWinners, percentReward1, percentReward2, percentReward3);
-		try {
-			repositoryParameters.save(param);
-		} catch (Exception e) {
-			return error(e.getMessage());
-		}
-		JSONObject json = new JSONObject();
-		updateJSON(json, STAT, OK);
-		return buildResponse(json);
-	}
-
-	/**
-	 * create the only default game type
-	 */
-	@GET
-	@Path("/defaultGameType/{consumerKey}")
-	public Response defaultGameType(@PathParam("consumerKey") String consumerKey) {
-
-		Consumer consumer = repositoryConsumer.load(consumerKey);
-		if (consumer == null)
-			return error(ErrorMessage.UNKNOWN_CONSUMER_KEY);
-
-		JSONObject json = new JSONObject();
-
-		if (!repositoryParameters.existSitAndGo()) {
-
-			repositoryParameters.save(new SitAndGo());
-			updateJSON(json, STAT, OK);
-		} else
-			return error(ErrorMessage.SITANDGO_ALREADY_EXISTS);
-
-		return buildResponse(json);
-	}
-
 	/***********************
 	 * END OF THE SERVICES *
 	 ***********************/
@@ -385,6 +352,9 @@ public class GameService extends AbstractPokerService {
 			currentGame.start();
 			// startTimerUpdateBlinds(currentGame);
 			repositoryGame.update(currentGame);
+
+			System.out.println("GAME SERVICE AFTER TIMER");
+
 			updateJSON(json, "startGame", true);
 
 		} else if (currentGame.isStarted())
@@ -412,7 +382,7 @@ public class GameService extends AbstractPokerService {
 	 * @return
 	 * 
 	 */
-	private Response getGameData(Game currentGame, Player selectedPlayer) {
+	private JSONObject getGameData(Game currentGame, Player selectedPlayer) {
 
 		JSONObject json = new JSONObject();
 		updateJSON(json, STAT, OK);
@@ -475,7 +445,7 @@ public class GameService extends AbstractPokerService {
 
 		updateJSON(json, "playerRanks", playersRanks);
 
-		return buildResponse(json);
+		return json;
 	}
 
 	/**

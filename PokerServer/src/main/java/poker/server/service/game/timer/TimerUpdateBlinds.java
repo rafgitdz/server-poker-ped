@@ -1,4 +1,4 @@
-package poker.server.service.game;
+package poker.server.service.game.timer;
 
 import poker.server.infrastructure.RepositoryGame;
 import poker.server.model.game.Game;

@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - call</title></head>
+<body>
+
+
+<div class="InfoCase">
+<h1>poker.server.service.player.call</h1>
+<div class="MethodDescription">Executer l"action "call" du joueur&nbsp;</div><h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/player/call/{consumerKey}/{signature}</a><span style="text-decoration: underline;"></span></pre>
+<h3>Authentification</h3>
+<p>Cette méthode exige une <a href="file:///services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl><dt><b><code>consumerKey: String</code></b>
+(Obligatoire)</dt><dd>Your API application key. <a href="file:///services/api/misc.api_keys.html">See here</a>
+for more details.</dd><dt><b><code>signature: String</code></b>
+(Obligatoire)</dt><dd>Tha
+signature generated from the String</dd><dd>&nbsp;(secret+"&amp;consumerKey&amp;"+consumerKey+"&amp;token&amp;"+token+"&amp;playerName&amp;"+playerName)</dd></dl>
+<h3>Arguments pour la génération de la signature (à faire côté
+client)</h3>
+<dl><dt style="color: rgb(0, 0, 153);"><b><code>secret:
+String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">le code secret délivré au client lors de la génération du consumerKey</dd><dt style="color: rgb(0, 0, 153);"><b><code>consumerKey:
+String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">décrit plus haut</dd><dt style="color: rgb(0, 0, 153);"><b><code>token:
+String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">Le token d'accès qui
+a été envoyé à l'application</dd><dt style="color: rgb(0, 0, 153);"><b><code>playerName:
+String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">Le nom du compte du
+joueur</dd></dl><h3>Returns</h3>
+<dl><dt><b><code>stat: String</code></b></dt><dd>The state of the request</dd></dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre>{<br> "stat":"ok"<br>}</pre>
+<h3>Codes d'erreur</h3>
+<dl><dt><dt><b><code>3: GAME_NOT_READY_TO_START</code></b></dt></dt><dd>The game isn't ready to start</dd><dt><b><code>14: ERROR_UNKNOWN_PLAYER</code></b></dt><dd>The player does not exists</dd><dt><b><code>15: PLAYER_NOT_CONNECTED</code></b></dt><dd>The player does not exists</dd><span style="font-family: monospace;"><span style="font-weight: bold;"></span></span></dl>
+</div><br><br>
+</body></html>

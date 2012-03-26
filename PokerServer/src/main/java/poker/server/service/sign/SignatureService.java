@@ -4,7 +4,6 @@ import poker.server.infrastructure.RepositoryAccessToken;
 import poker.server.infrastructure.RepositoryConsumer;
 import poker.server.infrastructure.auth.AccessToken;
 import poker.server.infrastructure.auth.Consumer;
-import poker.server.infrastructure.crypt.AES;
 import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.SignatureException;
 
@@ -46,9 +45,9 @@ public class SignatureService {
 		if (consumer == null)
 			throw new SignatureException(ErrorMessage.UNKNOWN_CONSUMER_KEY);
 
-		String seed = consumer.getSecret();
-
-		String clearCustomer = AES.decrypt(seed, signature);
+		// String seed = consumer.getSecret();
+		// String clearCustomer = AES.decrypt(seed, signature);
+		String clearCustomer = signature;
 		String[] infos = clearCustomer.split("&");
 
 		try {

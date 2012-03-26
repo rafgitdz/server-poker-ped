@@ -14,7 +14,7 @@ import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.ParametersException;
 
 @Entity
-public class OtherGameType extends AbstractParameters {
+public class OtherGameType extends GameType {
 
 	private static final long serialVersionUID = 1169923728589316907L;
 
@@ -31,8 +31,7 @@ public class OtherGameType extends AbstractParameters {
 		this.speakTime = speakTime;
 		this.timeChangeBlind = timeChangeBlind;
 		this.buyIn = buyIn;
-		this.buyInIncreasing = buyInIncreasing;
-		this.multFactor = multFactor;
+		this.factorUpdateBlinds = multFactor;
 		this.initPlayersTokens = initPlayersTokens;
 
 		if (numberOfWinners > percentReward.length
@@ -54,4 +53,28 @@ public class OtherGameType extends AbstractParameters {
 
 		numberOfCurrentGames = 0;
 	}
+
+	public OtherGameType(String gameName, int playerNumber, int playerTokens,
+			int buyIn, int speakTime, int smallBlind, int factorUpdateBlind,
+			int updateBlindTime, int potType, int numberOfWinners) {
+
+		this.name = gameName;
+		this.playerNumber = playerNumber;
+		this.initPlayersTokens = playerTokens;
+		this.buyIn = buyIn;
+		this.speakTime = speakTime;
+		this.smallBlind = smallBlind;
+		this.factorUpdateBlinds = factorUpdateBlind;
+		this.timeChangeBlind = updateBlindTime;
+
+		if (potType == TOKEN)
+			setPotAsToken();
+		else
+			setPotAsCash();
+
+		buyInSplit = new ArrayList<Percent>(numberOfWinners);
+		for (int i = 0; i < numberOfWinners; ++i) 
+			buyInSplit.add(new Percent(100 / numberOfWinners));
+	}
+
 }

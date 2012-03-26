@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - authenticate</title></head>
+<body>
+<div class="InfoCase">
+<h1>poker.server.service.game.authenticate</h1>
+<div class="MethodDescription">Connecte le joueur au serveur</div>
+<h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/game/authenticate/{consumerKey}/{signature}</a></pre><h3>Authentification</h3>
+<p>Cette méthode exige une <a href="/services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl>
+<dt><b><code>consumerKey: String</code></b>
+(Obligatoire)</dt>
+<dd>Your API application key. <a href="/services/api/misc.api_keys.html">See here</a>
+for more details.</dd><dt><b><code>signature: String</code></b>
+(Obligatoire)</dt><dd>Tha
+signature generated from the String</dd><dd>&nbsp;(secret+"&amp;consumerKey&amp;"+consumerKey+"&amp;token&amp;"+token+"&amp;playerName&amp;"+playerName+"&amp;password&amp;"+password)</dd></dl><h3>Arguments pour la génération de la signature (à faire côté client)</h3><dl><dt style="color: rgb(0, 0, 153);"></dt><dt style="color: rgb(0, 0, 153);"><b><code>secret:
+String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">le code secret délivré au client lors de la génération du consumerKey</dd><dt style="color: rgb(0, 0, 153);"><b><code>consumerKey: String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">décrit plus haut</dd><dt style="color: rgb(0, 0, 153);"><b><code>token: String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">Le token d'accès qui a été envoyé à l'application</dd><dt style="color: rgb(0, 0, 153);"><b><code>playerName: String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">Le nom du compte du joueur </dd><dt style="color: rgb(0, 0, 153);"><b><code>password: String</code></b>
+(Obligatoire)</dt><dd style="color: rgb(0, 0, 153);">Le mot de passe du compte du joueur</dd></dl><dl></dl>
+<h3>Returns</h3>
+<dl>
+<dt><b><code>alreadyConnected: boolean</code></b></dt>
+<dd>L'état de joueur après déconnexion (si vrai consulter le tableName)</dd><dt><b><code>tableName: String</code></b></dt><dd>The name of the table where the player is connected</dd>
+</dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre>{<br> "stat":"ok", <br> "alreadyConnected":true<br> "tableName":"LabriTexasHoldem_55b09952-1ae3-4585-9f2f-d4ad69ff5154"}<br>}</pre>
+<h3>Codes d'erreur</h3>
+<dl>
+<dt><b><code>1: NOT_CORRECT_PASSWORD</code></b></dt>
+<dd>The password of the player is incorrect</dd>
+<dt><b><code>2: PLAYER_INGAME</code></b></dt>
+<dd>The player is already connected to a current game</dd>
+<dt><b><code>9:&nbsp;NOT_ENOUGH_MONEY</code></b></dt>
+<dd>The player has not enough money to play a game</dd><dt><b><code>17: UNKNOWN_CONSUMER_KEY</code></b></dt><dd>Unknown consumer key</dd><dt><b><code>23: INVALID_SIGNATURE</code></b><b><code></code></b></dt><dd>Invalid signature</dd><dt><b><code>24: UNKNOWN_ACCESS_TOKEN</code></b></dt><dd>The access token is not valid</dd><dt><b><code>25: INCOMPATIBLE_ACCESS_TOKEN_CONSUMER</code></b></dt><dd>Incompatible access token and consumer key</dd><dt></dt>
+<span style="font-family: monospace;"><span style="font-weight: bold;"></span></span>
+</dl>
+</div>
+</body></html>

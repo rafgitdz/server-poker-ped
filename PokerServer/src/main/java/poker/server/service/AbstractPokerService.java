@@ -56,7 +56,7 @@ public abstract class AbstractPokerService implements PokerService {
 
 		try {
 			json.put(STAT, FAIL);
-			json.put(CODE, message);
+			json.put(MESSAGE, message);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -75,5 +75,5 @@ public abstract class AbstractPokerService implements PokerService {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

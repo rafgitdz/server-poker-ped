@@ -11,14 +11,14 @@ import java.util.List;
 import javax.ejb.Local;
 
 import poker.server.model.game.Game;
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.GameType;
 
 @Local
 public interface RepositoryGame extends RepositoryGeneric<Game, String> {
 
 	public Game currentGame();
 
-	public boolean exist(Parameters param);
+	public boolean exist(GameType param);
 
 	public List<Game> getNotReadyGames();
 

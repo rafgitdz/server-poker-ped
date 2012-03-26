@@ -7,11 +7,11 @@ import org.junit.Test;
 
 public class TestStopWatch {
 
-	private Stopwatch stopSwatch;
+	private StopWatch stopSwatch;
 
 	@Before
 	public void beforeTest() {
-		stopSwatch = Stopwatch.chrono(10);
+		stopSwatch = StopWatch.chrono(10);
 	}
 
 	private void wait(int seconds) {

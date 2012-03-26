@@ -8,11 +8,12 @@ package poker.server.infrastructure;
 
 import javax.ejb.Local;
 
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.GameType;
 
 @Local
-public interface RepositoryParameters extends RepositoryGeneric<Parameters, String> {
+public interface RepositoryGameType extends RepositoryGeneric<GameType, String> {
 
 	boolean existSitAndGo();
 
+	GameType getSitAndGo();
 }

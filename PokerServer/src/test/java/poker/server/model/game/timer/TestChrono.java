@@ -9,7 +9,7 @@ public class TestChrono {
 	@Test
 	public void testChrono() {
 
-		Chrono chrono = new Chrono(5);
+		Chrono chrono = new Chrono(30);
 		Thread th = new Thread(chrono);
 		th.start();
 		wait(6);

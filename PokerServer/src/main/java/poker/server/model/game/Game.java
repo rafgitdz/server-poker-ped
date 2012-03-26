@@ -24,19 +24,25 @@ import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
-import poker.server.model.game.parameters.AbstractParameters;
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.SitAndGo;
+import poker.server.model.player.Hand;
 import poker.server.model.player.Player;
 
 /**
- * @author PokerServerGroup <br/>
- * <br/>
+ * Manages all the entities and actions related to the poker game. The type of
+ * poker is Texas Holde'em Poker and the variant is SitAndGo, Note that it can
+ * be affect other variant than SitAndGo
  * 
- *         Manages all the entities and actions related to the poker game. The
- *         type of poker is Texas Holde'em Poker and the variant is SitAndGo
- *         Note that it can affect other variant than SitAndGo (Entity :
- *         gameType)
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Luc </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see GameType
  */
 
 @Entity
@@ -78,9 +84,9 @@ public class Game implements Serializable {
 	@IndexColumn(name = "playerRankIndex")
 	List<Player> playersRank;
 
-	@ManyToOne(cascade = CascadeType.ALL, targetEntity = AbstractParameters.class, fetch = FetchType.EAGER)
-	@JoinColumn(name = "parameters")
-	Parameters gameType;
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "gameType")
+	GameType gameType;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
@@ -130,7 +136,7 @@ public class Game implements Serializable {
 	 * @see class Parameters
 	 * 
 	 */
-	Game(Parameters gameT) {
+	Game(GameType gameT) {
 		gameType = gameT;
 		gameType.increment();
 		buildGame();
@@ -462,10 +468,14 @@ public class Game implements Serializable {
 		updateRoundPotAndBets();
 		totalPot = 0;
 		deck = originalDeck;
+		// deck = new Deck();
 		flippedCards = null;
 		flippedCards = new ArrayList<Card>();
 		initPlayersHands();
 		dealCards();
+		lastPlayerToPlay = bigBlindPlayerInt;
+		currentPlayerInt = (bigBlindPlayerInt + 1) % players.size();
+		currentRound = 0;
 	}
 
 	private void initPlayersHands() {
@@ -750,6 +760,7 @@ public class Game implements Serializable {
 
 			int bestHand = 0; // set to HighCard, that is the worst hand value
 			int result = 0;
+			playersBestHands.put(player.getName(), 0);
 
 			if (!player.isfolded()) {
 
@@ -766,8 +777,16 @@ public class Game implements Serializable {
 							if (result > bestHand) {
 
 								bestHand = result;
-								// updateBestHand
-								// updateValueBestHand
+
+								Hand hand = new Hand();
+								hand.addCards(player.getCurrentHand()
+										.getCards());
+								hand.addCard(flippedCards.get(i));
+								hand.addCard(flippedCards.get(j));
+								hand.addCard(flippedCards.get(k));
+								player.setBestHand(hand);
+								player.setValueBestHand(bestHand);
+
 								playersBestHands.put(player.getName(), result);
 							}
 
@@ -782,7 +801,7 @@ public class Game implements Serializable {
 		Map<String, Integer> bestPlayers = getWinners(playersBestHands, best,
 				playerToReward);
 
-		// sort playersBestHands
+		// sort BestPlayer
 		// si egalite -> compare
 		// setRankPlayer
 		// for each pot (splitPots) rewards the winners
@@ -870,11 +889,11 @@ public class Game implements Serializable {
 		return bigBlind;
 	}
 
-	public Parameters getGameType() {
+	public GameType getGameType() {
 		return gameType;
 	}
 
-	public void setGameType(Parameters gameType) {
+	public void setGameType(GameType gameType) {
 		this.gameType = gameType;
 	}
 

@@ -51,7 +51,7 @@ public class Hand implements Serializable {
 	@IndexColumn(name = "cardHandIndex")
 	List<Card> cards;
 
-	Hand() {
+	public Hand() {
 		cards = new ArrayList<Card>();
 	}
 

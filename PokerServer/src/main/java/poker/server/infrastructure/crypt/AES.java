@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class AES {
 
 	private static String CIPHER_ALGORITHM = "AES";
+	@SuppressWarnings("unused")
 	private static String CIPHER_TRANSFORMATION = "SHA1PRNG";
 
 	private final static String HEX = "0123456789ABCDEF";
@@ -49,7 +50,8 @@ public class AES {
 	private static byte[] getRawKey(byte[] seed) throws Exception {
 
 		KeyGenerator keygen = KeyGenerator.getInstance(CIPHER_ALGORITHM);
-		SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
+		// SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
+		SecureRandom sr = new SecureRandom();
 		sr.setSeed(seed);
 		keygen.init(128, sr);
 		SecretKey skey = keygen.generateKey();

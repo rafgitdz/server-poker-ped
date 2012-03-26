@@ -12,7 +12,7 @@ import poker.server.model.exception.PlayerException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactory;
 import poker.server.model.game.GameFactoryLocal;
-import poker.server.model.game.parameters.AbstractParameters;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.SitAndGo;
 
 public class TestPlayer {
@@ -46,7 +46,7 @@ public class TestPlayer {
 	@Before
 	public void beforeTest() {
 
-		AbstractParameters param = new SitAndGo();
+		GameType param = new SitAndGo();
 		param.setPlayerNumber(4);
 		game = gameFactory.newGame(param);
 		player = playerFactory.newPlayer("Lucas", "1234");

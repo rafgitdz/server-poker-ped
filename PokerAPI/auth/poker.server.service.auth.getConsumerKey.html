@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerAPI - getConsumerKey</title></head>
+<body>
+<div class="InfoCase">
+<h1>poker.server.service.auth.getConsumerKey</h1>
+<div class="MethodDescription">Retourne une clé pour une application cliente qui servira d'identifiant&nbsp;</div>
+<h3>REST Request</h3>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"><a href="http://localhost:8080/PokerServer/rest/">http://localhost:8080/PokerServer/rest/auth/getConsumerKey/{displayName}/</a><a href="http://localhost:8080/PokerServer/rest/"></a></pre>
+<h3>Authentification</h3>
+<p>Cette méthode n'exige pas une <a href="/services/api/misc.userauth.html">authentification</a>.</p>
+<h3>Arguments</h3>
+<dl>
+<dt><b><code>displayName: String</code></b>
+(Obligatoire)</dt>
+<dd>Le nom de l'application cliente</dd></dl>
+<h3>Returns</h3>
+<dl><dt><b><code>consumerKey: String</code></b></dt><dd>La clé qu'utilisera le client pour utiliser les services de l'API Poker</dd><dt><b><code>secret: String</code></b></dt><dd>Le secret (mot de passe) qui servira de crypter les requêtes vers l'API Poker</dd></dl>
+<h3>Exemple de réponse&nbsp;<br>
+</h3>
+<pre>{<br> "stat":"ok",<br> "consumerKey":"4996a7d8-92d9-4f17-9853-fbb02ca950ac"<br> "secret":"4ff6a7d8-00d9-4f17-fdfd53-vvb02cafdfd50ac"<br>}<br></pre><h3>Codes d'erreur</h3>
+<dl><dt><b><code>16: CONSUMEY_KEY_ERROR</code></b></dt><dd>Can not generate a consumer key</dd></dl><pre></pre><dl><span style="font-family: monospace;"><span style="font-weight: bold;"></span></span>
+</dl>
+</div>
+</body></html>

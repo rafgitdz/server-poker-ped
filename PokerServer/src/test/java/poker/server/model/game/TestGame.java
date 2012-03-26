@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import poker.server.model.exception.GameException;
 import poker.server.model.game.card.Card;
-import poker.server.model.game.parameters.AbstractParameters;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
@@ -64,7 +64,7 @@ public class TestGame {
 	@Test
 	public void testNewGameParameters() {
 		Game gameParameters;
-		AbstractParameters params = new SitAndGo();
+		GameType params = new SitAndGo();
 		gameParameters = gameFactory.newGame(params);
 
 		assertEquals(params, gameParameters.getGameType());
@@ -651,52 +651,63 @@ public class TestGame {
 		flipedCards.add(card4); // tournant
 		flipedCards.add(card5); // river
 	}
-	
+
 	// POT ALL IN
-	/* @Test
-	﻿  public void testSplitPot() {
-	﻿  ﻿  game.add(player1);
-	﻿  ﻿  game.add(player2);
-	﻿  ﻿  game.add(player3);
-	﻿  ﻿  game.add(player4);
-	﻿  ﻿  game.add(player5);
+	@Test
+	public void testSplitPot() {
+		game.add(player1);
+		game.add(player2);
+		game.add(player3);
+		game.add(player4);
+		game.add(player5);
 
-	﻿  ﻿  game.start();
+		game.start();
 
-	﻿  ﻿  player1.setCurrentTokens(1000);
-	﻿  ﻿  player2.setCurrentTokens(1390);
-	﻿  ﻿  player3.setCurrentTokens(1480);
-	﻿  ﻿  player4.setCurrentTokens(500);
-	﻿  ﻿  player5.setCurrentTokens(600);
+		player1.setCurrentTokens(1000);
+		player2.setCurrentTokens(1390);
+		player3.setCurrentTokens(1480);
+		player4.setCurrentTokens(500);
+		player5.setCurrentTokens(600);
 
-	﻿  ﻿  player4.allIn();
-	﻿  ﻿  player5.allIn();
-	﻿  ﻿  player1.call();
-	﻿  ﻿  player2.call();
-	﻿  ﻿  player3.call();
+		player4.allIn();
+		player5.allIn();
+		player1.call();
+		player2.call();
+		player3.call();
 
-	﻿  ﻿  player2.check();
-	﻿  ﻿  player3.check();
-	﻿  ﻿  player1.allIn();
-	﻿  ﻿  player2.call();
-	﻿  ﻿  player3.call();
+		player2.check();
+		player3.check();
+		player1.allIn();
+		player2.call();
+		player3.call();
 
-	﻿  ﻿  player2.raise(20);
-	﻿  ﻿  player3.call();
+		player2.raise(20);
+		player3.call();
 
-	﻿  ﻿  player2.raise(40);
-	﻿  ﻿  player3.call();
-	﻿  ﻿  
-	﻿  ﻿  int i;
-	﻿  ﻿  for (i = 0; i < game.splitPots.size(); i++) {
-	﻿  ﻿  ﻿  System.out.print(game.splitPots.get(i).diffValue + " "
-	﻿  ﻿  ﻿  ﻿  ﻿  + game.splitPots.get(i).valueReward + " ");
+		player2.raise(40);
+		player3.call();
 
-	﻿  ﻿  ﻿  for (int j = 0; j < game.splitPots.get(i).getPlayers().size(); j++)
-	﻿  ﻿  ﻿  ﻿  System.out.print(game.splitPots.get(i).getPlayers().get(j)
-	﻿  ﻿  ﻿  ﻿  ﻿  ﻿  .getName()
-	﻿  ﻿  ﻿  ﻿  ﻿  ﻿  + "  ");
-	﻿  ﻿  ﻿  System.out.println();
-	﻿  ﻿  }
-	﻿  }*/
+		/*
+		 * player4.call(); player5.fold(); player1.fold(); player2.call();
+		 * player3.check();
+		 * 
+		 * player2.check(); player3.check(); player4.check();
+		 * 
+		 * player2.check(); player3.check(); player4.check();
+		 * 
+		 * player2.check(); player3.check(); player4.check();
+		 */
+
+		int i;
+		for (i = 0; i < game.splitPots.size(); i++) {
+			System.out.print(game.splitPots.get(i).diffValue + " "
+					+ game.splitPots.get(i).valueReward + " ");
+
+			for (int j = 0; j < game.splitPots.get(i).getPlayers().size(); j++)
+				System.out.print(game.splitPots.get(i).getPlayers().get(j)
+						.getName()
+						+ "  ");
+			System.out.println();
+		}
+	}
 }
