@@ -29,7 +29,8 @@ public enum ErrorMessage {
 	NOT_EQUITABLE_REWARD(22, "The number of winners is not equals to the percent reward's array size"), 
 	INVALID_SIGNATURE (23, "Invalid signature"), 
 	UNKNOWN_ACCESS_TOKEN (24, "The access token is not valid"), 
-	INCOMPATIBLE_ACCESS_TOKEN_CONSUMER(25, "Incompatible access token and consumer key");
+	INCOMPATIBLE_ACCESS_TOKEN_CONSUMER(25, "Incompatible access token and consumer key"), 
+	UNKNOWN_GAME_TYPE(26, "Unknown game type");
 	
 	private int code;
 	private String message;

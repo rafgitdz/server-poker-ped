@@ -8,7 +8,7 @@ package poker.server.model.game;
 
 import javax.ejb.Stateless;
 
-import poker.server.model.game.parameters.Parameters;
+import poker.server.model.game.parameters.GameType;
 
 @Stateless
 public class GameFactory implements GameFactoryLocal {
@@ -19,7 +19,7 @@ public class GameFactory implements GameFactoryLocal {
 	}
 
 	@Override
-	public Game newGame(Parameters gameType) {
+	public Game newGame(GameType gameType) {
 		return new Game(gameType);
 	}
 }

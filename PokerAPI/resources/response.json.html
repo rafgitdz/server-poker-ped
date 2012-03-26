@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>PokerApi - JSON</title>
+
+</head>
+<body>
+<div class="TopBar TopBarWide" id="TopBar" role="banner">
+<br>
+</div>
+<a data-track="home-logo" href="/" data-rapid_p="1"><img src="C:/Users/Rafik/Desktop/PokerAPI/PokerLogo.png" id="FlickrLogo" alt="Logo Flickr. Si vous cliquez dessus, vous reviendrez à la page d'accueil" height="70" width="200"></a> &nbsp;<br>
+<a data-track="help" href="c:/Users/Rafik/Desktop/PokerAPI/response/poker.server.help.html" data-rapid_p="2">Aide</a><span style="font-family: Arial,Helvetica,sans-serif;"><br>
+<br>
+</span>
+<h2 style="font-size: 20px; font-weight: normal; margin-bottom: 10px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">Format
+de réponse JSON</h2>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">JSON,
+ou JavaScript Object Notation, est un format simple d'échange de
+données assimilable par l'ordinateur, qui facilite l'élaboration
+d'applications en Java avec l'API (il peut cependant être utilisé pour
+d'autres langages également&nbsp;!). Pour plus d'informations sur
+JSON,
+rendez-vous sur<span class="Apple-converted-space">&nbsp;</span><a href="http://www.json.org/" style="color: rgb(16, 87, 174); text-decoration: none;">json.org</a></p>
+<h3 style="font-size: 18px; font-weight: normal; margin-bottom: 10px; font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 153);">Représentation
+de l'objet</h3>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">Voici
+un exemple de tags JSON :</p>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">{<br>
+</p>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;"> "foo": {<br>	"bar": "baz"<br>	}<br>}<br></pre>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">Pour
+les éléments récurrents (tels que l'élément<span class="Apple-converted-space">&nbsp;</span><code>&lt;player&gt;</code><span class="Apple-converted-space">&nbsp;</span>lors
+de l'extraction d'une liste de joueurs), des crochets sont utilisés
+pour la valeur du membre de l'objet (la clé du membre représente le nom
+de l'élément). Chaque valeur comprise entre crochets est un objet
+représentant un élément enfant.</p>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;">{<br>	"outer": {<br>	"players": [<br>	{<br>	"name": "Janet"<br>	},<br>	{<br>	"name": "John"<br>	}<br>	]<br>	}<br>}<br></pre>
+<h3 style="font-size: 18px; color: rgb(255, 0, 132); font-weight: normal; margin-bottom: 10px; font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">Traitement
+des réponses</h3>
+<p style="font-size: 12px; color: rgb(0, 0, 0); font-family: Arial,Helvetica,sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; background-color: rgb(254, 254, 254);">En
+Java, afficher la liste des joueurs d'un jeu est trés simple :</p>
+<pre style="padding: 8px; background-color: rgb(254, 254, 254); color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px;">void jsonPokerApi(Response resp){<br><br>	if (rsp.stat != "ok"){<br><br>	// error -&gt; do something<br>	return;<br>	}<br><br>	JSONObject json = toJSON(resp);<br>	List&lt;String&gt; players = json.get("players");<br><br>	for(String name : players) <br>	DisplayList.add(name);<br>}</pre>
+</body></html>

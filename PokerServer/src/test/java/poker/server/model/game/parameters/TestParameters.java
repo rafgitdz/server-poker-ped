@@ -11,7 +11,7 @@ import org.junit.Test;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactory;
 import poker.server.model.game.GameFactoryLocal;
-import poker.server.model.game.parameters.AbstractParameters;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.Percent;
 
 public class TestParameters {
@@ -70,7 +70,7 @@ public class TestParameters {
 		int multFactor = 2;
 		int smallBlind = 20;
 
-		AbstractParameters gameType = new TestGameType(buyIn, buyInIncreasing,
+		GameType gameType = new TestGameType(buyIn, buyInIncreasing,
 				multFactor, smallBlind);
 		game = gameFactory.newGame(gameType);
 		int finalSmallBlind = game.getGameType().getSmallBlind();

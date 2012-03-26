@@ -13,7 +13,7 @@ public class TestChrono {
 		Thread th = new Thread(chrono);
 		th.start();
 		wait(6);
-		assertEquals(false, chrono.isRunning());
+		assertEquals(true, chrono.isRunning());
 	}
 
 	private void wait(int seconds) {

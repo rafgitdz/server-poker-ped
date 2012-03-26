@@ -3,10 +3,10 @@ package poker.server.model.game.parameters;
 import java.util.ArrayList;
 import java.util.List;
 
-import poker.server.model.game.parameters.AbstractParameters;
+import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.Percent;
 
-public class TestGameType extends AbstractParameters {
+public class TestGameType extends GameType {
 
 	private static final long serialVersionUID = -2480221153123675332L;
 
@@ -16,8 +16,7 @@ public class TestGameType extends AbstractParameters {
 		this.speakTime = 30;
 
 		this.buyIn = 10;
-		this.buyInIncreasing = 2;
-		this.multFactor = 2;
+		this.factorUpdateBlinds = 2;
 
 		this.setBlinds(10);
 		this.setPotAsToken();
@@ -42,8 +41,7 @@ public class TestGameType extends AbstractParameters {
 
 		this.setDefaultParams();
 		this.buyIn = buyIn;
-		this.buyInIncreasing = buyInIncreasing;
-		this.multFactor = multFactor;
+		this.factorUpdateBlinds = multFactor;
 		this.setBlinds(smallBlind);
 	}
 

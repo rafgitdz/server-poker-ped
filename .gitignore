@@ -22,3 +22,6 @@ PokerServer/.project
 PokerServer/readme.md
 PokerClient/
 Maven3/
+LoginManager/
+PokerGameAdministration/
+Admin/

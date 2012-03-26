@@ -14,7 +14,7 @@ import javax.swing.Timer;
 
 import poker.server.model.exception.GameException;
 
-public class Stopwatch {
+public class StopWatch {
 
 	private static final String FORBIDDEN_DURATION = "Can't launch chrono other than 30 or 180 seconds";
 
@@ -22,9 +22,9 @@ public class Stopwatch {
 	private int totalTime;
 	private Timer timer;
 
-	public static Stopwatch chrono(int duration) {
+	public static StopWatch chrono(int duration) {
 
-		Stopwatch stopwatch = new Stopwatch(duration);
+		StopWatch stopwatch = new StopWatch(duration);
 		stopwatch.start();
 		return stopwatch;
 	}
@@ -44,9 +44,9 @@ public class Stopwatch {
 		}
 	};
 
-	public Stopwatch(int duration) {
+	public StopWatch(int duration) {
 
-		if (duration != 10 && duration != 180)
+		if (duration != 30 && duration != 180)
 			throw new GameException(FORBIDDEN_DURATION);
 
 		totalTime = duration;
