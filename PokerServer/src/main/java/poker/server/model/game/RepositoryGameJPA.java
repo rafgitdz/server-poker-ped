@@ -1,11 +1,5 @@
 package poker.server.model.game;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model-Infrastructure class : RepositoryGameJPA
- */
-
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -16,6 +10,17 @@ import poker.server.infrastructure.RepositoryGame;
 import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.model.game.parameters.GameType;
 
+/**
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Luc </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ */
 @Stateless
 public class RepositoryGameJPA extends RepositoryGenericJPA<Game, String>
 		implements RepositoryGame {

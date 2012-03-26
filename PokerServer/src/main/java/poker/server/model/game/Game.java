@@ -32,7 +32,7 @@ import poker.server.model.player.Player;
 /**
  * Manages all the entities and actions related to the poker game. The type of
  * poker is Texas Holde'em Poker and the variant is SitAndGo, Note that it can
- * be affect other variant than SitAndGo
+ * be affect other variant than SitAndGo.
  * 
  * @author <b> Rafik Ferroukh </b> <br>
  *         <b> Lucas Kerdoncuff </b> <br>
@@ -44,13 +44,12 @@ import poker.server.model.player.Player;
  * 
  * @see GameType
  */
-
 @Entity
 public class Game implements Serializable {
 
 	static final long serialVersionUID = 2687924657560495636L;
 
-	private static final String UNKNOWN_ROUND = "unknown round !";
+	private static final String UNKNOWN_ROUND = "Unknown round !";
 	private static final String NOT_YOUR_TURN = "It's not your turn ";
 
 	public static final int FLOP = 1;
@@ -123,7 +122,7 @@ public class Game implements Serializable {
 	private int lastPlayerToPlay;
 
 	/**
-	 * Default constructor of Game, takes a SitAndGo parameters
+	 * Default constructor of Game, takes a SitAndGo parameters.
 	 */
 	public Game() {
 		gameType = new SitAndGo();
@@ -131,10 +130,11 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * It can affect a variant other SitAndO
+	 * It can affect a game type other than SitAndGo.
 	 * 
-	 * @see class Parameters
-	 * 
+	 * @param gameT
+	 *            a game type parameters
+	 * @see GameType
 	 */
 	Game(GameType gameT) {
 		gameType = gameT;
@@ -143,7 +143,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Do this for each new instance of Game to initialize the basic concepts
+	 * Do this for each new instance of Game to initialize the basic concepts.
 	 */
 	private void buildGame() {
 
@@ -170,9 +170,9 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Start the game if it has the number of player cited in Parameters
+	 * Start the game if it has the number of player cited in Parameters.
 	 * 
-	 * @see PlayerNumber in class Parameters
+	 * @see playerNumber in class GameType
 	 */
 	public void start() {
 
@@ -189,7 +189,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the begin of game, set each role for each player
+	 * At the begin of a game, set the role of each player.
 	 */
 	public void setPlayerRoles() {
 
@@ -212,9 +212,9 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the start of the game, give for each player a number of tokens
+	 * At the start of a game, give for each player a number of tokens.
 	 * 
-	 * @see tokens in class Parameters
+	 * @see initPlayersTokens in class GameType
 	 */
 	private void initPlayersTokens() {
 
@@ -225,9 +225,9 @@ public class Game implements Serializable {
 
 	/**
 	 * At the starting of the game, sum all the buyIn of players and update the
-	 * prizepool
+	 * prizePool.
 	 * 
-	 * @see buyIn in class Parameters
+	 * @see buyIn in class GameType
 	 */
 	private void fixPrizePool() {
 		prizePool = gameType.getPlayerNumber() * gameType.getBuyIn();
@@ -244,7 +244,7 @@ public class Game implements Serializable {
 
 	/**
 	 * Initialize the bet, the pot and update the current tokens for the players
-	 * concerned (smallBlind and the bigBlind)
+	 * concerned (smallBlind and the bigBlind).
 	 */
 	private void setInitBetGame() {
 
@@ -255,7 +255,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Method to set prize for the first three players in the ranking
+	 * Method to set prize for the first three players in the ranking.
 	 */
 	protected void setPrizeForPlayers() {
 
@@ -268,7 +268,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the begin of game, give for each player two cards
+	 * At the begin of game, give for each player two cards.
 	 */
 	protected void dealCards() {
 		deck.shuffle();
@@ -284,7 +284,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * First round to flip three cards on the table
+	 * It is the first round called flop. To flip three cards on the table,
+	 * update the pot and the bets and add an event.
 	 */
 	protected void flop() {
 
@@ -301,7 +302,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Second round to flip one card and add it for the three flop's cards
+	 * It is the second round called tournant. To flip one card and add it to
+	 * the three flip's cards, update the pot and the bets and add an event.
 	 */
 	protected void tournant() {
 
@@ -312,8 +314,9 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Third round to flip one card and add it for the four flop's and
-	 * tournant's cards
+	 * It is the third round called river. To flip one card and add it to the
+	 * four flip's and tournant's cards, update the pot and the bets and add an
+	 * event.
 	 */
 	protected void river() {
 
@@ -324,7 +327,10 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Give the next card from the deck
+	 * Give the next card from the deck.
+	 * 
+	 * @return one card
+	 * @see Card
 	 */
 	private Card flipCard() {
 		Card card = deck.getNextCard();
@@ -333,7 +339,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Between each round, do the habitual tasks to go to the next round...
+	 * Between each round, do the habitual tasks to go to the next round.
 	 */
 	private void nextRound() {
 
@@ -363,6 +369,15 @@ public class Game implements Serializable {
 		}
 	}
 
+	/**
+	 * It returns a boolean. True if a player played an all in in the current
+	 * round, else False.
+	 * 
+	 * @param currentPlayers
+	 *            a list of players still playing the round
+	 * @return a boolean
+	 * @see java.lang.Boolean
+	 */
 	private boolean playerAllInInRound(List<Player> currentPlayers) {
 		for (Player p : currentPlayers) {
 			if (p.isAllIn() && (p.getRoundAllIn() == currentRound))
@@ -372,7 +387,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Handle the split of the plot
+	 * Handle the split of the pot.
 	 * 
 	 * @param currentPlayers
 	 */
@@ -438,6 +453,14 @@ public class Game implements Serializable {
 
 	}
 
+	/**
+	 * Check if a pot already exist with the same bet of the player.
+	 * 
+	 * @param player
+	 * @return pot a pot is an amount of tokens which will be given to the
+	 *         winner of the pot
+	 * @see Pot
+	 */
 	private Pot checkPot(Player player) {
 		for (Pot pot : splitPots) {
 			if (pot.getValue() == player.getTotalBet()) {
@@ -448,7 +471,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Method go to the next round and verify if is the end of the game
+	 * This is a method which call several methods to do before each preflop if
+	 * the game is not ended.
 	 */
 	private void nextRoundTasks() {
 
@@ -468,7 +492,6 @@ public class Game implements Serializable {
 		updateRoundPotAndBets();
 		totalPot = 0;
 		deck = originalDeck;
-		// deck = new Deck();
 		flippedCards = null;
 		flippedCards = new ArrayList<Card>();
 		initPlayersHands();
@@ -478,6 +501,9 @@ public class Game implements Serializable {
 		currentRound = 0;
 	}
 
+	/**
+	 * For each player initialize their hand.
+	 */
 	private void initPlayersHands() {
 
 		for (Player player : players)
@@ -485,7 +511,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Remove the looser's players and update ranking
+	 * Remove the looser's players and update ranking.
 	 */
 	protected void cleanTable() {
 
@@ -505,7 +531,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * After a showDown, set all players as regular and cancel them fold's state
+	 * After a showDown, set all players as regular and cancel their fold's
+	 * state
 	 */
 	protected void resetPlayers() {
 
@@ -517,8 +544,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * For each round, set the next dealer by increment the index, the right
-	 * position of the old dealer
+	 * For each round, set the next dealer by incrementing the index. It will be
+	 * at the right position of the old dealer.
 	 */
 	private void nextDealerPlayer() {
 
@@ -536,8 +563,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * For each round, set the next bigBlind by increment the index, the right
-	 * position of the old bigBlind
+	 * For each round, set the next bigBlind by incrementing the index. It will
+	 * be at the right position of the old bigBlind.
 	 */
 	private void nextBigBlindPlayer() {
 
@@ -553,8 +580,8 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * For each round, set the next samllBlind by increment the index, the right
-	 * position of the old smallBlind
+	 * For each round, set the next smallBlind by incrementing the index. It
+	 * will be at the right position of the old smallBlind.
 	 */
 	private void nextSmallBlindPlayer() {
 
@@ -571,7 +598,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * After each showDown poker, reset all the bets of players and the pot
+	 * After each poker round, reset all the bets of players and the pot.
 	 */
 	protected void updateRoundPotAndBets() {
 
@@ -586,7 +613,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At each round, flip a card(s) according to the conform round
+	 * At each round, flip a card(s) according to the conform round.
 	 */
 	private void flipRoundCard() {
 		switch (currentRound) {
@@ -609,7 +636,10 @@ public class Game implements Serializable {
 	/**
 	 * Verify if all players are all in. Return true if it is, false if not.
 	 * 
-	 * @param currentPlayers
+	 * @param currentPlayersInRound
+	 *            a list of all the players still playing in this round
+	 * @return a boolean
+	 * @see java.lang.Boolean
 	 */
 	private boolean isPlayersAllIn(List<Player> currentPlayerInRound) {
 
@@ -621,7 +651,7 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * After a certain time, update the blinds and increment the level of them
+	 * After a certain time, update the blinds and increment the level of them.
 	 */
 	public void updateBlind() {
 
@@ -635,7 +665,10 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * After each player's action, update the current pot in the Game
+	 * After each player's action, update the current pot in the game.
+	 * 
+	 * @param quantity
+	 *            the amount of tokens played by the player
 	 */
 	public void updateCurrentPot(int quantity) {
 		currentPot += quantity;
@@ -643,7 +676,11 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * After each player's action, update the current bet in the game
+	 * After each player's action, update the current bet in the game.
+	 * 
+	 * @param quantity
+	 *            After each player's action, update the current pot in the
+	 *            game.
 	 */
 	public void updateCurrentBet(int quantity) {
 		currentBet += quantity;
@@ -651,8 +688,13 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Before a player action, it verify is it his turn </br> Launch a game
-	 * exception if not
+	 * Before a player action, it verifies if it is his turn.
+	 * 
+	 * @param player
+	 *            a player
+	 * @see Player
+	 * @exception GameException
+	 *                if is not the turn of the player
 	 */
 	public void verifyIsMyTurn(Player player) {
 
@@ -661,7 +703,13 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * After each connection of player, add it to the only one non-ready game
+	 * After each connection of player, add it to the only one non-ready game.
+	 * 
+	 * @param player
+	 *            a player
+	 * @see Player
+	 * @exception GameException
+	 *                if the player has not enough money
 	 */
 	public void add(Player player) {
 
@@ -678,8 +726,12 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Remove the player from this current game, if he disconnect from it or he
-	 * loose
+	 * Remove the player from his current game, if he is disconnected from it or
+	 * if he loosed the game.
+	 * 
+	 * @param player
+	 *            a player
+	 * @see Player
 	 */
 	protected void remove(Player player) {
 		players.remove(player);
@@ -687,7 +739,7 @@ public class Game implements Serializable {
 
 	/**
 	 * After a player action, it passed the turn to the right position of the
-	 * current player
+	 * current player.
 	 */
 	public void nextPlayer() {
 
@@ -710,23 +762,16 @@ public class Game implements Serializable {
 
 		} while (players.get(currentPlayerInt).isfolded()
 				|| players.get(currentPlayerInt).isAllIn()
-				|| players.get(currentPlayerInt).getCurrentTokens()==0);
+				|| players.get(currentPlayerInt).getCurrentTokens() == 0);
 
-	}
-
-	@SuppressWarnings("unused")
-	private boolean verifyBet() {
-		for (Player player : players) {
-			if (player.getCurrentBet() != getCurrentBet() && !player.isfolded()
-					&& !player.isAllIn())
-				return false;
-		}
-		return true;
 	}
 
 	/**
-	 * After each player action, it verifies if there is one or more players to
-	 * stop or continue the round of poker
+	 * After each player action, returns the list of all the players still
+	 * playing. It is usefull to know if the game has to stop or not.
+	 * 
+	 * @return List a list of player
+	 * @see List
 	 */
 	private List<Player> currentPlayerInRound() {
 
@@ -741,8 +786,11 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the end of round river, it executed the showDown action to see all
-	 * hands of the current player and get the winner(s)
+	 * At the end of the river, execute the showDown actions to see all hands of
+	 * the current player and get the winner(s)
+	 * 
+	 * @return Map
+	 * @see Map
 	 */
 	public Map<String, Integer> showDown() {
 
@@ -813,9 +861,10 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the end of round river, get the winners that have the best hand
+	 * At the end of the river, get the winners that have the best hand.
 	 * 
-	 * @see <@links showDown>
+	 * @return HashMap
+	 * @see HashMap
 	 */
 	private HashMap<String, Integer> getWinners(
 			Map<String, Integer> playersBestHands, int best,
@@ -837,10 +886,19 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the end of round river, evaluate each combination of the cards and
-	 * return the value of the hand*
+	 * At the end of the river, evaluate each combination of the cards and
+	 * return the value of the hand.
 	 * 
-	 * @see <@links showDown>
+	 * @param player
+	 *            a player
+	 * @param i
+	 *            represents the value of a card
+	 * @param j
+	 *            represents the value of a card
+	 * @param k
+	 *            represents the value of a card
+	 * @return int which reprents the value of the hand.
+	 * @see int
 	 */
 	private int evaluate(Player player, int i, int j, int k) {
 
@@ -858,10 +916,11 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the end of round river, reward the winners by divide the total pot
+	 * At the end of the river, reward the winners by dividing the total pot
 	 * between all the best players
 	 * 
-	 * @see <@links showDown>
+	 * @param playerToReward
+	 *            the list of all the winners
 	 */
 	private void rewardTheWinners(List<Player> playerToReward) {
 		int potWinner = totalPot / playerToReward.size();
@@ -870,6 +929,10 @@ public class Game implements Serializable {
 			player.reward(potWinner);
 	}
 
+	/**
+	 * Set the last player to player, to the player on the left of the current
+	 * player.
+	 */
 	public void updateLastPlayerToPlay() {
 		if (currentPlayerInt == 0)
 			lastPlayerToPlay = players.size() - 1;
@@ -877,91 +940,182 @@ public class Game implements Serializable {
 			lastPlayerToPlay = (currentPlayerInt % players.size()) - 1;
 	}
 
-	// Getters and Setters
+	/**
+	 * 
+	 * @return the deck of the game
+	 */
 	public Deck getDeck() {
 		return deck;
 	}
 
+	/**
+	 * 
+	 * @return the index of the small blind player
+	 */
 	public int getSmallBlind() {
 		return smallBlind;
 	}
 
+	/**
+	 * 
+	 * @return the index of the big blind player
+	 */
 	public int getBigBlind() {
 		return bigBlind;
 	}
 
+	/**
+	 * 
+	 * @return the type parameters of the game
+	 */
 	public GameType getGameType() {
 		return gameType;
 	}
 
+	/**
+	 * 
+	 * @param the
+	 *            gameType to set
+	 */
 	public void setGameType(GameType gameType) {
 		this.gameType = gameType;
 	}
 
+	/**
+	 * 
+	 * @return the list of the players
+	 */
 	public List<Player> getPlayers() {
 		return players;
 	}
 
+	/**
+	 * 
+	 * @return the current round (in int)
+	 */
 	public int getCurrentRound() {
 		return currentRound;
 	}
 
+	/**
+	 * 
+	 * @return the list of the cards already flipped
+	 */
 	public List<Card> getFlipedCards() {
 		return flippedCards;
 	}
 
+	/**
+	 * 
+	 * @return the level of the game
+	 */
 	public int getGameLevel() {
 		return gameLevel;
 	}
 
+	/**
+	 * 
+	 * @return the index of the current player
+	 */
 	public int getCurrentPlayerInt() {
 		return currentPlayerInt;
 	}
 
+	/**
+	 * 
+	 * @return the current player
+	 */
 	public Player getCurrentPlayer() {
-		return players.get(currentPlayerInt);
+		Player currentPlayer = players.get(currentPlayerInt);
+		return currentPlayer;
 	}
 
+	/**
+	 * 
+	 * @return the index of the dealer
+	 */
 	public int getDealerInt() {
 		return dealerPlayerInt;
 	}
 
+	/**
+	 * 
+	 * @return the index of the big blind
+	 */
 	public int getBigBlindPlayerInt() {
 		return bigBlindPlayerInt;
 	}
 
+	/**
+	 * 
+	 * @return the index of the small blind
+	 */
 	public int getSmallBlindPlayerInt() {
 		return smallBlindPlayerInt;
 	}
 
+	/**
+	 * 
+	 * @return the total pot
+	 */
 	public int getTotalPot() {
 		return totalPot;
 	}
 
+	/**
+	 * 
+	 * @return the current pot
+	 */
 	public int getCurrentPot() {
 		return currentPot;
 	}
 
+	/**
+	 * 
+	 * @return the current bet
+	 */
 	public int getCurrentBet() {
 		return currentBet;
 	}
 
+	/**
+	 * 
+	 * @return the index of the last player to play
+	 */
 	public int getLastPlayerToPlay() {
 		return lastPlayerToPlay;
 	}
 
+	/**
+	 * 
+	 * @return the dealer player
+	 */
 	public Player getDealerPlayer() {
 		return players.get(dealerPlayerInt);
 	}
 
+	/**
+	 * 
+	 * @return the small blind player
+	 */
 	public Player getSmallBlindPlayer() {
 		return players.get(smallBlindPlayerInt);
 	}
 
+	/**
+	 * 
+	 * @return the big blind player
+	 */
 	public Player getBigBlindPlayer() {
 		return players.get(bigBlindPlayerInt);
 	}
 
+	/**
+	 * 
+	 * @param player
+	 *            a player
+	 * @return the player on the right of the player
+	 */
 	public Player getAfterPlayer(Player player) {
 		int playerInt = this.players.indexOf(player);
 		if (playerInt == players.size() - 1)
@@ -970,54 +1124,106 @@ public class Game implements Serializable {
 			return players.get((playerInt % players.size()) + 1);
 	}
 
+	/**
+	 * 
+	 * @return the name of the game
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * 
+	 * @return the prize pool
+	 */
 	public int getPrizePool() {
 		return prizePool;
 	}
 
+	/**
+	 * 
+	 * @return a list representing the players by their rank
+	 */
 	public List<Player> getPlayersRank() {
 		return playersRank;
 	}
 
+	/**
+	 * 
+	 * @param currentB current bet to set
+	 */
 	public void setCurrentBet(int currentB) {
 		currentBet = currentB;
 	}
 
+	/**
+	 * 
+	 * @param currentP current pot to set
+	 */
 	public void setCurrentPot(int currentP) {
 		currentPot = currentP;
 	}
 
+	/**
+	 * 
+	 * @param totalP total pot to set
+	 */
 	public void setTotalPot(int totalP) {
 		totalPot = totalP;
 	}
 
+	/**
+	 * 
+	 * @param lrp index of last player to play to set
+	 */
 	public void setLastPlayerToPlay(int lrp) {
 		lastPlayerToPlay = lrp;
 	}
 
+	/**
+	 * 
+	 * @param cp index of current player to set
+	 */
 	public void setCurrentPlayer(int cp) {
 		currentPlayerInt = cp;
 	}
 
+	/**
+	 * 
+	 * @param i current round to set
+	 */
 	public void setCurrentRound(int i) {
 		currentRound = i;
 	}
 
+	/**
+	 * 
+	 * @param cards a list of flipped cards to set
+	 */
 	protected void setFlipedCards(List<Card> cards) {
 		flippedCards = cards;
 	}
 
+	/**
+	 * 
+	 * @param i index of the small blind player to set
+	 */
 	public void setSmallBlindPlayer(int i) {
 		smallBlindPlayerInt = i;
 	}
 
+	/**
+	 * 
+	 * @param i index of the big blind player to set
+	 */
 	public void setBigBlindPlayer(int i) {
 		bigBlindPlayerInt = i;
 	}
-	
+
+	/**
+	 * 
+	 * @param i index of the dealer player to set
+	 */
 	public void setDealerPlayer(int i) {
 		dealerPlayerInt = i;
 	}
@@ -1032,7 +1238,7 @@ public class Game implements Serializable {
 	/**
 	 * Verify if a game is ready to begin if it reaches the number of player
 	 * 
-	 * @see playerNumber in class Parameters
+	 * @see playerNumber in class GameType
 	 */
 	public boolean isReadyToStart() {
 
@@ -1114,14 +1320,17 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * Removes a player in the game
+	 * Removes a player from the game
+	 * 
+	 * @param playerName the name of the player to remove
 	 */
 	public void removePlayer(String playerName) {
 		players.remove(playerName);
 	}
 
 	/**
-	 * Returns the list of the current pots if it exists
+	 * 
+	 * @return the list of the current pots if it exits
 	 */
 	public List<Integer> getPots() {
 

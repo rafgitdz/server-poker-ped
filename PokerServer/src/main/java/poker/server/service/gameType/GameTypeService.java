@@ -96,11 +96,11 @@ public class GameTypeService extends AbstractPokerService {
 		param.setName(gameName);
 		param.setBlinds(smallBlind);
 		param.setPlayerNumber(playerNumber);
-		param.setPlayerTokens(playerTokens);
+		param.setInitPlayerTokens(playerTokens);
 		param.setBuyIn(buyIn);
 		param.setSpeakTime(speakTime);
-		param.setFactorUpdateBlind(factorUpdateBlind);
-		param.setUpdateBlindTime(updateBlindTime);
+		param.setFactorUpdateBlinds(factorUpdateBlind);
+		param.setTimeChangeBlind(updateBlindTime);
 		param.setPotType(potType);
 		param.setNumberWinners(numberOfWinners);
 
@@ -159,7 +159,7 @@ public class GameTypeService extends AbstractPokerService {
 			JSONObject jsonGameType = new JSONObject();
 			updateJSON(jsonGameType, "gameName", gameType.getName());
 			updateJSON(jsonGameType, "playerNumber", gameType.getPlayerNumber());
-			updateJSON(jsonGameType, "playerTokens", gameType.getPlayerTokens());
+			updateJSON(jsonGameType, "playerTokens", gameType.getTokens());
 			updateJSON(jsonGameType, "buyIn", gameType.getBuyIn());
 			updateJSON(jsonGameType, "speakTime", gameType.getSpeakTime());
 			updateJSON(jsonGameType, "smallBlind", gameType.getSmallBlind());
