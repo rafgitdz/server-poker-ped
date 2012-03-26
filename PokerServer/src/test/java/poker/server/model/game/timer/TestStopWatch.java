@@ -11,7 +11,7 @@ public class TestStopWatch {
 
 	@Before
 	public void beforeTest() {
-		stopSwatch = StopWatch.chrono(10);
+		stopSwatch = StopWatch.chrono(30);
 	}
 
 	private void wait(int seconds) {
@@ -43,13 +43,13 @@ public class TestStopWatch {
 		wait(3);
 		this.stopSwatch.stop();
 
-		assertEquals(8, stopSwatch.getTotalTime());
+		assertEquals(28, stopSwatch.getTotalTime());
 	}
 
 	@Test
 	public void testCountOver() {
 
-		wait(11);
+		wait(31);
 		assertEquals(false, stopSwatch.isRunning());
 	}
 }

@@ -103,7 +103,6 @@ public class TestRunGame {
 
 	@Test
 	public void testE_dealCards() {
-		game.dealCards();
 		int expectedDeckSize = 42;
 		int expectedHandSize = 2;
 
@@ -256,49 +255,14 @@ public class TestRunGame {
 
 	@Test
 	public void testI_end() {
+		assertEquals(4560, game.getTotalPot());
+		assertEquals(4, game.getCurrentRound());
+		assertEquals(0, game.getCurrentBet());
+		
+		game.showDown();
+		
 		assertEquals(0, game.getTotalPot());
 		assertEquals(0, game.getCurrentRound());
-
-		assertEquals(1520, game.getPlayers().get(0).getCurrentTokens());
-		assertEquals(1440, game.getPlayers().get(1).getCurrentTokens());
-		assertEquals(1520, game.getPlayers().get(2).getCurrentTokens());
-		assertEquals(1520, game.getPlayers().get(3).getCurrentTokens());
-		assertEquals(1500, game.getPlayers().get(4).getCurrentTokens());
+		assertEquals(0, game.getCurrentBet());
 	}
-
-	/*
-	 * @Test public void testI_tournant(){ int expectedDeckSize = 36;
-	 * 
-	 * assertEquals(2, game.getCurrentRound()); assertEquals(3120,
-	 * game.getTotalPot()); assertEquals(expectedDeckSize,
-	 * game.getDeck().getCards().size()); assertEquals(2,
-	 * game.getLastPlayerToPlay()); }
-	 * 
-	 * @Test public void testJ_bet(){ assertEquals(3, game.getCurrentPlayer());
-	 * game.currentPlayer().check();
-	 * 
-	 * assertEquals(game.getCurrentRound(), 2);
-	 * 
-	 * assertEquals(0, game.getCurrentPlayer()); game.currentPlayer().check(); }
-	 * 
-	 * @Test public void testK_river(){ int expectedDeckSize = 34;
-	 * 
-	 * assertEquals(game.getTotalPot(), 3200);
-	 * assertEquals(game.getDeck().getCards().size(), expectedDeckSize);
-	 * assertEquals(game.getCurrentRound(), 3); }
-	 * 
-	 * @Test public void testL_bet(){ assertEquals(game.getCurrentPlayer(), 3);
-	 * game.currentPlayer().check();
-	 * 
-	 * assertEquals(game.getCurrentPlayer(), 0); game.currentPlayer().check(); }
-	 * 
-	 * @Test public void testM_end(){ assertEquals(game.getTotalPot(), 0);
-	 * assertEquals(game.getCurrentRound(), 0);
-	 * 
-	 * assertEquals(game.players.get(0).getCurrentTokens(), 1600);
-	 * assertEquals(game.players.get(1).getCurrentTokens(), 1400);
-	 * assertEquals(game.players.get(2).getCurrentTokens(), 1400);
-	 * assertEquals(game.players.get(3).getCurrentTokens(), 1600);
-	 * assertEquals(game.players.get(4).getCurrentTokens(), 1500); }
-	 */
 }

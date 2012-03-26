@@ -709,7 +709,8 @@ public class Game implements Serializable {
 			}
 
 		} while (players.get(currentPlayerInt).isfolded()
-				|| players.get(currentPlayerInt).isAllIn());
+				|| players.get(currentPlayerInt).isAllIn()
+				|| players.get(currentPlayerInt).getCurrentTokens()==0);
 
 	}
 
@@ -1015,6 +1016,10 @@ public class Game implements Serializable {
 
 	public void setBigBlindPlayer(int i) {
 		bigBlindPlayerInt = i;
+	}
+	
+	public void setDealerPlayer(int i) {
+		dealerPlayerInt = i;
 	}
 
 	/**

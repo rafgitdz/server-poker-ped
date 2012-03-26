@@ -43,7 +43,6 @@ public class TestRound {
 		game.add(player5);
 
 		game.start();
-		game.dealCards();
 	}
 
 	private void playersPlayingPreFlop() {
@@ -111,12 +110,14 @@ public class TestRound {
 	public void testFlop() {
 		testPreFlop();
 		int totalPotBefore = game.getTotalPot();
+		assertEquals(3, game.flippedCards.size());
 	
 		playersPlaying();
 		
 		int expectedTotalPot = totalPotBefore + 80*4;
 		expectedDeckAfterPlayingFlop = expectedDeckAfterPlayingPreFlop - 2;
-		
+
+		assertEquals(4, game.flippedCards.size());
 		assertEquals(expectedDeckAfterPlayingFlop, game.getDeck().getCards().size());
 		assertEquals(2, game.getCurrentRound());
 		assertEquals(expectedTotalPot, game.getTotalPot());
@@ -134,33 +135,28 @@ public class TestRound {
 		assertEquals(840, player2.getCurrentTokens());
 		assertEquals(1480, player3.getCurrentTokens());
 		assertEquals(0, player4.getCurrentTokens());
-		assertEquals(4340, player5.getCurrentTokens());
+		assertEquals(0, player5.getCurrentTokens());
 		
 		int expectedTotalTokens = game.getGameType().getTokens() * game.getGameType().getPlayerNumber();
 		int actual = 0;
 		for(Player player : game.getPlayers()){
 			actual += player.getCurrentTokens();
 		}
+		actual += game.getTotalPot();
 		
 		assertEquals(expectedTotalTokens, actual);
 		
 		assertEquals(1, game.getGameLevel());
-		assertEquals(0, game.getCurrentRound());
-		assertEquals(0, game.getTotalPot());
+		assertEquals(4, game.getCurrentRound());
+		assertEquals(4340, game.getTotalPot());
 		assertEquals(0, game.getCurrentBet());
-		
-		assertEquals(player2, game.getDealerPlayer());
-		assertEquals(player3, game.getSmallBlindPlayer());
-		assertEquals(player5, game.getBigBlindPlayer());
-		assertEquals(game.getSmallBlindPlayer(), game.getCurrentPlayer());
-		
-		assertEquals(player4, game.getPlayersRank().get(0));
 	}
 	
 	@Test
-	public void testFlopFold() {
+	public void testTournantFold() {
 		testFlop();
-		
+
+		assertEquals(4, game.flippedCards.size());
 		playersPlayingFold();
 		
 		assertEquals(840, player1.getCurrentTokens());
@@ -178,14 +174,9 @@ public class TestRound {
 		assertEquals(expectedTotalTokens, actual);
 		
 		assertEquals(1, game.getGameLevel());
-		assertEquals(0, game.getCurrentRound());
-		assertEquals(0, game.getTotalPot());
-		assertEquals(0, game.getCurrentBet());
-		
-		assertEquals(player2, game.getDealerPlayer());
-		assertEquals(player3, game.getSmallBlindPlayer());
-		assertEquals(player4, game.getBigBlindPlayer());
-		assertEquals(game.getSmallBlindPlayer(), game.getCurrentPlayer());
+		assertEquals(4, game.getCurrentRound());
+		assertEquals(2660, game.getTotalPot());
+		assertEquals(840, game.getCurrentBet());
 	}
 	
 	@Test
@@ -212,18 +203,18 @@ public class TestRound {
 		playersPlaying();
 		
 		assertEquals(1, game.getGameLevel());
-		assertEquals(0, game.getCurrentRound());
-		assertEquals(0, game.getTotalPot());
+		assertEquals(4, game.getCurrentRound());
+		assertEquals(3300, game.getTotalPot());
 		assertEquals(0, game.getCurrentBet());
+		
+		game.showDown();
 		
 		assertEquals(player2, game.getDealerPlayer());
 		assertEquals(player3, game.getSmallBlindPlayer());
 		assertEquals(player4, game.getBigBlindPlayer());
 		
-		assertEquals(680, player1.getCurrentTokens());
-		assertEquals(680, player2.getCurrentTokens());
-		assertEquals(1480, player3.getCurrentTokens());
-		assertEquals(680, player4.getCurrentTokens());
-		assertEquals(3660, player5.getCurrentTokens());
+		assertEquals(0, game.getCurrentRound());
+		assertEquals(0, game.getTotalPot());
+		assertEquals(0, game.getCurrentBet());
 	}
 }

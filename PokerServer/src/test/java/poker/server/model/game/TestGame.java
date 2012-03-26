@@ -3,15 +3,12 @@ package poker.server.model.game;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import poker.server.model.exception.GameException;
-import poker.server.model.game.card.Card;
 import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.SitAndGo;
 import poker.server.model.player.Player;
@@ -38,7 +35,6 @@ public class TestGame {
 
 	private int smallBlind;
 	private int bigBlind;
-	private List<Card> flipedCards;
 
 	@Before
 	public void beforeTest() {
@@ -50,8 +46,6 @@ public class TestGame {
 		player3 = playerFactory.newPlayer("youga", "youga");
 		player4 = playerFactory.newPlayer("balla", "balla");
 		player5 = playerFactory.newPlayer("xan", "xan");
-
-		flipedCards = new ArrayList<Card>();
 	}
 
 	@Test
@@ -302,41 +296,6 @@ public class TestGame {
 	}
 
 	@Test
-	public void testShowDown() {
-
-		game.add(player1);
-		game.add(player2);
-		game.add(player3);
-		game.add(player4);
-		game.add(player5);
-
-		game.setCurrentRound(4);
-
-		addCards(player1, Card.TWO_CLUB, Card.KING_HEART);
-		addCards(player2, Card.ACE_DIAMOND, Card.EIGHT_CLUB);
-		addCards(player3, Card.NINE_SPADE, Card.KING_SPADE);
-		addCards(player4, Card.FIVE_CLUB, Card.NINE_HEART);
-		addCards(player5, Card.SEVEN_HEART, Card.TWO_SPADE);
-
-		buildFlipedCards(Card.NINE_DIAMOND, Card.FIVE_SPADE, Card.KING_DIAMOND,
-				Card.TWO_DIAMOND, Card.EIGHT_HEART);
-
-		game.setFlipedCards(flipedCards);
-		game.start();
-
-		Map<String, Integer> actifWinners = new HashMap<String, Integer>();
-		actifWinners.put(player1.getName(), 2);
-		actifWinners.put(player3.getName(), 2);
-		actifWinners.put(player4.getName(), 2);
-
-		game.setCurrentPot(600);// simulate that we have a pot of 600 at the
-								// show down
-
-		Map<String, Integer> expectedWinners = game.showDown();
-		assertEquals(expectedWinners, actifWinners);
-	}
-
-	@Test
 	public void testVerifyIsMyTurn() {
 		game.add(player1);
 		game.add(player2);
@@ -404,49 +363,14 @@ public class TestGame {
 		game.add(player3);
 		game.add(player4);
 		game.add(player5);
-
-		game.start();
-		assertEquals(player4, game.getCurrentPlayer());
-
 		player5.setCurrentTokens(0);
-		game.nextPlayer();
-
-		assertEquals(player1, game.getCurrentPlayer());
-	}
-
-	@Test
-	public void testNextPlayerVerifyBetFalse() {
-		game.add(player1);
-		game.add(player2);
-		game.add(player3);
-		game.add(player4);
-		game.add(player5);
-
+		
 		game.start();
-
-		player1.setCurrentBet(30);
-		player2.setCurrentBet(20);
-		player3.setCurrentBet(20);
-		player4.setCurrentBet(20);
-		player5.setCurrentBet(20);
-
 		assertEquals(player4, game.getCurrentPlayer());
-		assertEquals(player3, game.getPlayers().get(game.getLastPlayerToPlay()));
 
 		game.nextPlayer();
+
 		assertEquals(player5, game.getCurrentPlayer());
-
-		game.nextPlayer();
-		assertEquals(player1, game.getCurrentPlayer());
-
-		game.nextPlayer();
-		assertEquals(player2, game.getCurrentPlayer());
-
-		game.nextPlayer();
-		assertEquals(player3, game.getCurrentPlayer());
-
-		game.nextPlayer();
-		assertEquals(player4, game.getCurrentPlayer());
 	}
 
 	@Test
@@ -540,6 +464,7 @@ public class TestGame {
 
 		game.nextPlayer();
 		assertEquals(1, game.getCurrentRound());
+		assertEquals(player2, game.getPlayers().get(game.getLastPlayerToPlay()));
 		assertEquals(player4, game.getCurrentPlayer());
 		player4.setAsFolded();
 
@@ -578,11 +503,6 @@ public class TestGame {
 		for (Player p : game.getPlayers()) {
 			assertEquals(0, p.getCurrentBet());
 		}
-
-		game.setCurrentRound(4);
-		game.updateRoundPotAndBets();
-
-		assertEquals(0, game.getTotalPot());
 	}
 
 	@Test
@@ -637,21 +557,6 @@ public class TestGame {
 		bigBlind = game.getBigBlind();
 	}
 
-	private void addCards(Player player, Card card1, Card card2) {
-		player.addCard(card1);
-		player.addCard(card2);
-	}
-
-	private void buildFlipedCards(Card card1, Card card2, Card card3,
-			Card card4, Card card5) {
-
-		flipedCards.add(card1);
-		flipedCards.add(card2);
-		flipedCards.add(card3); // flop
-		flipedCards.add(card4); // tournant
-		flipedCards.add(card5); // river
-	}
-
 	// POT ALL IN
 	@Test
 	public void testSplitPot() {
@@ -687,18 +592,7 @@ public class TestGame {
 		player2.raise(40);
 		player3.call();
 
-		/*
-		 * player4.call(); player5.fold(); player1.fold(); player2.call();
-		 * player3.check();
-		 * 
-		 * player2.check(); player3.check(); player4.check();
-		 * 
-		 * player2.check(); player3.check(); player4.check();
-		 * 
-		 * player2.check(); player3.check(); player4.check();
-		 */
-
-		int i;
+		/*int i;
 		for (i = 0; i < game.splitPots.size(); i++) {
 			System.out.print(game.splitPots.get(i).diffValue + " "
 					+ game.splitPots.get(i).valueReward + " ");
@@ -708,6 +602,6 @@ public class TestGame {
 						.getName()
 						+ "  ");
 			System.out.println();
-		}
+		}*/
 	}
 }

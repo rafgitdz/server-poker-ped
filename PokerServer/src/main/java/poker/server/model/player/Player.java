@@ -406,6 +406,7 @@ public class Player implements Serializable {
 
 	public void setAsDealer() {
 		role = DEALER;
+		game.setDealerPlayer(game.getPlayers().indexOf(this));
 	}
 
 	public void setAsBigBlind() {
