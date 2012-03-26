@@ -30,7 +30,7 @@ public class CompareHands {
 			Map<Player, Integer> playersWithHands) {
 
 		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
-		ranking = initRanks(playersWithHands, 1);
+		ranking = initRanks(playersWithHands, 0);
 
 		List<Player> playersToCompare = new ArrayList<Player>();
 
@@ -39,7 +39,7 @@ public class CompareHands {
 
 		Iterator<Entry<Player, Integer>> it;
 
-		for (int hv = 8; hv >= 0; hv--) {
+		for (int hv = 9; hv >= 0; hv--) {
 
 			it = playersWithHands.entrySet().iterator();
 			while (it.hasNext()) {
@@ -53,12 +53,12 @@ public class CompareHands {
 				}
 			}
 
-			worstRank = getWorstRank(ranking);
-			setMinRankTo(ranking, worstRank + 1, playersToCompare);
-
-			compareAllHands(ranking, playersToCompare, hv);
-
-			playersToCompare.clear();
+			if (playersToCompare.size() > 0) {
+				worstRank = getWorstRank(ranking);
+				setMinRankTo(ranking, worstRank + 1, playersToCompare);
+				compareAllHands(ranking, playersToCompare, hv);
+				playersToCompare.clear();
+			}
 		}
 
 		return ranking;
@@ -86,35 +86,37 @@ public class CompareHands {
 		Hand sortedRefHand, sortedCurrentHand;
 		int result, refRank, currentRank;
 
-		for (int i = 0; i < playersToCompare.size(); i++) {
+		if (playersToCompare.size() >= 2) {
+			for (int i = 0; i < playersToCompare.size(); i++) {
 
-			ref = playersToCompare.get(i);
+				ref = playersToCompare.get(i);
 
-			refHand = ref.getCurrentHand();
-			sortedRefHand = sortHand(refHand);
+				refHand = ref.getCurrentHand();
+				sortedRefHand = sortHand(refHand);
 
-			for (int j = i + 1; j < playersToCompare.size(); j++) {
+				for (int j = i + 1; j < playersToCompare.size(); j++) {
 
-				current = playersToCompare.get(j);
-				currentHand = current.getCurrentHand();
-				sortedCurrentHand = sortHand(currentHand);
+					current = playersToCompare.get(j);
+					currentHand = current.getCurrentHand();
+					sortedCurrentHand = sortHand(currentHand);
 
-				result = compareHands(sortedRefHand, sortedCurrentHand,
-						handValue);
+					result = compareHands(sortedRefHand, sortedCurrentHand,
+							handValue);
 
-				switch (result) {
-				case 1:
-					refRank = ranking.get(ref);
-					currentRank = refRank + 1;
-					ranking.put(current, currentRank);
-					break;
-				case -1:
-					currentRank = ranking.get(ref);
-					ranking = updateRanksFor(ranking, currentRank);
-					ranking.put(current, currentRank);
-					break;
-				default:
-					break;
+					switch (result) {
+					case 1:
+						refRank = ranking.get(ref);
+						currentRank = refRank + 1;
+						ranking.put(current, currentRank);
+						break;
+					case -1:
+						currentRank = ranking.get(ref);
+						ranking = updateRanksFor(ranking, currentRank);
+						ranking.put(current, currentRank);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
