@@ -678,4 +678,40 @@ public class TestCompareHands {
 		assertTrue(ranking.get(player4) == 1);
 		assertTrue(ranking.get(player5) == 3);
 	}
+	
+	@Test
+	public void testGetRanking2() {
+
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
+		
+		buildPlayerHand(player1, Card.QUEEN_CLUB, Card.QUEEN_CLUB,
+				Card.TEN_CLUB, Card.JACK_SPADE, Card.JACK_CLUB);
+		
+		buildPlayerHand(player2, Card.TWO_CLUB, Card.FOUR_DIAMOND,
+				Card.FIVE_SPADE, Card.EIGHT_CLUB, Card.EIGHT_CLUB);
+		
+		buildPlayerHand(player3, Card.KING_CLUB, Card.KING_CLUB,
+				Card.TWO_CLUB, Card.JACK_CLUB, Card.JACK_CLUB);
+		
+		buildPlayerHand(player4, Card.EIGHT_CLUB, Card.NINE_CLUB,
+				Card.TEN_CLUB, Card.JACK_CLUB, Card.QUEEN_CLUB);
+		
+		buildPlayerHand(player5, Card.TWO_DIAMOND, Card.EIGHT_CLUB,
+				Card.JACK_CLUB, Card.JACK_CLUB, Card.JACK_CLUB);
+		
+		Map<Player, Integer> playersWithHands = new HashMap<Player, Integer>();
+		playersWithHands.put(player1, 2);
+		playersWithHands.put(player2, 1);
+		playersWithHands.put(player3, 2);
+		playersWithHands.put(player4, 8);
+		playersWithHands.put(player5, 3);
+		
+		ranking = CompareHands.getRanking(playersWithHands);
+		
+		assertTrue(ranking.get(player1) == 4);
+		assertTrue(ranking.get(player2) == 5);
+		assertTrue(ranking.get(player3) == 3);
+		assertTrue(ranking.get(player4) == 1);
+		assertTrue(ranking.get(player5) == 2);
+	}
 }
