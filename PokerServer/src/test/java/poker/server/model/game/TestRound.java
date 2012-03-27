@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import poker.server.model.game.card.Card;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactory;
 import poker.server.model.player.PlayerFactoryLocal;

@@ -1,11 +1,5 @@
 package poker.server.service.auth;
 
-/**
- * @author PokerServerGroup
- * 
- *         Service class : AuthService
- */
-
 import java.util.UUID;
 
 import javax.ejb.EJB;
@@ -32,6 +26,23 @@ import poker.server.infrastructure.auth.AccessToken;
 import poker.server.infrastructure.auth.Consumer;
 import poker.server.infrastructure.auth.RequestToken;
 import poker.server.model.exception.ErrorMessage;
+
+/** 
+ * Service class : AuthService
+ *         
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see AuthProvider
+ * @see Consumer
+ * @see RequestToken
+ * @see AccessToken
+ */
 
 @Stateless
 @Path("auth/")

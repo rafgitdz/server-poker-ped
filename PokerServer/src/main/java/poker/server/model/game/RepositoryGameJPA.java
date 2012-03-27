@@ -44,7 +44,7 @@ public class RepositoryGameJPA extends RepositoryGenericJPA<Game, String>
 	public boolean exist(GameType param) {
 
 		Query q = em
-				.createQuery("SELECT g FROM AbstractParameters g WHERE g.name=:paramName AND g.numberOfCurrentGames = :num");
+				.createQuery("SELECT g FROM GameType g WHERE g.name=:paramName AND g.numberOfCurrentGames = :num");
 
 		q.setParameter("paramName", param.getName());
 		q.setParameter("num", 0);

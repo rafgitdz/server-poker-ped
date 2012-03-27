@@ -8,6 +8,20 @@ import org.json.JSONObject;
 
 import poker.server.model.exception.ErrorMessage;
 
+/**
+ * This abstract class implement PokerSevice's request management functions.
+ * <p>
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ *
+ * @see PokerService
+ */
 public abstract class AbstractPokerService implements PokerService {
 
 	private static final String CODE = "code";

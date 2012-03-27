@@ -1,11 +1,18 @@
 package poker.server.service.game;
 
 /**
- * @author PokerServerGroup
- * 
- *         Service class : GameService
+ * Service class : GameService
+ *         
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ *
+ * @see Game
  */
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
