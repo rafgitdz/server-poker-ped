@@ -22,6 +22,8 @@ PokerServer/.project
 PokerServer/readme.md
 PokerClient/
 Maven3/
-LoginManager/
+gwt-unitCache/
+.gwt
+*.gif
 PokerGameAdministration/
-Admin/
+LoginManager/
