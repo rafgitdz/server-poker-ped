@@ -9,6 +9,22 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+/**
+ * According to OAuth protocol, this entity is asked by a consumer application, and allows to communicate with the server.
+ * The consumer can't make a valid request without this token. 
+ * <p>
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Consumer
+ * @see RequestToken
+ */
 @Entity
 public class AccessToken implements Serializable {
 

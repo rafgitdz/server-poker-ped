@@ -1,13 +1,5 @@
 package poker.server.model.player;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model class : Player
- *         
- *  class Player manages the behaviors of a Player
- */
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +17,19 @@ import poker.server.model.game.Event;
 import poker.server.model.game.Game;
 import poker.server.model.game.card.Card;
 
+/**
+ * Manages all the entities and actions related to the player.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see showDown in class Game
+ */
 @Entity
 public class Player implements Serializable {
 
@@ -52,7 +57,7 @@ public class Player implements Serializable {
 
 	private String pwd;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
 	Game game;
 
@@ -87,14 +92,12 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * Constructor
+	 * Constructor. Builds an instance of a player.
 	 * 
 	 * @param nameE
 	 *            name of the player
 	 * @param pwD
-	 *            password of the player <br>
-	 * <br>
-	 *            Builds an instance of a player
+	 *            password of the player
 	 */
 	Player(String namE, String pwD) {
 
@@ -110,29 +113,43 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * Add the flip cards to the hand of the player
+	 * Add the flip cards to the hand of the player.
+	 * 
+	 * @param card
+	 *            the card to add
 	 */
 	public void addCard(Card card) {
 		currentHand.addCard(card);
 	}
 
 	/**
-	 * Update token when the player is the smallBlind or bigBlind
+	 * Update token when the player is the smallBlind or bigBlind.
+	 * 
+	 * @param token
+	 *            the amount of tokens to remove from the tokens of the player
 	 */
 	public void updateToken(int token) {
 		currentTokens -= token;
 	}
 
 	/**
-	 * Method to set the tokens win by the player if it has the best hand cards
+	 * Method to set the tokens win by the player if it has the best hand cards.
+	 * 
+	 * @param potWinner
+	 *            the amount of tokens to add to the tokens of the player
 	 */
 	public void reward(int potWinner) {
 		currentTokens += potWinner;
 	}
 
 	/**
-	 * Raise a number of tokens after verify he can do this based on the
-	 * concepts of the game (currentBet, currentTokens)
+	 * The player can raise during his turn.
+	 * 
+	 * @param quantity
+	 *            the quantity of tokens to raise
+	 * @exception PlayerException
+	 *                if the player doesn't raise enough or has not enough
+	 *                tokens to raise
 	 */
 	public void raise(int quantity) {
 
@@ -159,7 +176,10 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * Call the currentBet tokens if the player has an enough tokens to do it
+	 * The player can call during his turn.
+	 * 
+	 * @exception PlayerException
+	 *                if the player has not enough token to call
 	 */
 	public void call() {
 
@@ -186,7 +206,7 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * AllIn implies to bet all the tokens that the player has
+	 * The player can do an all in during his turn.
 	 */
 	public void allIn() {
 
@@ -207,7 +227,7 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * Fold implies to retry the player from the current round of poker
+	 * The player can fold his hand during his turn.
 	 */
 	public void fold() {
 
@@ -219,14 +239,18 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * Cancel the folded state of the player after begin a new round of poker
+	 * Cancel the folded state of the player after begin a new round of poker.
 	 */
 	public void unFold() {
 		folded = false;
 	}
 
 	/**
-	 * Check implies that the player passed her turn without leave the game
+	 * The player can check during his turn.
+	 * 
+	 * @exception PlayerException
+	 *                if the player's bet is not equals to the current bet of
+	 *                the game
 	 */
 	public void check() {
 
@@ -241,14 +265,21 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * Updates the current money after that the player is connected to a game
+	 * Updates the current money after that the player is connected to a game.
+	 * 
+	 * @param buyIn
+	 *            the amount of money to remove from the player's money
 	 */
 	public void updateMoney(int buyIn) {
 		money -= buyIn;
 	}
 
 	/**
-	 * Verifies if the player has enough money to play a game with a buyIn
+	 * Verifies if the player has enough money to play a game with a buyIn.
+	 * 
+	 * @param buyIn
+	 *            the buy in to compare with the player's money
+	 * @return false if he has not enough money, else true
 	 */
 	public boolean hasNecessaryMoney(int buyIn) {
 
@@ -260,7 +291,8 @@ public class Player implements Serializable {
 	/**
 	 * Evaluates the current hand after a showDown
 	 * 
-	 * @see showDown
+	 * @return the value of the hand
+	 * @see showDown in class Game
 	 */
 	public int evaluateHand() {
 		return currentHand.evaluateHand();
@@ -268,6 +300,9 @@ public class Player implements Serializable {
 
 	/**
 	 * Removes the card from the current hand of the player
+	 * 
+	 * @param card
+	 *            the card to remove
 	 */
 	public void removeCard(Card card) {
 		currentHand.removeCard(card);
@@ -282,8 +317,8 @@ public class Player implements Serializable {
 		return pwd;
 	}
 
-	public void getBestHand() {
-		System.out.println("getBestHand() : TODO");
+	public Hand getBestHand() {
+		return bestHand;
 	}
 
 	public Hand getCurrentHand() {
@@ -314,11 +349,18 @@ public class Player implements Serializable {
 		return roundAllIn;
 	}
 
+	/**
+	 * Remove a player from the game.
+	 */
 	public void setOutGame() {
 		connectionStatus = OUTGAME;
 		game.removePlayer(name);
 	}
 
+	/**
+	 * @return a map containing the possible actions of the player, and the
+	 *         value of tokens that he can used for each possible actions
+	 */
 	public Map<String, Integer> getPossibleActions() {
 
 		Map<String, Integer> possibleActions = new HashMap<String, Integer>();
@@ -446,10 +488,6 @@ public class Player implements Serializable {
 
 	public int getLastRaisedValue() {
 		return lastRaisedValue;
-	}
-
-	public void updateBestHand(Card c1, Card c2, Card c3) {
-		// update bestHand
 	}
 
 	public int getStatus() {

@@ -5,6 +5,23 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+/**
+ * According to OAuth protocol, this entity represent the consumer application. 
+ * After an authentication, it's allowed to communicate with the server.
+ * <p>
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ *         
+ * @see RequestToken
+ * @see AccessToken
+ */
+
 @Entity
 public class Consumer implements Serializable {
 

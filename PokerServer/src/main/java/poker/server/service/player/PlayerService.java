@@ -1,11 +1,5 @@
 package poker.server.service.player;
 
-/**
- * @author PokerServerGroup
- * 
- *         Service class : PlayerService
- */
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
@@ -24,17 +18,30 @@ import poker.server.model.player.Player;
 import poker.server.service.AbstractPokerService;
 import poker.server.service.sign.SignatureService;
 
+/**
+ * Service class : PlayerService
+ *         
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Player
+ */
 @Stateless
 @Path("/player")
 public class PlayerService extends AbstractPokerService {
 
-	private static final int FOLD = 1;
-	private static final int CALL = 2;
-	private static final int CHECK = 3;
-	private static final int ALLIN = 4;
-	private static final int RAISE = 5;
-	private static final int MISSING = 6;
-	private static final int DISCONNECT = 7;
+	public static final int FOLD = 1;
+	public static final int CALL = 2;
+	public static final int CHECK = 3;
+	public static final int ALLIN = 4;
+	public static final int RAISE = 5;
+	public static final int MISSING = 6;
+	public static final int DISCONNECT = 7;
 
 	@EJB
 	private RepositoryPlayer repositoryPlayer;

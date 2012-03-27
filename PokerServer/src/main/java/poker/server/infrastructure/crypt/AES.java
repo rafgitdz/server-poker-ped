@@ -12,14 +12,41 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * This involves some tools to encrypt and decrypt request strings, using AES
+ * algorithm.
+ * <p>
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ */
 public class AES {
 
 	private static String CIPHER_ALGORITHM = "AES";
-	@SuppressWarnings("unused")
 	private static String CIPHER_TRANSFORMATION = "SHA1PRNG";
 
 	private final static String HEX = "0123456789ABCDEF";
 
+	/**
+	 * Encrypt a clear text using AES algorithm.
+	 * 
+	 * @param seed
+	 *            The password given by the consumer to generate the encryption
+	 *            key. this password must be correct to start the encryption.
+	 * 
+	 * @param cleartext
+	 *            The string to encrypt.
+	 * 
+	 * @return The encrypted text, in hex format.
+	 * 
+	 * @throws Exception
+	 *             if the encrypting go wrong.
+	 */
 	public static String encrypt(String seed, String cleartext)
 			throws Exception {
 
@@ -28,6 +55,18 @@ public class AES {
 		return toHex(ciphertext);
 	}
 
+	/**
+	 * decrypt an encrypted text using AES algorithm.
+	 * 
+	 * @param seed
+	 *            The password given by the consumer to generate the encryption
+	 *            key. this password must be correct to reverse the encryption.
+	 * 
+	 * @param encrypted
+	 *            The encrypted string to decrypt.
+	 * 
+	 * @return The decrypted clear text.
+	 */
 	public static String decrypt(String seed, String encrypted) {
 
 		byte[] RAWKey = null;
@@ -47,11 +86,21 @@ public class AES {
 		return new String(plaintext);
 	}
 
+	/**
+	 * Get the key, generated from a password given by the consumer. This key is
+	 * required to start the encryption/decryption process.
+	 * 
+	 * @param seed
+	 *            The password given by the consumer to generate the key.
+	 * 
+	 * @return Generated encryption/decryption key represented by an array of
+	 *         Byte.
+	 * @see Byte
+	 */
 	private static byte[] getRawKey(byte[] seed) throws Exception {
 
 		KeyGenerator keygen = KeyGenerator.getInstance(CIPHER_ALGORITHM);
-		// SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
-		SecureRandom sr = new SecureRandom();
+		SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
 		sr.setSeed(seed);
 		keygen.init(128, sr);
 		SecretKey skey = keygen.generateKey();
@@ -59,6 +108,21 @@ public class AES {
 		return raw;
 	}
 
+	/**
+	 * Encrypt a clear text using a given encryption key
+	 * 
+	 * @param raw
+	 *            an array of Byte, representing the encryption key.
+	 * 
+	 * @param clear
+	 *            The string to encrypt.
+	 * 
+	 * @return An array of Byte representing the encrypted text, .
+	 * 
+	 * @throws Exception
+	 *             if the encrypting go wrong.
+	 * @see Byte
+	 */
 	private static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
 
 		SecretKeySpec skeySpec = new SecretKeySpec(raw, CIPHER_ALGORITHM);
@@ -68,6 +132,18 @@ public class AES {
 		return encrypted;
 	}
 
+	/**
+	 * Decrypt an encrypted text using a given encryption key
+	 * 
+	 * @param raw
+	 *            An array of Byte, representing the encryption key.
+	 * 
+	 * @param encrpted
+	 *            An array of Byte, representing the encrypted text.
+	 * 
+	 * @return An array of Byte representing the decrypted text.
+	 * @see Byte
+	 */
 	private static byte[] decrypt(byte[] raw, byte[] encrypted) {
 
 		SecretKeySpec skeySpec = new SecretKeySpec(raw, CIPHER_ALGORITHM);

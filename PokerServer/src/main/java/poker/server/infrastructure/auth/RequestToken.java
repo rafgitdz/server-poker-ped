@@ -9,6 +9,23 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+/**
+ * According to OAuth protocol, this entity is required to make an AccessToken request. 
+ * So, the first step for the consumer to authenticate, is to get this first RequestToken entity.
+ * After an authentication, the consumer is allowed to communicate with the server.
+ * <p>
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ *         
+ * @see Consumer
+ * @see AccessToken
+ */
 @Entity
 public class RequestToken implements Serializable {
 

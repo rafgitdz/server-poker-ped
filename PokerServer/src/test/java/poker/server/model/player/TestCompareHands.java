@@ -36,6 +36,7 @@ public class TestCompareHands {
 
 		Hand sortedHand = CompareHands.sortHand(hand);
 		player.setCurrentHand(sortedHand);
+		player.setBestHand(sortedHand);
 	}
 
 	@Before

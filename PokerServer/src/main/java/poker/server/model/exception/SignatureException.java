@@ -1,13 +1,18 @@
 package poker.server.model.exception;
 
 /**
- * @author PokerServerGroup
+ * Handle the signature exceptions.
  * 
- * @exception SignatureException
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
  * 
- *                Exception launched after an error detected in the treatment
+ * @see RuntimeException
  */
-
 public class SignatureException extends RuntimeException {
 
 	private static final long serialVersionUID = 4981858401709109438L;

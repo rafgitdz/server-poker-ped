@@ -1,20 +1,31 @@
 package poker.server.model.game.parameters;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model class : SitAndGo
- */
-
 import java.util.ArrayList;
 
 import javax.persistence.Entity;
 
+/**
+ * This class extends the GameType class, to represent the sit and go parameters
+ * used by a game.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see GameType
+ */
 @Entity
 public class SitAndGo extends GameType {
 
 	private static final long serialVersionUID = 6407941111548541169L;
 
+	/**
+	 * Default constructor.
+	 */
 	public SitAndGo() {
 
 		name = "Labri_Texas_Holdem_SitAndGo";
