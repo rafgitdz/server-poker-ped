@@ -14,7 +14,6 @@ package poker.server.service.game;
  * @see Game
  */
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,10 +41,12 @@ import poker.server.model.game.GameFactoryLocal;
 import poker.server.model.game.Pot;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.parameters.GameType;
+import poker.server.model.player.Hand;
 import poker.server.model.player.Player;
 import poker.server.model.player.PlayerFactoryLocal;
 import poker.server.service.AbstractPokerService;
 import poker.server.service.game.timer.TimerUpdateBlinds;
+import poker.server.service.player.PlayerService;
 import poker.server.service.sign.SignatureService;
 
 @Stateless
@@ -199,7 +200,7 @@ public class GameService extends AbstractPokerService {
 			Game newGame = gameFactory.newGame();
 			newGame = repositoryGame.save(newGame);
 			currentGames.add(newGame);
-			
+
 		} else if (currentGames.size() < parameters.size()) {
 
 			for (GameType param : parameters) {
@@ -335,11 +336,24 @@ public class GameService extends AbstractPokerService {
 			return error(e.getError());
 		}
 
-		Map<String, List<Integer>> playersCards = getPlayersCards(game);
+		JSONArray jsonWinnersPot = new JSONArray();
+
+		for (Pot pot : winners) {
+
+			for (Player player : pot.getPlayers()) {
+
+				JSONObject jsonWinner = new JSONObject();
+				updateJSON(jsonWinner, "winner", player.getName());
+				updateJSON(jsonWinner, "cards", getCards(player.getBestHand()));
+				updateJSON(jsonWinner, "pot", pot.getValueReward());
+				updateJSON(jsonWinner, "idPot", pot.getId());
+
+				jsonWinnersPot.put(jsonWinner);
+			}
+		}
 
 		updateJSON(json, STAT, OK);
-		updateJSON(json, "winners", winners);
-		updateJSON(json, "playerCards", playersCards);
+		updateJSON(json, "winners", jsonWinnersPot);
 
 		return buildResponse(json);
 	}
@@ -347,6 +361,18 @@ public class GameService extends AbstractPokerService {
 	/***********************
 	 * END OF THE SERVICES *
 	 ***********************/
+
+	/**
+	 * Returns the list of the cards that represent the best hand
+	 */
+	private JSONArray getCards(Hand bestHand) {
+
+		JSONArray jsonCards = new JSONArray();
+		for (Card card : bestHand.getCards()) {
+			jsonCards.put(card.getId());
+		}
+		return jsonCards;
+	}
 
 	/**
 	 * Returns the status of the game
@@ -408,7 +434,7 @@ public class GameService extends AbstractPokerService {
 		updateJSON(json, "currentPlayer", currentGame.getCurrentPlayer()
 				.getName());
 
-		List<JSONObject> playersInfos = new ArrayList<JSONObject>();
+		JSONArray playersInfos = new JSONArray();
 
 		for (Player player : currentGame.getPlayers()) {
 
@@ -419,7 +445,7 @@ public class GameService extends AbstractPokerService {
 			updateJSON(jsonPlayer, "value", 0);
 			updateJSON(jsonPlayer, "status", player.getStatus());
 
-			playersInfos.add(jsonPlayer);
+			playersInfos.put(jsonPlayer);
 		}
 
 		updateJSON(json, "players", playersInfos);
@@ -440,7 +466,7 @@ public class GameService extends AbstractPokerService {
 
 		List<Player> playersRank = currentGame.getPlayersRank();
 
-		List<JSONObject> playersRanks = new ArrayList<JSONObject>();
+		JSONArray playersRanks = new JSONArray();
 
 		for (Player player : playersRank) {
 
@@ -448,35 +474,46 @@ public class GameService extends AbstractPokerService {
 			updateJSON(jsonPlayer, "position", playersRank.indexOf(player));
 			updateJSON(jsonPlayer, "name", player.getName());
 
-			playersRanks.add(jsonPlayer);
+			playersRanks.put(jsonPlayer);
 		}
 
 		updateJSON(json, "playerRanks", playersRanks);
 
-		return json;
-	}
+		JSONArray possibleActions = new JSONArray();
 
-	/**
-	 * Returns the current two cards for every player
-	 * 
-	 * @return
-	 * 
-	 */
-	private Map<String, List<Integer>> getPlayersCards(Game game) {
+		for (Player player : currentGame.getPlayers()) {
 
-		List<Player> players = game.getPlayers();
-		Map<String, List<Integer>> playersCards = new HashMap<String, List<Integer>>();
+			JSONObject possibleAction = new JSONObject();
 
-		for (Player player : players) {
+			if (player.isInGame() && !player.isfolded()) {
 
-			List<Integer> cards = new ArrayList<Integer>();
-			for (Card card : player.getCurrentHand().getCards())
-				cards.add(card.getId());
+				Map<String, Integer> possActions = player.getPossibleActions();
 
-			playersCards.put(player.getName(), cards);
+				if (possActions.containsKey("check"))
+					updateJSON(possibleAction, "action", PlayerService.CHECK);
+				if (possActions.containsKey("allIn"))
+					updateJSON(possibleAction, "action", PlayerService.ALLIN);
+				if (possActions.containsKey("raise")) {
+					updateJSON(possibleAction, "action", PlayerService.RAISE);
+					updateJSON(possibleAction, "value",
+							possActions.get("raise"));
+				}
+				if (possActions.containsKey("fold"))
+					updateJSON(possibleAction, "action", PlayerService.FOLD);
+				if (possActions.containsKey("call"))
+					updateJSON(possibleAction, "action", PlayerService.CALL);
+			}
+
+			JSONObject jsonActionsPlayer = new JSONObject();
+			updateJSON(jsonActionsPlayer, "playerName", player.getName());
+			updateJSON(jsonActionsPlayer, "actions", possibleAction);
+
+			possibleActions.put(jsonActionsPlayer);
 		}
 
-		return playersCards;
+		updateJSON(json, "possibleActions", possibleActions);
+		
+		return json;
 	}
 
 	/**

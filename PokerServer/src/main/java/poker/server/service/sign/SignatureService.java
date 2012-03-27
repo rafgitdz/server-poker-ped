@@ -11,7 +11,7 @@ import poker.server.service.auth.AuthProvider;
 
 /**
  * Service class : SignatureService
- *         
+ * 
  * @author <b> Rafik Ferroukh </b> <br>
  *         <b> Lucas Kerdoncuff </b> <br>
  *         <b> Xan Lucu </b> <br>
@@ -19,7 +19,7 @@ import poker.server.service.auth.AuthProvider;
  *         <b> Balla Seck </b> <br>
  * <br>
  *         University Bordeaux 1, Software Engineering, Master 2 <br>
- *         
+ * 
  * @see Consumer
  * @see AccessToken
  * @see RequestToken
@@ -63,8 +63,11 @@ public class SignatureService {
 		if (consumer == null)
 			throw new SignatureException(ErrorMessage.UNKNOWN_CONSUMER_KEY);
 
+		// Uncomment these lines to enable AES Encryption
+
 		// String seed = consumer.getSecret();
 		// String clearCustomer = AES.decrypt(seed, signature);
+
 		String clearCustomer = signature;
 		String[] infos = clearCustomer.split("&");
 

@@ -57,7 +57,7 @@ public class Player implements Serializable {
 
 	private String pwd;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "game_Id")
 	Game game;
 

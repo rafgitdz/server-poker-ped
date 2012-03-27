@@ -105,6 +105,7 @@ public class OtherGameType extends GameType {
 		this.buyIn = buyIn;
 		this.speakTime = speakTime;
 		this.smallBlind = smallBlind;
+		this.bigBlind = factorUpdateBlind * smallBlind;
 		this.factorUpdateBlinds = factorUpdateBlind;
 		this.timeChangeBlind = updateBlindTime;
 

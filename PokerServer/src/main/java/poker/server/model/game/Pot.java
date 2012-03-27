@@ -46,11 +46,11 @@ public class Pot implements Serializable {
 	@IndexColumn(name = "playerPotIndex")
 	List<Player> players;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pot_Id")
-	@IndexColumn(name = "playerWinnerPotIndex")
-	List<Player> playersWinners;
-	
+	// @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	// @JoinColumn(name = "pot_Id")
+	// @IndexColumn(name = "playerWinnerPotIndex")
+	transient List<Player> playersWinners;
+
 	int valueReward;
 	int diffValue;
 
@@ -77,6 +77,9 @@ public class Pot implements Serializable {
 			this.players = new ArrayList<Player>();
 
 		players.add(player);
+
+		// this.playersWinners = new ArrayList<Player>();
+		// playersWinners.add(player); // only to avoid hibernate error
 	}
 
 	/**
@@ -124,6 +127,7 @@ public class Pot implements Serializable {
 	 *            the list of the winners to set
 	 */
 	public void setPlayersWinners(List<Player> playersWinners) {
+		this.playersWinners = null;
 		this.playersWinners = playersWinners;
 	}
 
@@ -145,5 +149,9 @@ public class Pot implements Serializable {
 	public void addPlayer(Player player) {
 		if (!this.players.contains(player))
 			players.add(player);
+	}
+
+	public int getId() {
+		return id;
 	}
 }

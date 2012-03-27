@@ -28,6 +28,7 @@ public class TestRound {
 
 	@Before
 	public void beforeTest() {
+		
 		game = gameFactory.newGame();
 
 		player1 = playerFactory.newPlayer("rafik", "rafik");

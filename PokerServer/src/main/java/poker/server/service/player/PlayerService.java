@@ -35,13 +35,13 @@ import poker.server.service.sign.SignatureService;
 @Path("/player")
 public class PlayerService extends AbstractPokerService {
 
-	private static final int FOLD = 1;
-	private static final int CALL = 2;
-	private static final int CHECK = 3;
-	private static final int ALLIN = 4;
-	private static final int RAISE = 5;
-	private static final int MISSING = 6;
-	private static final int DISCONNECT = 7;
+	public static final int FOLD = 1;
+	public static final int CALL = 2;
+	public static final int CHECK = 3;
+	public static final int ALLIN = 4;
+	public static final int RAISE = 5;
+	public static final int MISSING = 6;
+	public static final int DISCONNECT = 7;
 
 	@EJB
 	private RepositoryPlayer repositoryPlayer;

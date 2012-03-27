@@ -25,6 +25,7 @@
 			work with JBoss EAP 6. It requires you have access to the JBoss EAP 6 maven 
 			repository. -->
 		<!-- <javaee6.web.spec.version>3.0.0.Beta1-redhat-1</javaee6.web.spec.version> -->
+		<skipTests>true</skipTests>
 	</properties>
 
 	<dependencyManagement>
@@ -227,13 +228,8 @@
 			</activation>
 			<build>
 				<plugins>
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.4.3</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
+	<!-- <plugin> <artifactId>maven-surefire-plugin</artifactId> <version>2.4.3</version> 
+		<configuration> <skip>true</skip> </configuration> </plugin> -->
 				</plugins>
 
 			</build>
