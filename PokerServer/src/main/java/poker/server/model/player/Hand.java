@@ -1,11 +1,5 @@
 package poker.server.model.player;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model class : Hand
- */
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +16,23 @@ import javax.persistence.OneToMany;
 import org.hibernate.annotations.IndexColumn;
 
 import poker.server.model.exception.PlayerException;
+import poker.server.model.game.Game;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Value;
 
+/**
+ * This class represents an hand. Each player has one of this.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Game
+ */
 @Entity
 public class Hand implements Serializable {
 
@@ -51,19 +59,39 @@ public class Hand implements Serializable {
 	@IndexColumn(name = "cardHandIndex")
 	List<Card> cards;
 
+	/**
+	 * Default constructor.
+	 */
 	public Hand() {
 		cards = new ArrayList<Card>();
 	}
 
+	/**
+	 * Add a list of cards to the hand.
+	 * 
+	 * @param addCards
+	 *            a list of cards
+	 */
 	public void addCards(List<Card> addCards) {
 		for (Card c : addCards)
 			cards.add(c);
 	}
 
+	/**
+	 * Add a card to the hand.
+	 * 
+	 * @param card
+	 *            a card
+	 */
 	public void addCard(Card card) {
 		cards.add(card);
 	}
 
+	/**
+	 * Evaluate the hand.
+	 * 
+	 * @return the value of the hand
+	 */
 	public int evaluateHand() {
 
 		if (cards.size() != 5)
@@ -272,6 +300,10 @@ public class Hand implements Serializable {
 		return bestCard;
 	}
 
+	/**
+	 * 
+	 * @return the list of the card from the hand
+	 */
 	public List<Card> getCards() {
 		return this.cards;
 	}
@@ -280,7 +312,6 @@ public class Hand implements Serializable {
 
 		int count = 1;
 		Card firstCard = tempCards.get(pos);
-		// tempCards.remove(0);
 
 		for (int i = pos + 1; i < tempCards.size(); ++i) {
 			if (tempCards.get(i).getValue() == firstCard.getValue())
@@ -289,6 +320,10 @@ public class Hand implements Serializable {
 		return count;
 	}
 
+	/**
+	 * Sort the list of cards.
+	 * @param tempCards a list of cards
+	 */
 	public void sort(List<Card> tempCards) {
 
 		for (int i = 0; i < tempCards.size(); ++i) {
@@ -304,10 +339,18 @@ public class Hand implements Serializable {
 		}
 	}
 
+	/**
+	 * 
+	 * @return the size of the hand
+	 */
 	public int getSize() {
 		return cards.size();
 	}
 
+	/**
+	 * Remove a card from the hand.
+	 * @param card the card to remove
+	 */
 	public void removeCard(Card card) {
 		cards.remove(card);
 	}

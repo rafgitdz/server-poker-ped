@@ -8,7 +8,7 @@ import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.ParametersException;
 
 /**
- * This class is useful to create other game type.
+ * This class is used to create other game type.
  * 
  * @author <b> Rafik Ferroukh </b> <br>
  *         <b> Lucas Kerdoncuff </b> <br>
@@ -31,6 +31,23 @@ public class OtherGameType extends GameType {
 	public OtherGameType() {
 	}
 
+	/**
+	 * Constructor with parameters.
+	 * 
+	 * @param name
+	 * @param potType
+	 * @param buyIn
+	 * @param buyInIncreasing
+	 * @param multFactor
+	 * @param bigBlind
+	 * @param smallBlind
+	 * @param initPlayersTokens
+	 * @param playerNumber
+	 * @param speakTime
+	 * @param timeChangeBlind
+	 * @param numberOfWinners
+	 * @param percentReward
+	 */
 	public OtherGameType(String name, int potType, int buyIn,
 			int buyInIncreasing, int multFactor, int bigBlind, int smallBlind,
 			int initPlayersTokens, int playerNumber, int speakTime,
@@ -64,6 +81,20 @@ public class OtherGameType extends GameType {
 		numberOfCurrentGames = 0;
 	}
 
+	/**
+	 * Constructor 2 with different parameters
+	 * 
+	 * @param gameName
+	 * @param playerNumber
+	 * @param playerTokens
+	 * @param buyIn
+	 * @param speakTime
+	 * @param smallBlind
+	 * @param factorUpdateBlind
+	 * @param updateBlindTime
+	 * @param potType
+	 * @param numberOfWinners
+	 */
 	public OtherGameType(String gameName, int playerNumber, int playerTokens,
 			int buyIn, int speakTime, int smallBlind, int factorUpdateBlind,
 			int updateBlindTime, int potType, int numberOfWinners) {

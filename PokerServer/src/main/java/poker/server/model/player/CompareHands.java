@@ -7,13 +7,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import poker.server.model.game.Game;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Value;
 
+/**
+ * This class is used to compare a set of hands. Their functions are used at the
+ * showdown round, to sort the player by rank, and create a ranking list.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Game
+ */
 public class CompareHands {
 
 	/**
-	 * Main function of this class... Return the ranking of given players.
+	 * Main function of this class. Return the ranking of given players.
 	 * 
 	 * @param playersWithHands
 	 *            map associating players with their hand value
@@ -161,6 +176,12 @@ public class CompareHands {
 	// //////////////////////////////////////////////
 	// ////////////////////////////////////////////////////
 
+	/**
+	 * 
+	 * @param hand
+	 *            the hand to sort
+	 * @return the hand sorted
+	 */
 	public static Hand sortHand(Hand hand) {
 
 		Hand sortedHand = new Hand();
@@ -185,7 +206,7 @@ public class CompareHands {
 	}
 
 	/**
-	 * Function used in all comparaisons from this classe. Compare two integer
+	 * Function used in all comparaisons from this class. Compare two integer
 	 * values.
 	 * 
 	 * @param rank1

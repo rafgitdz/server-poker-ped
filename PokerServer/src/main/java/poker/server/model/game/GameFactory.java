@@ -4,7 +4,6 @@ import javax.ejb.Stateless;
 
 import poker.server.model.game.parameters.GameType;
 
-
 /**
  * Implements the interface GameFactoryLocal.
  * 

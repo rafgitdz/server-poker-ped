@@ -1,11 +1,5 @@
 package poker.server.model.game.parameters;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model-Infrastructure class : RepositoryGameJPA
- */
-
 import javax.ejb.Stateless;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -13,6 +7,18 @@ import javax.persistence.Query;
 import poker.server.infrastructure.RepositoryGenericJPA;
 import poker.server.infrastructure.RepositoryGameType;
 
+/**
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see GameType
+ */
 @Stateless
 public class RepositoryGameTypeJPA extends
 		RepositoryGenericJPA<GameType, String> implements RepositoryGameType {
