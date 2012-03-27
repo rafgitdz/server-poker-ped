@@ -1,0 +1,85 @@
+body {
+	background-color: white;
+	color: black;
+	font-family: Arial, sans-serif;
+	font-size: small;
+	margin: 5px;
+}
+
+a {
+	color: darkblue;
+}
+
+a:visited {
+	color: darkblue;
+}
+
+.LoginWidget {
+	margin-right: 50%;
+	margin-left: 28%;
+	width: 580px;
+	height: 344px;
+	border: 2px solid #C3D9FF;
+}
+
+.FlexTable {
+	border: 2px solid green;
+}
+
+.LabelResultFlexTable {
+	font-size: 16px;
+}
+
+.Title {
+	color: Blue;
+	font-size: 46px;
+	font-style: normal;
+	font-family: Algerian;
+}
+
+.gwt-Label-Login {
+	color: Black;
+	font-stretch: normal;
+	font-variant: normal;
+	font-style: normal;
+	font-family: fantasy;
+	font-weight: 100;
+}
+
+.gwt-CheckBox-Login {
+	color: Black;
+	font-size: 16px;
+	font-style: italic;
+	font-family: cursive;
+	font-weight: bold;
+}
+
+.gwt-Label-loginBis {
+	font-size: 16px;
+	font-style: normal;
+	font-family: Baskerville Old Face;
+}
+
+.gwt-Button-Login {
+	width: 100px;
+	font-size: 16px;
+	margin-left: 5px;
+	font-family: Baskerville Old Face;
+	cursor: pointer;
+}
+
+.gwt-LabelPGA {
+	color: Blue;
+	font-size: 24px;
+	font-style: normal;
+	font-family: Algerian;
+}
+
+.gwt-Celllist-admin {
+	box-shadow: 1px 1px 2px #C0C0C0 inset;
+	color: Blue;
+	padding: 3px;
+	border: 3px solid black;
+	font-size: 20px;
+	font-family: Bodoni MT Black;
+}

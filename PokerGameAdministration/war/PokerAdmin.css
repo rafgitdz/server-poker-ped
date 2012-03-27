@@ -1,0 +1,239 @@
+body {
+	background-color: white;
+	color: black;
+	font-family: Arial, sans-serif;
+	font-size: small;
+	margin: 5px;
+}
+
+a {
+	color: darkblue;
+}
+
+a:visited {
+	color: darkblue;
+}
+
+.AdminWidget {
+	margin-left: 25%;
+	margin-right: 25%;
+	height: 50%;
+	width: 50%;
+	border-style: ridge;
+	border-width: 2px;
+}
+
+.AuthWidget {
+	margin-left: 40%;
+	margin-bottom: 100%;
+	font-size: 30%;
+}
+
+.LoginAuthLabel {
+	font-size: 16px;
+	font-style: normal;
+	font: lighter;
+}
+
+.OkButton {
+	font-size: 16px;
+	font-style: normal;
+	font: lighter;
+}
+
+.HelpDialogBox {
+	font-size: 16px;
+	font-style: normal;
+	font: lighter;
+}
+
+.Title {
+	font-size: 25%;
+}
+
+.gwt-DialogBox {
+	border: 2px solid #AAAAAA;
+	background-color: white;
+}
+
+.gwt-DialogBox .Caption {
+	background-image: url(gray_gradient.gif);
+	background-repeat: repeat-x;
+	padding: 4px;
+	padding-bottom: 8px;
+	font-weight: bold;
+	cursor: default;
+}
+
+.gwt-HorizontalSplitPanel {
+	border: 3px solid #FFFFF;
+}
+
+.gwt-HorizontalSplitPanel .splitter {
+	background-color: #C3D9FF;
+	cursor: move;
+}
+
+.gwt-HorizontalSplitPanel .left {
+	background-color: #E8EEF7;
+}
+
+.gwt-VerticalSplitPanel {
+	border-width: 1px thin;
+}
+
+.gwt-VerticalSplitPanel .splitter {
+	background-color: #C3D9FF;
+	height: 8px;
+	cursor: move;
+}
+
+.gwt-SuggestBoxPopup {
+	border: 2px solid #C3D9FF;
+}
+
+.gwt-PushButton-down-hovering {
+	background-color: #C3D9FF;
+	padding: 2px;
+	border: 2px solid transparent;
+	border-color: #9DAECD rgb(232, 241, 255) rgb(232, 241, 255)
+		rgb(157, 174, 205);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.gwt-ToggleButton-up {
+	background-color: #C3D9FF;
+	padding: 2px;
+	border: 2px solid transparent;
+	border-color: #E8F1FF rgb(157, 174, 205) rgb(157, 174, 205)
+		rgb(232, 241, 255);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.gwt-ToggleButton-up-hovering {
+	background-color: #C3D9FF;
+	padding: 2px;
+	border: 2px solid transparent;
+	border-color: #E8F1FF rgb(157, 174, 205) rgb(157, 174, 205)
+		rgb(232, 241, 255);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.gwt-ToggleButton-down {
+	background-color: #C3D9FF;
+	padding: 2px;
+	background-color: #E8F1FF;
+	border: 2px solid transparent;
+	border-color: #9DAECD rgb(232, 241, 255) rgb(232, 241, 255)
+		rgb(157, 174, 205);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.gwt-ToggleButton-down-hovering {
+	background-color: #C3D9FF;
+	padding: 2px;
+	background-color: #E8F1FF;
+	border: 2px solid transparent;
+	border-color: #9DAECD rgb(232, 241, 255) rgb(232, 241, 255)
+		rgb(157, 174, 205);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.gwt-SuggestBoxPopup .item {
+	padding: 2px;
+}
+
+.gwt-SuggestBoxPopup .item-selected {
+	background-color: #C3D9FF;
+	padding: 2px;
+}
+
+.gwt-DisclosurePanel {
+	border: 2px solid #C3D9FF;
+}
+
+.gwt-DisclosurePanel .header {
+	background-color: #e8eef7;
+	cursor: hand;
+}
+
+.gwt-Label-Login {
+	color: Black;
+	font-stretch: normal;
+	font-variant: normal;
+	font-style: normal;
+	font-family: fantasy;
+	font-weight: 100;
+}
+
+.gwt-CheckBox-Login {
+	color: Black;
+	font-size: 16px;
+	font-style: italic;
+	font: lighter;
+	font-weight: bold;
+}
+
+.gwt-Label-loginBis {
+	font-size: 16px;
+	font-style: normal;
+	font: lighter;
+}
+
+-
+.gwt-horizPan {
+	background-color: powderblue;
+}
+
+.gwt-Button-Login {
+	width: 100px;
+	font-size: 16px;
+	margin-left: 5px;
+	font-family: Baskerville Old Face;
+	cursor: pointer;
+}
+
+.gwt-TextArea-Login {
+	padding: 3px;
+	border: 1px solid #F5C5C5;
+	border-radius: 10px;
+	box-shadow: 1px 1px 2px #C0C0C0 inset;
+	font-stretch: normal;
+	font-variant: normal;
+	font-style: normal;
+}
+
+.gwt-LabelPGA {
+	color: Blue;
+	font-size: 48px;
+	font-style: normal;
+	font-family: Algerian;
+}
+
+.gwt-Celllist-admin {
+	box-shadow: 1px 1px 2px #C0C0C0 inset;
+	color: Blue;
+	padding: 3px;
+	border: 2px solid black;
+	font-size: 20px;
+	font-family: cursive;
+}
+
+.gwt-VerticalPanel {
+	background: #005200;
+	border-width: thin;
+	padding: 0.5em;
+}
+
+.HelpButton {
+	margin-left: 51%;
+	width: 100px;
+	font-size: 16px;
+	font-family: Baskerville Old Face;
+	cursor: pointer;
+}
