@@ -46,6 +46,11 @@ public class Pot implements Serializable {
 	@IndexColumn(name = "playerPotIndex")
 	List<Player> players;
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "pot_Id")
+	@IndexColumn(name = "playerWinnerPotIndex")
+	List<Player> playersWinners;
+	
 	int valueReward;
 	int diffValue;
 
@@ -103,6 +108,23 @@ public class Pot implements Serializable {
 	 */
 	public List<Player> getPlayers() {
 		return players;
+	}
+
+	/**
+	 * 
+	 * @return the list of the winners
+	 */
+	public List<Player> getPlayersWinners() {
+		return playersWinners;
+	}
+
+	/**
+	 * 
+	 * @param playersWinners
+	 *            the list of the winners to set
+	 */
+	public void setPlayersWinners(List<Player> playersWinners) {
+		this.playersWinners = playersWinners;
 	}
 
 	/**

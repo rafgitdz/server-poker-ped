@@ -26,6 +26,7 @@ import poker.server.model.game.card.Card;
 import poker.server.model.game.card.Deck;
 import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.SitAndGo;
+import poker.server.model.player.CompareHands;
 import poker.server.model.player.Hand;
 import poker.server.model.player.Player;
 
@@ -36,7 +37,7 @@ import poker.server.model.player.Player;
  * 
  * @author <b> Rafik Ferroukh </b> <br>
  *         <b> Lucas Kerdoncuff </b> <br>
- *         <b> Xan Luc </b> <br>
+ *         <b> Xan Lucu </b> <br>
  *         <b> Youga Mbaye </b> <br>
  *         <b> Balla Seck </b> <br>
  * <br>
@@ -354,8 +355,8 @@ public class Game implements Serializable {
 			currentRound = SHOWDOWN;
 		} else if (currentRound == RIVER) {
 
-			updateRoundPotAndBets();
 			handlePot(currentPlayers);
+			updateRoundPotAndBets();
 			currentRound++;
 		} else if (isPlayersAllIn(currentPlayers)) {
 
@@ -430,6 +431,7 @@ public class Game implements Serializable {
 		}
 
 		Collections.sort(splitPots, new Comparator<Object>() {
+			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public int compare(Object o1, Object o2) {
 				return ((Comparable) ((Pot) (o1)).getValue())
@@ -451,6 +453,31 @@ public class Game implements Serializable {
 			pot.calcValueReward();
 		}
 
+		if (currentRound == RIVER) {
+			int bigPot = 0;
+			for (Pot pot : splitPots) {
+				if (pot.getValue() > bigPot)
+					bigPot = pot.getValue();
+			}
+
+			for (Player player : players) {
+				if (player.isfolded()) {
+					Pot tempPot = new Pot();
+					int tempPotDiff = 0;
+					int potDiff = bigPot;
+
+					for (Pot pot : splitPots) {
+						tempPotDiff = pot.getValue() - player.getTotalBet();
+						if (tempPotDiff > 0 && tempPotDiff < potDiff) {
+							tempPot = pot;
+							potDiff = tempPotDiff;
+						}
+					}
+
+					tempPot.valueReward += player.getTotalBet();
+				}
+			}
+		}
 	}
 
 	/**
@@ -772,6 +799,7 @@ public class Game implements Serializable {
 	 * 
 	 * @return List a list of player
 	 * @see List
+	 * @see Player
 	 */
 	private List<Player> currentPlayerInRound() {
 
@@ -789,10 +817,15 @@ public class Game implements Serializable {
 	 * At the end of the river, execute the showDown actions to see all hands of
 	 * the current player and get the winner(s)
 	 * 
-	 * @return Map
-	 * @see Map
+	 * @return the list of all the pots
+	 * @see List
+	 * @see Pot
+	 * 
+	 * @exception GameException if the currentRound is not showdown
+	 * @exception GameException if the flipped cards are not 5
+	 * @exception GameException if there is no player or just one
 	 */
-	public Map<String, Integer> showDown() {
+	public List<Pot> showDown() {
 
 		if (currentRound != SHOWDOWN)
 			throw new GameException(ErrorMessage.NOT_END_ROUND_POKER);
@@ -801,19 +834,17 @@ public class Game implements Serializable {
 		if (players.isEmpty() || players.size() == 1)
 			throw new GameException(ErrorMessage.NO_PLAYER_IN_GAME);
 
-		Map<String, Integer> playersBestHands = new HashMap<String, Integer>();
-		List<Player> playerToReward = new ArrayList<Player>();
+		Map<Player, Integer> playersBestHands = new HashMap<Player, Integer>();
 		int best = 0;
 
 		for (Player player : players) {
 
-			int bestHand = 0; // set to HighCard, that is the worst hand value
+			int bestHand = 0;
 			int result = 0;
-			playersBestHands.put(player.getName(), 0);
 
 			if (!player.isfolded()) {
 
-				playersBestHands.put(player.getName(), 0);
+				playersBestHands.put(player, 0);
 
 				for (int i = 0; i != 3; ++i) {
 
@@ -836,7 +867,7 @@ public class Game implements Serializable {
 								player.setBestHand(hand);
 								player.setValueBestHand(bestHand);
 
-								playersBestHands.put(player.getName(), result);
+								playersBestHands.put(player, result);
 							}
 
 							if (result > best)
@@ -847,42 +878,14 @@ public class Game implements Serializable {
 			}
 		}
 
-		Map<String, Integer> bestPlayers = getWinners(playersBestHands, best,
-				playerToReward);
+		Map<Player, Integer> ranking = new HashMap<Player, Integer>();
 
-		// sort BestPlayer
-		// si egalite -> compare
-		// setRankPlayer
-		// for each pot (splitPots) rewards the winners
-		rewardTheWinners(playerToReward);
+		ranking = CompareHands.getRanking(playersBestHands);
+
+		rewardTheWinners(splitPots, ranking);
 		nextRoundTasks();
 
-		return bestPlayers;
-	}
-
-	/**
-	 * At the end of the river, get the winners that have the best hand.
-	 * 
-	 * @return HashMap
-	 * @see HashMap
-	 */
-	private HashMap<String, Integer> getWinners(
-			Map<String, Integer> playersBestHands, int best,
-			List<Player> playerToReward) {
-
-		HashMap<String, Integer> bestPlayers = new HashMap<String, Integer>();
-
-		for (int i = 0; i < playersBestHands.size(); ++i) {
-
-			String playerName = players.get(i).getName();
-			int value = playersBestHands.get(playerName);
-
-			if (value == best) {
-				bestPlayers.put(playerName, value);
-				playerToReward.add(players.get(i));
-			}
-		}
-		return bestPlayers;
+		return splitPots;
 	}
 
 	/**
@@ -916,17 +919,41 @@ public class Game implements Serializable {
 	}
 
 	/**
-	 * At the end of the river, reward the winners by dividing the total pot
+	 * At the end of the river, reward the winners by dividing the each pot
 	 * between all the best players
 	 * 
-	 * @param playerToReward
-	 *            the list of all the winners
+	 * @param splitPots
+	 *            the list of all the pots
+	 * @param ranking
+	 *            the list of the players with their ranks
 	 */
-	private void rewardTheWinners(List<Player> playerToReward) {
-		int potWinner = totalPot / playerToReward.size();
-
-		for (Player player : playerToReward)
-			player.reward(potWinner);
+	private void rewardTheWinners(List<Pot> splitPots,
+			Map<Player, Integer> ranking) {
+		
+		for (int i = 0; i < splitPots.size(); i++) {
+			int best = players.size();
+			List<Player> playersToReward = new ArrayList<Player>();
+			int valueReward = 0;
+			
+			for (Player player : splitPots.get(i).getPlayers()) {
+				if (ranking.get(player) < best)
+					best = ranking.get(player);
+			}
+			
+			for (Player player : splitPots.get(i).getPlayers()) {
+				if (ranking.get(player) == best)
+					playersToReward.add(player);
+			}
+			
+			valueReward = splitPots.get(i).getValueReward()
+					/ playersToReward.size();
+			
+			for (Player player : playersToReward) {
+				player.reward(valueReward);
+			}
+			
+			splitPots.get(i).setPlayersWinners(playersToReward);
+		}
 	}
 
 	/**
@@ -1150,7 +1177,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param currentB current bet to set
+	 * @param currentB
+	 *            current bet to set
 	 */
 	public void setCurrentBet(int currentB) {
 		currentBet = currentB;
@@ -1158,7 +1186,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param currentP current pot to set
+	 * @param currentP
+	 *            current pot to set
 	 */
 	public void setCurrentPot(int currentP) {
 		currentPot = currentP;
@@ -1166,7 +1195,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param totalP total pot to set
+	 * @param totalP
+	 *            total pot to set
 	 */
 	public void setTotalPot(int totalP) {
 		totalPot = totalP;
@@ -1174,7 +1204,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param lrp index of last player to play to set
+	 * @param lrp
+	 *            index of last player to play to set
 	 */
 	public void setLastPlayerToPlay(int lrp) {
 		lastPlayerToPlay = lrp;
@@ -1182,7 +1213,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param cp index of current player to set
+	 * @param cp
+	 *            index of current player to set
 	 */
 	public void setCurrentPlayer(int cp) {
 		currentPlayerInt = cp;
@@ -1190,7 +1222,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param i current round to set
+	 * @param i
+	 *            current round to set
 	 */
 	public void setCurrentRound(int i) {
 		currentRound = i;
@@ -1198,7 +1231,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param cards a list of flipped cards to set
+	 * @param cards
+	 *            a list of flipped cards to set
 	 */
 	protected void setFlipedCards(List<Card> cards) {
 		flippedCards = cards;
@@ -1206,7 +1240,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param i index of the small blind player to set
+	 * @param i
+	 *            index of the small blind player to set
 	 */
 	public void setSmallBlindPlayer(int i) {
 		smallBlindPlayerInt = i;
@@ -1214,7 +1249,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param i index of the big blind player to set
+	 * @param i
+	 *            index of the big blind player to set
 	 */
 	public void setBigBlindPlayer(int i) {
 		bigBlindPlayerInt = i;
@@ -1222,7 +1258,8 @@ public class Game implements Serializable {
 
 	/**
 	 * 
-	 * @param i index of the dealer player to set
+	 * @param i
+	 *            index of the dealer player to set
 	 */
 	public void setDealerPlayer(int i) {
 		dealerPlayerInt = i;
@@ -1322,7 +1359,8 @@ public class Game implements Serializable {
 	/**
 	 * Removes a player from the game
 	 * 
-	 * @param playerName the name of the player to remove
+	 * @param playerName
+	 *            the name of the player to remove
 	 */
 	public void removePlayer(String playerName) {
 		players.remove(playerName);

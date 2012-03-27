@@ -26,43 +26,6 @@ public class TestParameters {
 	}
 
 	@Test
-	public void testSetPotSplit() {
-
-		List<Percent> potSplit = new ArrayList<Percent>();
-		potSplit.add(new Percent(50));
-		potSplit.add(new Percent(30));
-		potSplit.add(new Percent(20));
-
-		game = gameFactory.newGame(new TestGameType(potSplit));
-
-		List<Percent> finalSplit = new ArrayList<Percent>();
-		finalSplit = game.getGameType().getPotSplit();
-
-		assertEquals(finalSplit.get(0).getRate(), potSplit.get(0).getRate());
-		assertEquals(finalSplit.get(1).getRate(), potSplit.get(1).getRate());
-		assertEquals(finalSplit.get(2).getRate(), potSplit.get(2).getRate());
-	}
-
-	@Test
-	public void testSetWrongPotSplit() {
-
-		List<Percent> potSplit = new ArrayList<Percent>();
-		potSplit.add(new Percent(50));
-		potSplit.add(new Percent(30));
-		potSplit.add(new Percent(30));
-		
-		game = gameFactory.newGame(new TestGameType(potSplit));
-
-		List<Percent> finalSplit = new ArrayList<Percent>();
-		finalSplit = game.getGameType().getPotSplit();
-		int equalSplit = 100 / potSplit.size();
-
-		assertEquals(finalSplit.get(0).getRate(), equalSplit);
-		assertEquals(finalSplit.get(1).getRate(), equalSplit);
-		assertEquals(finalSplit.get(2).getRate(), equalSplit);
-	}
-
-	@Test
 	public void testSetBlinds() {
 
 		int buyIn = 10;

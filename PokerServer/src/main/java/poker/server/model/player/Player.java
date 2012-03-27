@@ -282,8 +282,8 @@ public class Player implements Serializable {
 		return pwd;
 	}
 
-	public void getBestHand() {
-		System.out.println("getBestHand() : TODO");
+	public Hand getBestHand() {
+		return bestHand;
 	}
 
 	public Hand getCurrentHand() {

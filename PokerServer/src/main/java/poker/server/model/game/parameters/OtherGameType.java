@@ -1,11 +1,5 @@
 package poker.server.model.game.parameters;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model class : SitAndGo
- */
-
 import java.util.ArrayList;
 
 import javax.persistence.Entity;
@@ -13,11 +7,27 @@ import javax.persistence.Entity;
 import poker.server.model.exception.ErrorMessage;
 import poker.server.model.exception.ParametersException;
 
+/**
+ * This class is useful to create other game type.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see GameType
+ */
 @Entity
 public class OtherGameType extends GameType {
 
 	private static final long serialVersionUID = 1169923728589316907L;
 
+	/**
+	 * Default constructor.
+	 */
 	public OtherGameType() {
 	}
 
@@ -73,8 +83,7 @@ public class OtherGameType extends GameType {
 			setPotAsCash();
 
 		buyInSplit = new ArrayList<Percent>(numberOfWinners);
-		for (int i = 0; i < numberOfWinners; ++i) 
+		for (int i = 0; i < numberOfWinners; ++i)
 			buyInSplit.add(new Percent(100 / numberOfWinners));
 	}
-
 }

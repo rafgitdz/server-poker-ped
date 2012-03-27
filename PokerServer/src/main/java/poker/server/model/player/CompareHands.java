@@ -91,13 +91,13 @@ public class CompareHands {
 
 				ref = playersToCompare.get(i);
 
-				refHand = ref.getCurrentHand();
+				refHand = ref.getBestHand();
 				sortedRefHand = sortHand(refHand);
 
 				for (int j = i + 1; j < playersToCompare.size(); j++) {
 
 					current = playersToCompare.get(j);
-					currentHand = current.getCurrentHand();
+					currentHand = current.getBestHand();
 					sortedCurrentHand = sortHand(currentHand);
 
 					result = compareHands(sortedRefHand, sortedCurrentHand,
@@ -467,7 +467,6 @@ public class CompareHands {
 	public static int compareOnePair(Hand hand1, Hand hand2) {
 
 		int result = 0;
-
 		int rankPair1 = evaluatePair(hand1);
 		int rankPair2 = evaluatePair(hand2);
 

@@ -96,7 +96,7 @@ public class GameTypeService extends AbstractPokerService {
 		param.setName(gameName);
 		param.setBlinds(smallBlind);
 		param.setPlayerNumber(playerNumber);
-		param.setInitPlayerTokens(playerTokens);
+		param.setInitPlayersTokens(playerTokens);
 		param.setBuyIn(buyIn);
 		param.setSpeakTime(speakTime);
 		param.setFactorUpdateBlinds(factorUpdateBlind);

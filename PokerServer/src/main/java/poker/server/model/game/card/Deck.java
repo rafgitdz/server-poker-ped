@@ -1,11 +1,5 @@
 package poker.server.model.game.card;
 
-/**
- * @author PokerServerGroup
- * 
- *         Model class : Deck
- */
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +19,20 @@ import org.hibernate.annotations.IndexColumn;
 import poker.server.model.exception.GameException;
 import poker.server.model.game.Event;
 
+/**
+ * Manages all the entities and actions related to the deck. A deck is a list of
+ * cards.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Card
+ */
 @Entity
 public class Deck implements Serializable {
 
@@ -42,11 +50,18 @@ public class Deck implements Serializable {
 	@IndexColumn(name = "deckCardIndex")
 	List<Card> cards;
 
+	/**
+	 * Default constructor. Create a deck with NUMBER_CARDS cards.
+	 */
 	public Deck() {
 		cards = new ArrayList<Card>(NUMBER_CARDS);
 		prepareCards();
 	}
 
+	/**
+	 * 
+	 * @return the next card from the deck
+	 */
 	public Card getNextCard() {
 
 		if (cards.size() == 0)
@@ -58,19 +73,26 @@ public class Deck implements Serializable {
 		return card;
 	}
 
+	/**
+	 * Burn a card, to do before flipping an other card. This is the rule of
+	 * poker.
+	 * 
+	 * @return the burned card
+	 */
 	public Card burnCard() {
 
 		if (cards.size() == 0)
 			throw new GameException(NO_CARDS);
 
 		Card card = getNextCard();
-		cards.remove(card);
 		Event.addEvent("THE BURNED CARD : " + card.getValue() + " , "
 				+ card.getSuit());
 		return card;
 	}
 
-	// based on permutation between 0 and n-1, 1 and n-2,...
+	/**
+	 * Shuffle the deck.
+	 */
 	public void shuffle() {
 
 		if (cards.size() == 0)
@@ -94,10 +116,17 @@ public class Deck implements Serializable {
 		Event.addEvent("THE DECK IS SHUFFLED");
 	}
 
+	/**
+	 * 
+	 * @return the list of the card
+	 */
 	public List<Card> getCards() {
 		return cards;
 	}
 
+	/**
+	 * Fill the deck with the 52 cards.
+	 */
 	private void prepareCards() {
 
 		cards.add(new Card(1, Value.ACE, Suit.HEART));

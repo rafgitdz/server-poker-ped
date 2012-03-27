@@ -8,10 +8,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
- * @author PokerServerGroup
+ * Manages all the entities and actions related to the cards. A card is
+ * representing by her value and her suit.
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
  * 
  */
-
 @Entity
 public class Card implements Serializable {
 
@@ -25,9 +33,22 @@ public class Card implements Serializable {
 	int value;
 	String suit;
 
+	/**
+	 * Default constructor.
+	 */
 	Card() {
 	}
 
+	/**
+	 * Constructor with parameters.
+	 * 
+	 * @param idCard
+	 *            an id
+	 * @param valueCard
+	 *            the value of the card
+	 * @param suitCard
+	 *            the suit of the card
+	 */
 	Card(int idCard, int valueCard, String suitCard) {
 
 		id = idCard;

@@ -32,6 +32,7 @@ import poker.server.model.exception.GameException;
 import poker.server.model.exception.SignatureException;
 import poker.server.model.game.Game;
 import poker.server.model.game.GameFactoryLocal;
+import poker.server.model.game.Pot;
 import poker.server.model.game.card.Card;
 import poker.server.model.game.parameters.GameType;
 import poker.server.model.player.Player;
@@ -317,7 +318,7 @@ public class GameService extends AbstractPokerService {
 		else if (!game.isStarted())
 			return error(ErrorMessage.GAME_NOT_READY_TO_START);
 
-		Map<String, Integer> winners = null;
+		List<Pot> winners = null;
 
 		try {
 			winners = game.showDown();

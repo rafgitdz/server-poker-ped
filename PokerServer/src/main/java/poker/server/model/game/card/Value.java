@@ -1,19 +1,23 @@
 package poker.server.model.game.card;
 
 /**
- * @author PokerServerGroup
+ * Describe the ranks of the card's value, used by the card.
  * 
- *         Model class : Value
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see Card
  */
-
 public final class Value {
 
-	// the ranks of cards
-	// the honors
 	public final static int KING = 13;
 	public final static int QUEEN = 12;
 	public final static int JACK = 11;
-	// the points
 	public final static int ACE = 1;
 	public final static int TWO = 2;
 	public final static int THREE = 3;

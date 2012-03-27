@@ -6,11 +6,11 @@ import poker.server.model.game.parameters.GameType;
 
 
 /**
- * This is an interface.
+ * This is the interface of a local factory for the game.
  * 
  * @author <b> Rafik Ferroukh </b> <br>
  *         <b> Lucas Kerdoncuff </b> <br>
- *         <b> Xan Luc </b> <br>
+ *         <b> Xan Lucu </b> <br>
  *         <b> Youga Mbaye </b> <br>
  *         <b> Balla Seck </b> <br>
  * <br>

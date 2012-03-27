@@ -258,9 +258,9 @@ public class TestRunGame {
 		assertEquals(4560, game.getTotalPot());
 		assertEquals(4, game.getCurrentRound());
 		assertEquals(0, game.getCurrentBet());
-		
+
 		game.showDown();
-		
+
 		assertEquals(0, game.getTotalPot());
 		assertEquals(0, game.getCurrentRound());
 		assertEquals(0, game.getCurrentBet());
