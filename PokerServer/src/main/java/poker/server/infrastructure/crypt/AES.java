@@ -13,7 +13,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * This involves some tools to encrypt and decrypt request strings, using AES algorithm.
+ * This involves some tools to encrypt and decrypt request strings, using AES
+ * algorithm.
  * <p>
  * 
  * @author <b> Rafik Ferroukh </b> <br>
@@ -27,25 +28,24 @@ import javax.crypto.spec.SecretKeySpec;
 public class AES {
 
 	private static String CIPHER_ALGORITHM = "AES";
-	@SuppressWarnings("unused")
 	private static String CIPHER_TRANSFORMATION = "SHA1PRNG";
 
 	private final static String HEX = "0123456789ABCDEF";
 
-	
 	/**
 	 * Encrypt a clear text using AES algorithm.
 	 * 
 	 * @param seed
-	 *           The password given by the consumer to generate the encryption key.
-	 *           this password must be correct to start the encryption.
-	 *  
+	 *            The password given by the consumer to generate the encryption
+	 *            key. this password must be correct to start the encryption.
+	 * 
 	 * @param cleartext
-	 *           The string to encrypt.
-	 *  
+	 *            The string to encrypt.
+	 * 
 	 * @return The encrypted text, in hex format.
-	 *
-	 * @throws Exception if the encrypting go wrong.
+	 * 
+	 * @throws Exception
+	 *             if the encrypting go wrong.
 	 */
 	public static String encrypt(String seed, String cleartext)
 			throws Exception {
@@ -59,12 +59,12 @@ public class AES {
 	 * decrypt an encrypted text using AES algorithm.
 	 * 
 	 * @param seed
-	 *           The password given by the consumer to generate the encryption key.
-	 *           this password must be correct to reverse the encryption.
-	 *  
+	 *            The password given by the consumer to generate the encryption
+	 *            key. this password must be correct to reverse the encryption.
+	 * 
 	 * @param encrypted
-	 *           The encrypted string to decrypt.
-	 *  
+	 *            The encrypted string to decrypt.
+	 * 
 	 * @return The decrypted clear text.
 	 */
 	public static String decrypt(String seed, String encrypted) {
@@ -87,20 +87,20 @@ public class AES {
 	}
 
 	/**
-	 * Get the key, generated from a password given by the consumer.
-	 * This key is required to start the encryption/decryption process.
+	 * Get the key, generated from a password given by the consumer. This key is
+	 * required to start the encryption/decryption process.
 	 * 
 	 * @param seed
-	 *           The password given by the consumer to generate the key.
+	 *            The password given by the consumer to generate the key.
 	 * 
-	 * @return Generated encryption/decryption key represented by an array of Byte.
+	 * @return Generated encryption/decryption key represented by an array of
+	 *         Byte.
 	 * @see Byte
 	 */
 	private static byte[] getRawKey(byte[] seed) throws Exception {
 
 		KeyGenerator keygen = KeyGenerator.getInstance(CIPHER_ALGORITHM);
-		// SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
-		SecureRandom sr = new SecureRandom();
+		SecureRandom sr = SecureRandom.getInstance(CIPHER_TRANSFORMATION);
 		sr.setSeed(seed);
 		keygen.init(128, sr);
 		SecretKey skey = keygen.generateKey();
@@ -111,15 +111,16 @@ public class AES {
 	/**
 	 * Encrypt a clear text using a given encryption key
 	 * 
-	 * @param raw 
-	 *           an array of Byte, representing the encryption key.
-	 *  
+	 * @param raw
+	 *            an array of Byte, representing the encryption key.
+	 * 
 	 * @param clear
-	 *           The string to encrypt.
-	 *  
+	 *            The string to encrypt.
+	 * 
 	 * @return An array of Byte representing the encrypted text, .
-	 *
-	 * @throws Exception if the encrypting go wrong.
+	 * 
+	 * @throws Exception
+	 *             if the encrypting go wrong.
 	 * @see Byte
 	 */
 	private static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
@@ -134,12 +135,12 @@ public class AES {
 	/**
 	 * Decrypt an encrypted text using a given encryption key
 	 * 
-	 * @param raw 
-	 *           An array of Byte, representing the encryption key.
-	 *  
-	 * @param encrpted 
-	 *           An array of Byte, representing the encrypted text.
-	 *  
+	 * @param raw
+	 *            An array of Byte, representing the encryption key.
+	 * 
+	 * @param encrpted
+	 *            An array of Byte, representing the encrypted text.
+	 * 
 	 * @return An array of Byte representing the decrypted text.
 	 * @see Byte
 	 */
