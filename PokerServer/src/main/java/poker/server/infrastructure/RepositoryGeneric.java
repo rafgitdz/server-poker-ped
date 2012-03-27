@@ -8,6 +8,9 @@ package poker.server.infrastructure;
 
 import java.util.List;
 
+/**
+ * Generic interface involving all database requests.
+ */
 public interface RepositoryGeneric<T, TId> {
 
 	public T load(TId id);

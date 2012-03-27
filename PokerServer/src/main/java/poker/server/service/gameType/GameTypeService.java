@@ -20,6 +20,19 @@ import poker.server.model.game.parameters.GameType;
 import poker.server.model.game.parameters.OtherGameType;
 import poker.server.service.AbstractPokerService;
 
+/**
+ * Service class : GameTypeService
+ * 
+ * @author <b> Rafik Ferroukh </b> <br>
+ *         <b> Lucas Kerdoncuff </b> <br>
+ *         <b> Xan Lucu </b> <br>
+ *         <b> Youga Mbaye </b> <br>
+ *         <b> Balla Seck </b> <br>
+ * <br>
+ *         University Bordeaux 1, Software Engineering, Master 2 <br>
+ * 
+ * @see GameType
+ */
 @Stateless
 @Path("/gameType")
 public class GameTypeService extends AbstractPokerService {
@@ -96,11 +109,11 @@ public class GameTypeService extends AbstractPokerService {
 		param.setName(gameName);
 		param.setBlinds(smallBlind);
 		param.setPlayerNumber(playerNumber);
-		param.setPlayerTokens(playerTokens);
+		param.setInitPlayersTokens(playerTokens);
 		param.setBuyIn(buyIn);
 		param.setSpeakTime(speakTime);
-		param.setFactorUpdateBlind(factorUpdateBlind);
-		param.setUpdateBlindTime(updateBlindTime);
+		param.setFactorUpdateBlinds(factorUpdateBlind);
+		param.setTimeChangeBlind(updateBlindTime);
 		param.setPotType(potType);
 		param.setNumberWinners(numberOfWinners);
 
@@ -159,7 +172,7 @@ public class GameTypeService extends AbstractPokerService {
 			JSONObject jsonGameType = new JSONObject();
 			updateJSON(jsonGameType, "gameName", gameType.getName());
 			updateJSON(jsonGameType, "playerNumber", gameType.getPlayerNumber());
-			updateJSON(jsonGameType, "playerTokens", gameType.getPlayerTokens());
+			updateJSON(jsonGameType, "playerTokens", gameType.getTokens());
 			updateJSON(jsonGameType, "buyIn", gameType.getBuyIn());
 			updateJSON(jsonGameType, "speakTime", gameType.getSpeakTime());
 			updateJSON(jsonGameType, "smallBlind", gameType.getSmallBlind());

@@ -12,17 +12,12 @@ import poker.server.model.game.card.Value;
 
 public class CompareHands {
 
-	// ////////////////////////////////////////////////////////////
-	// COMPARE BEST HANDS
-	// ////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////
-
 	/**
 	 * Main function of this class... Return the ranking of given players.
 	 * 
 	 * @param playersWithHands
 	 *            map associating players with their hand value
-	 * @see <@links Hand>
+	 * @see Hand
 	 * 
 	 * @return ranking map associating players with an integer value (rank).
 	 */
